@@ -60,15 +60,19 @@
             <div class="section-card" style="margin-top: 16px;">
                 <div class="section-body">
                     <div class="field-row">
-                        <div class="field-group" style="flex:1.2">
-                            <label class="field-label" for="report-date">日付</label>
+                        <div class="field-group" style="flex:1">
+                            <label class="field-label" for="report-date" style="display:none;">日付</label>
                             <input type="date" id="report-date">
                         </div>
                         <div class="field-group" style="flex:2">
-                            <label class="field-label" for="vehicle-id">車両</label>
+                            <label class="field-label" for="vehicle-id" style="display:none;">車両</label>
                             <select id="vehicle-id">
-                                <option value="">-- 選択 --</option>
+                                <option value="">-- 車両を選択してください --</option>
                             </select>
+                        </div>
+                        <div class="field-group" style="flex:0 0 auto;">
+                            <!-- QRスキャンボタン（ダミー枠 / 赤枠） -->
+                            <button id="btn-qr-scan" class="btn-qr-dummy">QR</button>
                         </div>
                     </div>
                 </div>
@@ -76,28 +80,28 @@
 
             <div class="task-list">
                 <button class="task-btn" onclick="switchView('view-pre-check')">
-                    <span class="task-name">1. 乗車前チェック</span>
+                    <span class="task-name">1. アルコールチェック 1</span>
                     <span class="task-status badge-warning" id="badge-pre-check">未送信</span>
                 </button>
+                <button class="task-btn" onclick="switchView('view-post-check')">
+                    <span class="task-name">2. アルコールチェック 2</span>
+                    <span class="task-status badge-warning" id="badge-post-check">未送信</span>
+                </button>
                 <button class="task-btn" onclick="switchView('view-record-1')">
-                    <span class="task-name">2. 記録 1 (必須)</span>
+                    <span class="task-name">3. 運転記録 1</span>
                     <span class="task-status badge-warning" id="badge-record-1">未送信</span>
                 </button>
                 <button class="task-btn" onclick="switchView('view-record-2')">
-                    <span class="task-name">3. 記録 2 (任意)</span>
+                    <span class="task-name">4. 運転記録 2</span>
                     <span class="task-status badge-warning" id="badge-record-2">未送信</span>
                 </button>
                 <button class="task-btn" onclick="switchView('view-record-3')">
-                    <span class="task-name">4. 記録 3 (任意)</span>
+                    <span class="task-name">5. 運転記録 3</span>
                     <span class="task-status badge-warning" id="badge-record-3">未送信</span>
                 </button>
                 <button class="task-btn" onclick="switchView('view-refuel')">
-                    <span class="task-name">5. 給油情報 (任意)</span>
+                    <span class="task-name">6. 給油、その他</span>
                     <span class="task-status badge-warning" id="badge-refuel">入力可</span>
-                </button>
-                <button class="task-btn" onclick="switchView('view-post-check')">
-                    <span class="task-name">6. 乗車後チェック</span>
-                    <span class="task-status badge-warning" id="badge-post-check">未送信</span>
                 </button>
             </div>
         </div>
@@ -105,7 +109,7 @@
         <div id="view-pre-check" class="view">
             <header class="app-header">
                 <button class="btn-icon btn-back" onclick="switchView('view-home')">◀ 戻る</button>
-                <h2>乗車前チェック</h2>
+                <h2>アルコールチェック 1</h2>
                 <div style="width: 60px;"></div>
             </header>
             <div class="section-body" style="padding: 20px 16px;">
@@ -152,7 +156,7 @@
         <div id="view-record-1" class="view">
             <header class="app-header">
                 <button class="btn-icon btn-back" onclick="switchView('view-home')">◀ 戻る</button>
-                <h2>記録 1</h2>
+                <h2>運転記録 1</h2>
                 <div style="width: 60px;"></div>
             </header>
             <div class="section-body" style="padding: 20px 16px;">
@@ -237,7 +241,7 @@
         <div id="view-record-2" class="view">
             <header class="app-header">
                 <button class="btn-icon btn-back" onclick="switchView('view-home')">◀ 戻る</button>
-                <h2>記録 2</h2>
+                <h2>運転記録 2</h2>
                 <div style="width: 60px;"></div>
             </header>
             <div class="section-body" style="padding: 20px 16px;">
@@ -322,7 +326,7 @@
         <div id="view-record-3" class="view">
             <header class="app-header">
                 <button class="btn-icon btn-back" onclick="switchView('view-home')">◀ 戻る</button>
-                <h2>記録 3</h2>
+                <h2>運転記録 3</h2>
                 <div style="width: 60px;"></div>
             </header>
             <div class="section-body" style="padding: 20px 16px;">
@@ -407,7 +411,7 @@
         <div id="view-refuel" class="view">
             <header class="app-header">
                 <button class="btn-icon btn-back" onclick="switchView('view-home')">◀ 戻る</button>
-                <h2>給油情報</h2>
+                <h2>給油、その他</h2>
                 <div style="width: 60px;"></div>
             </header>
             <div class="section-body" style="padding: 20px 16px;">
@@ -434,7 +438,7 @@
         <div id="view-post-check" class="view">
             <header class="app-header">
                 <button class="btn-icon btn-back" onclick="switchView('view-home')">◀ 戻る</button>
-                <h2>乗車後チェック</h2>
+                <h2>アルコールチェック 2</h2>
                 <div style="width: 60px;"></div>
             </header>
             <div class="section-body" style="padding: 20px 16px;">

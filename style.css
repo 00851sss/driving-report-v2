@@ -316,6 +316,27 @@ select {
     cursor: pointer;
 }
 
+/* ---- QR Scan Button (Dummy) ---- */
+.btn-qr-dummy {
+    width: 60px;
+    height: 100%;
+    background: #fff;
+    color: var(--color-error);
+    border: 2px solid var(--color-error);
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.btn-qr-dummy:hover {
+    background: #ffeeee;
+}
+
 /* ---- Status Message ---- */
 .status-msg {
     font-size: 0.85rem;
