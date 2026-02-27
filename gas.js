@@ -76,7 +76,10 @@ function applyDayData(values, lastEndMeter) {
     const prevEndMeter = v(0, 19) || lastEndMeter;
     if (prevEndMeter && !v(0, 18)) {
         const sm1 = document.getElementById('start-meter-1');
-        if (sm1 && !sm1.value) sm1.value = prevEndMeter;
+        if (sm1 && !sm1.value) {
+            sm1.value = prevEndMeter;
+            sm1.dispatchEvent(new Event('input'));
+        }
     }
 
     if (v(0, 19) && window.markAsDone) {
@@ -91,11 +94,23 @@ function applyDayData(values, lastEndMeter) {
     setVal('post-checker', v(1, 11));
     if (v(1, 6) && window.markAsDone) window.markAsDone('post-check');
 
-    setVal('driver-name-2', v(1, 2));
+    // 記録1の運転者と到着メーターを、記録2の初期値として自動セット
+    const autoDriver2 = v(0, 2);
+    const autoMeter2 = v(0, 19);
+
+    setVal('driver-name-2', v(1, 2) || (v(0, 19) ? autoDriver2 : ''));
     setVal('destination-2', v(1, 3));
     setVal('start-time-2', fmtTime(v(1, 16)));
-    setVal('end-time-2', fmtTime(v(1, 17)));
-    setVal('start-meter-2', v(1, 18));
+
+    // ======== メーター引き継ぎ処理 ========
+    const sm2 = document.getElementById('start-meter-2');
+    if (v(1, 18)) {
+        setVal('start-meter-2', v(1, 18));
+    } else if (autoMeter2 && sm2 && !sm2.value) {
+        sm2.value = autoMeter2;
+        sm2.dispatchEvent(new Event('input'));
+    }
+
     setVal('end-meter-2', v(1, 19));
 
     if (v(1, 19) && window.markAsDone) {
@@ -106,11 +121,23 @@ function applyDayData(values, lastEndMeter) {
     }
 
     // Row2 (記録3)
-    setVal('driver-name-3', v(2, 2));
+    // 記録2の運転者と到着メーターを、記録3の初期値として自動セット
+    const autoDriver3 = v(1, 2) || autoDriver2;
+    const autoMeter3 = v(1, 19);
+
+    setVal('driver-name-3', v(2, 2) || (v(1, 19) ? autoDriver3 : ''));
     setVal('destination-3', v(2, 3));
     setVal('start-time-3', fmtTime(v(2, 16)));
-    setVal('end-time-3', fmtTime(v(2, 17)));
-    setVal('start-meter-3', v(2, 18));
+
+    // ======== メーター引き継ぎ処理 ========
+    const sm3 = document.getElementById('start-meter-3');
+    if (v(2, 18)) {
+        setVal('start-meter-3', v(2, 18));
+    } else if (autoMeter3 && sm3 && !sm3.value) {
+        sm3.value = autoMeter3;
+        sm3.dispatchEvent(new Event('input'));
+    }
+
     setVal('end-meter-3', v(2, 19));
 
     if (v(2, 19) && window.markAsDone) {

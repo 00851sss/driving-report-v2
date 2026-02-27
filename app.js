@@ -237,10 +237,10 @@ function switchView(viewId) {
 }
 
 // --- セクションを開く際の確認 ---
-window.openSectionView = function (viewId, badgeId) {
+window.openSectionView = async function (viewId, badgeId) {
     const badge = document.getElementById(badgeId);
     if (badge && badge.innerHTML.includes('送信済')) {
-        const ok = confirm('この項目はすでに送信済みです。\n新しく再送信（上書き）してよろしいですか？');
+        const ok = await window.showCustomConfirm('この項目はすでに送信済みです。\n新しく再送信（上書き）してよろしいですか？');
         if (!ok) return; // キャンセルされたら開かない
     }
     switchView(viewId);
@@ -261,4 +261,62 @@ window.hideLoading = function () {
     if (loader) {
         loader.style.display = 'none';
     }
+};
+
+// --- カスタムポップアップ制御 ---
+window.showCustomAlert = function (message) {
+    return new Promise((resolve) => {
+        const popup = document.getElementById('custom-popup');
+        const msgEl = document.getElementById('popup-message');
+        const btnOk = document.getElementById('btn-popup-ok');
+        const btnCancel = document.getElementById('btn-popup-cancel');
+
+        if (!popup || !msgEl || !btnOk || !btnCancel) {
+            alert(message); // HTMLがない場合のフォールバック
+            resolve();
+            return;
+        }
+
+        msgEl.textContent = message;
+        btnCancel.style.display = 'none'; // Alert時はキャンセル非表示
+
+        const handleOk = () => {
+            popup.style.display = 'none';
+            btnOk.removeEventListener('click', handleOk);
+            resolve();
+        };
+
+        btnOk.addEventListener('click', handleOk);
+        popup.style.display = 'flex';
+    });
+};
+
+window.showCustomConfirm = function (message) {
+    return new Promise((resolve) => {
+        const popup = document.getElementById('custom-popup');
+        const msgEl = document.getElementById('popup-message');
+        const btnOk = document.getElementById('btn-popup-ok');
+        const btnCancel = document.getElementById('btn-popup-cancel');
+
+        if (!popup || !msgEl || !btnOk || !btnCancel) {
+            resolve(confirm(message)); // HTMLがない場合のフォールバック
+            return;
+        }
+
+        msgEl.textContent = message;
+        btnCancel.style.display = 'block'; // Confirm時はキャンセル表示
+
+        const cleanup = () => {
+            popup.style.display = 'none';
+            btnOk.removeEventListener('click', handleOk);
+            btnCancel.removeEventListener('click', handleCancel);
+        };
+
+        const handleOk = () => { cleanup(); resolve(true); };
+        const handleCancel = () => { cleanup(); resolve(false); };
+
+        btnOk.addEventListener('click', handleOk);
+        btnCancel.addEventListener('click', handleCancel);
+        popup.style.display = 'flex';
+    });
 };

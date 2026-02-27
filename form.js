@@ -35,6 +35,41 @@ window.markAsUnsent = function (taskId, defaultText = '未送信') {
     if (badge) { badge.innerHTML = defaultText; badge.className = 'task-status badge-warning'; }
 };
 
+// --- フォーム全体のリセット（日付/車両変更時用） ---
+window.resetForm = function () {
+    // 1. 各種入力のクリア
+    const inputs = document.querySelectorAll('.control-input:not(#report-date):not(#vehicle-id)');
+    inputs.forEach(el => el.value = '');
+    document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    document.querySelectorAll('.status-msg').forEach(el => el.className = 'status-msg');
+
+    // 2. ラジオボタンのリセット（未選択へ）
+    document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+    const alcohol1Group = document.getElementById('pre-alcohol-val-group');
+    if (alcohol1Group) alcohol1Group.style.display = 'none';
+
+    // 3. 運転状態とバッジのリセット
+    [1, 2, 3].forEach(n => {
+        if (window.removeDrivingState) window.removeDrivingState(n);
+        const dist = document.getElementById(`calc-distance-${n}`);
+        if (dist) dist.textContent = '—';
+    });
+
+    const tasks = ['pre-check', 'post-check', 'record-1', 'record-2', 'record-3'];
+    tasks.forEach(t => {
+        if (window.markAsUnsent) window.markAsUnsent(t, '未送信');
+    });
+    if (window.markAsUnsent) window.markAsUnsent('refuel', '入力可');
+
+    // 4. デフォルト運転者の再セット
+    if (typeof appData !== 'undefined' && appData.defaultDriver) {
+        ['driver-name-1', 'driver-name-2', 'driver-name-3'].forEach(id => {
+            const d = document.getElementById(id);
+            if (d) d.value = appData.defaultDriver;
+        });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('report-date');
     if (dateInput && !dateInput.value) {
@@ -56,8 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('report-date')?.addEventListener('change', () => { if (typeof loadDayData === 'function') loadDayData(); });
-    document.getElementById('vehicle-id')?.addEventListener('change', () => { if (typeof loadDayData === 'function') loadDayData(); });
+    document.getElementById('report-date')?.addEventListener('change', () => {
+        if (window.resetForm) window.resetForm();
+        if (typeof loadDayData === 'function') loadDayData();
+    });
+    document.getElementById('vehicle-id')?.addEventListener('change', () => {
+        if (window.resetForm) window.resetForm();
+        if (typeof loadDayData === 'function') loadDayData();
+    });
 
     setTimeout(() => { if (typeof loadDayData === 'function') loadDayData(); }, 100);
 
@@ -172,7 +213,7 @@ function copyArrivalMeter(fromNum, toNum) {
         document.getElementById(`start-meter-${toNum}`).value = fromVal;
         document.getElementById(`start-meter-${toNum}`).dispatchEvent(new Event('input'));
     } else {
-        alert(`記録${fromNum}の到着メーターが入力されていません。`);
+        if (window.showCustomAlert) window.showCustomAlert(`記録${fromNum}の到着メーターが入力されていません。`);
     }
 }
 
@@ -180,21 +221,48 @@ function setupRecordPhases(recordNum) {
     const btnStart = document.getElementById(`btn-start-record-${recordNum}`);
     const btnCancel = document.getElementById(`btn-cancel-record-${recordNum}`);
 
-    if (!btnStart) return;
+    if (btnStart) {
+        btnStart.addEventListener('click', async () => {
+            const driverEl = document.getElementById(`driver-name-${recordNum}`);
+            const sTimeEl = document.getElementById(`start-time-${recordNum}`);
+            const sMeterEl = document.getElementById(`start-meter-${recordNum}`);
+            const msgEl = document.getElementById(`status-record-${recordNum}`);
 
-    btnStart.addEventListener('click', () => {
-        const driver = document.getElementById(`driver-name-${recordNum}`).value;
-        const sTime = document.getElementById(`start-time-${recordNum}`).value;
-        const sMeter = document.getElementById(`start-meter-${recordNum}`).value;
-        if (!driver || !sTime || !sMeter) { alert('運転者、出発時刻、出発メーターを入力してください。'); return; }
+            // すでに運転中の場合は解除確認
+            if (btnStart.getAttribute('data-active') === "true") {
+                const ok = await window.showCustomConfirm('出発状態を取り消し、入力内容を解除しますか？');
+                if (ok) {
+                    removeDrivingState(recordNum);
+                    driverEl.value = '';
+                    sTimeEl.value = '';
+                    sMeterEl.value = '';
+                    if (msgEl) msgEl.className = 'status-msg'; // エラー消去
+                }
+                return;
+            }
 
-        markAsDriving(recordNum);
-        switchView('view-home'); // 出発したらホームに戻る
-    });
+            // 未入力チェックと赤枠表示
+            let ok = true;
+            [driverEl, sTimeEl, sMeterEl].forEach(el => {
+                if (el && !el.value) { el.classList.add('error'); ok = false; }
+                else if (el) { el.classList.remove('error'); }
+            });
+
+            if (!ok) {
+                if (msgEl) { msgEl.textContent = '必須項目を入力してください'; msgEl.className = 'status-msg visible error'; }
+                return;
+            }
+
+            if (msgEl) msgEl.className = 'status-msg'; // 成功時エラー消去
+            markAsDriving(recordNum);
+            switchView('view-home'); // 出発したらホームに戻る
+        });
+    }
 
     if (btnCancel) {
-        btnCancel.addEventListener('click', () => {
-            if (confirm('出発状態を取り消し、入力内容を解除しますか？')) {
+        btnCancel.addEventListener('click', async () => {
+            const ok = await window.showCustomConfirm('出発状態を取り消し、入力内容を解除しますか？');
+            if (ok) {
                 removeDrivingState(recordNum);
                 document.getElementById(`destination-${recordNum}`).value = '';
                 document.getElementById(`end-time-${recordNum}`).value = '';

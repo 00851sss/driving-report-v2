@@ -517,6 +517,20 @@
         <div class="loading-text" id="loading-message">処理中...</div>
     </div>
 
+    <!-- カスタムポップアップ (Alert / Confirm) -->
+    <div class="modal-overlay" id="custom-popup" role="dialog" style="display: none; z-index: 10000;">
+        <div class="modal-sheet" style="min-height: auto; padding-bottom: 24px;">
+            <div class="modal-title" style="border-bottom: none; padding-bottom: 8px;">お知らせ</div>
+            <div id="popup-message"
+                style="padding: 0 16px 24px; font-size: 0.95rem; color: var(--color-text); text-align: center; white-space: pre-wrap;">
+            </div>
+            <div style="display: flex; gap: 12px; padding: 0 16px;">
+                <button id="btn-popup-cancel" class="btn-secondary" style="flex: 1; display: none;">キャンセル</button>
+                <button id="btn-popup-ok" class="btn-primary" style="flex: 1;">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <script src="form.js"></script>
     <script src="gas.js"></script>
