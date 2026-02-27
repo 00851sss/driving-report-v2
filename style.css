@@ -1,0 +1,491 @@
+/* =============================================
+   運行日報 - シンプルスタイル
+   ============================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --color-bg: #ffffff;
+    --color-surface: #f8f8f8;
+    --color-surface-done: #efefef;
+    --color-border: #d0d0d0;
+    --color-border-strong: #a0a0a0;
+    --color-text: #111111;
+    --color-text-sub: #555555;
+    --color-text-placeholder: #aaaaaa;
+    --color-accent: #1a1a1a;
+    --color-btn-primary: #111111;
+    --color-btn-primary-text: #ffffff;
+    --color-btn-secondary: #ffffff;
+    --color-error: #cc0000;
+    --color-success: #007700;
+    --color-warning: #cc6600;
+    --radius: 6px;
+    --gap: 10px;
+}
+
+html,
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+        "Noto Sans JP", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    background: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+}
+
+/* ---- Layout ---- */
+.app-container {
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 0 0 80px;
+}
+
+/* ---- Header ---- */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.header-date {
+    font-size: 0.78rem;
+    color: var(--color-text-sub);
+}
+
+.header-vehicle {
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-vehicle.empty {
+    color: var(--color-text-placeholder);
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.btn-icon {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-icon:hover {
+    background: var(--color-surface);
+}
+
+/* ---- Section Card ---- */
+.section-card {
+    margin: 12px 12px 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    overflow: hidden;
+}
+
+.section-card.is-done {
+    background: var(--color-surface-done);
+}
+
+.section-card.is-done input,
+.section-card.is-done select,
+.section-card.is-done textarea {
+    background: var(--color-surface-done);
+    color: var(--color-text-sub);
+    pointer-events: none;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+.section-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.section-badge {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-sub);
+}
+
+.section-badge.done {
+    border-color: var(--color-success);
+    color: var(--color-success);
+    background: #f0fff0;
+}
+
+.section-body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+/* ---- Toggle (記録2・3) ---- */
+.section-toggle {
+    width: 100%;
+    text-align: left;
+    background: var(--color-surface);
+    border: none;
+    border-top: 1px solid var(--color-border);
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: var(--color-text-sub);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.section-toggle:hover {
+    background: #f0f0f0;
+}
+
+.section-toggle .toggle-icon {
+    font-size: 0.7rem;
+}
+
+/* ---- Form Fields ---- */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.field-label {
+    font-size: 0.72rem;
+    color: var(--color-text-sub);
+    font-weight: 500;
+}
+
+.field-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.field-row .field-group {
+    flex: 1;
+}
+
+input[type="text"],
+input[type="time"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--color-text);
+    background: var(--color-bg);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+input.error,
+select.error {
+    border-color: var(--color-error);
+}
+
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+/* ---- Radio Group ---- */
+.radio-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.radio-group label {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text-sub);
+    background: var(--color-bg);
+    transition: background 0.1s;
+}
+
+.radio-group label:last-child {
+    border-right: none;
+}
+
+.radio-group input[type="radio"] {
+    display: none;
+}
+
+.radio-group input[type="radio"]:checked+span {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.radio-group label:has(input:checked) {
+    background: var(--color-surface-done);
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+/* ---- Distance Display ---- */
+.distance-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    font-size: 0.88rem;
+    color: var(--color-text-sub);
+    min-height: 38px;
+}
+
+.distance-display .value {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 1rem;
+}
+
+/* ---- Buttons ---- */
+.btn-submit {
+    width: 100%;
+    padding: 11px;
+    background: var(--color-btn-primary);
+    color: var(--color-btn-primary-text);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+}
+
+.btn-submit:hover {
+    background: #333333;
+}
+
+.btn-submit:disabled {
+    background: #aaaaaa;
+    cursor: default;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 9px;
+    background: var(--color-btn-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: var(--color-surface);
+}
+
+/* ---- Status Message ---- */
+.status-msg {
+    font-size: 0.82rem;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    display: none;
+}
+
+.status-msg.visible {
+    display: block;
+}
+
+.status-msg.sending {
+    background: #f0f0f0;
+    color: var(--color-text-sub);
+}
+
+.status-msg.success {
+    background: #f0fff0;
+    color: var(--color-success);
+}
+
+.status-msg.error {
+    background: #fff0f0;
+    color: var(--color-error);
+}
+
+/* ---- Settings Modal ---- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal-sheet {
+    background: var(--color-bg);
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    border-radius: 12px 12px 0 0;
+    overflow-y: auto;
+    padding: 20px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.setting-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.setting-block-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-sub);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 32px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    font-size: 0.82rem;
+    cursor: default;
+}
+
+.tag-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-sub);
+    font-size: 0.8rem;
+    padding: 0 2px;
+    line-height: 1;
+}
+
+.tag-del:hover {
+    color: var(--color-error);
+}
+
+.input-add-row {
+    display: flex;
+    gap: 6px;
+}
+
+.input-add-row input {
+    flex: 1;
+}
+
+.btn-add {
+    padding: 8px 14px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.88rem;
+    white-space: nowrap;
+}
+
+.btn-add:hover {
+    background: var(--color-surface);
+}
+
+/* ---- Helpers ---- */
+.text-error {
+    font-size: 0.75rem;
+    color: var(--color-error);
+    display: none;
+}
+
+.text-error.visible {
+    display: block;
+}
+
+.section-divider {
+    height: 6px;
+}
