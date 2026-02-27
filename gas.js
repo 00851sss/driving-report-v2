@@ -147,6 +147,15 @@ function applyDayData(values, lastEndMeter) {
         window.markAsDriving('3');
     }
 
+    // 給油・特記の反映 (GASからの取得はA列〜Z列なので、W列はインデックス22、Y列は24)
+    setVal('refuel-amount', v(0, 22)); // 記録1のW列
+    setVal('refuel-meter', v(1, 22));  // 記録2のW列
+    setVal('notes', v(0, 24));         // 記録1のY列
+
+    if ((v(0, 22) || v(1, 22) || v(0, 24)) && window.markAsDone) {
+        window.markAsDone('refuel');
+    }
+
     // 距離再計算
     ['1', '2', '3'].forEach(n => {
         if (window.calcDistance) window.calcDistance(`start-meter-${n}`, `end-meter-${n}`, `calc-distance-${n}`);
