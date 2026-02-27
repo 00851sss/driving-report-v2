@@ -1,33 +1,25 @@
-/**
- * form.js - フォームロジック・バリデーション・距離計算・送信状態管理
- */
-
-// ---- 送信済みフラグ ----
-const submitted = {
-    preCheck: false,
-    record1: false,
-    record2: false,
-    record3: false,
-    postCheck: false,
+// ---- 現在時刻をセットする関数 ----
+window.setCurrentTime = function (targetId) {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const el = document.getElementById(targetId);
+    if (el) el.value = `${hh}:${mm}`;
 };
 
 // ---- 距離計算 ----
 function calcDistance(startId, endId, displayId) {
-    const start = parseFloat(document.getElementById(startId)?.value);
-    const end = parseFloat(document.getElementById(endId)?.value);
+    const s = parseFloat(document.getElementById(startId)?.value);
+    const e = parseFloat(document.getElementById(endId)?.value);
     const el = document.getElementById(displayId);
     if (!el) return;
-    if (!isNaN(start) && !isNaN(end) && end >= start) {
-        el.textContent = (end - start).toFixed(1);
-    } else {
-        el.textContent = '—';
-    }
+    el.textContent = (!isNaN(s) && !isNaN(e) && e >= s) ? (e - s).toFixed(1) : '—';
 }
 
 // ---- バリデーション ----
 function validate(fields) {
     let ok = true;
-    fields.forEach(({ id, label }) => {
+    fields.forEach(({ id }) => {
         const el = document.getElementById(id);
         if (!el) return;
         const empty = !el.value;
@@ -37,218 +29,133 @@ function validate(fields) {
     return ok;
 }
 
-// ---- セクションをロック（送信済み） ----
-function lockSection(cardId, badgeId) {
-    const card = document.getElementById(cardId);
-    const badge = document.getElementById(badgeId);
-    if (card) card.classList.add('is-done');
-    if (badge) { badge.textContent = '送信済み'; badge.className = 'section-badge done'; }
-}
-
-// ---- ステータスメッセージ ----
+// ---- ステータス・バッジ ----
 function showStatus(id, type, msg) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.textContent = msg;
-    el.className = `status-msg visible ${type}`;
+    el.textContent = msg; el.className = `status-msg visible ${type}`;
+}
+function markAsDone(taskId) {
+    const badge = document.getElementById(`badge-${taskId}`);
+    if (badge) { badge.innerHTML = '✅ 送信済'; badge.className = 'task-status badge-success'; }
 }
 
-function clearStatus(id) {
-    const el = document.getElementById(id);
-    if (el) el.className = 'status-msg';
-}
-
-// ---- 送信ボタン・イベント ----
+// ---- イベント設定 ----
 document.addEventListener('DOMContentLoaded', () => {
-
-    // メーター → 距離計算
+    // メーター計算
     ['1', '2', '3'].forEach(n => {
         ['start-meter-', 'end-meter-'].forEach(prefix => {
-            const el = document.getElementById(prefix + n);
-            if (el) el.addEventListener('input', () => calcDistance(`start-meter-${n}`, `end-meter-${n}`, `calc-distance-${n}`));
+            document.getElementById(prefix + n)?.addEventListener('input', () => calcDistance(`start-meter-${n}`, `end-meter-${n}`, `calc-distance-${n}`));
         });
     });
 
-    // リアルタイム矛盾チェック（時刻）
-    ['1', '2', '3'].forEach(n => {
-        ['start-time-', 'end-time-'].forEach(prefix => {
-            const el = document.getElementById(prefix + n);
-            if (el) el.addEventListener('change', () => checkTimeConflict(n));
+    // 共通送信処理（到着・チェック用）
+    const setupSubmit = (btnId, taskName, sectionId, badgeId, fields) => {
+        document.getElementById(btnId)?.addEventListener('click', async () => {
+            const statusId = `status-${sectionId.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
+            if (!validate(fields)) { showStatus(statusId, 'error', '必須項目を入力してください'); return; }
+
+            showStatus(statusId, 'sending', '送信中...');
+            const err = await submitSection(sectionId);
+            if (err) { showStatus(statusId, 'error', err); return; }
+
+            document.getElementById(statusId).className = 'status-msg';
+            markAsDone(badgeId);
+
+            // 記録1~3なら、送信完了後に「運転中」の目印を消す
+            const numMatch = sectionId.match(/\d/);
+            if (numMatch) localStorage.removeItem(`dr_driving_${numMatch[0]}`);
+
+            switchView('view-home');
         });
-    });
+    };
 
-    // ---- 乗車前チェック送信 ----
-    document.getElementById('btn-submit-pre-check').addEventListener('click', async () => {
-        const ok = validate([
-            { id: 'pre-check-time', label: '確認時刻' },
-            { id: 'pre-checker', label: '確認者' },
-        ]);
-        if (!ok) { showStatus('status-pre-check', 'error', '必須項目を入力してください'); return; }
+    // 各セクションの送信設定（訪問先・到着時刻・到着メーターなどを必須チェック）
+    setupSubmit('btn-submit-pre-check', '乗車前', 'preCheck', 'pre-check', [{ id: 'pre-check-time' }, { id: 'pre-checker' }]);
+    setupSubmit('btn-submit-record-1', '記録1', 'record1', 'record-1', [{ id: 'destination-1' }, { id: 'end-time-1' }, { id: 'end-meter-1' }]);
+    setupSubmit('btn-submit-record-2', '記録2', 'record2', 'record-2', [{ id: 'destination-2' }, { id: 'end-time-2' }, { id: 'end-meter-2' }]);
+    setupSubmit('btn-submit-record-3', '記録3', 'record3', 'record-3', [{ id: 'destination-3' }, { id: 'end-time-3' }, { id: 'end-meter-3' }]);
+    setupSubmit('btn-submit-post-check', '乗車後', 'postCheck', 'post-check', [{ id: 'post-check-time' }, { id: 'post-checker' }]);
 
-        showStatus('status-pre-check', 'sending', '送信中...');
-        const err = await submitSection('preCheck');
-        if (err) { showStatus('status-pre-check', 'error', err); return; }
-        submitted.preCheck = true;
-        lockSection('card-pre-check', 'badge-pre-check');
-        clearStatus('status-pre-check');
-    });
+    // ---- 2ステップ（一時保存）の処理 ----
+    ['1', '2', '3'].forEach(num => {
+        applyDrivingState(num); // 起動時に状態復元
 
-    // ---- 記録1送信 ----
-    document.getElementById('btn-submit-record-1').addEventListener('click', async () => {
-        const ok = validate([
-            { id: 'driver-name-1', label: '運転者' },
-            { id: 'start-time-1', label: '出発時刻' },
-            { id: 'end-time-1', label: '到着時刻' },
-            { id: 'start-meter-1', label: '出発メーター' },
-            { id: 'end-meter-1', label: '到着メーター' },
-        ]);
-        if (!ok) { showStatus('status-record-1', 'error', '必須項目を入力してください'); return; }
+        // 出発ボタン
+        document.getElementById(`btn-start-record-${num}`)?.addEventListener('click', () => {
+            const ok = validate([{ id: `driver-name-${num}` }, { id: `start-time-${num}` }, { id: `start-meter-${num}` }]);
+            if (!ok) { alert("運転者、出発時刻、出発メーターを入力してください"); return; }
+            localStorage.setItem(`dr_driving_${num}`, 'true');
+            applyDrivingState(num);
+            switchView('view-home');
+        });
 
-        showStatus('status-record-1', 'sending', '送信中...');
-        const err = await submitSection('record1');
-        if (err) { showStatus('status-record-1', 'error', err); return; }
-        submitted.record1 = true;
-        lockSection('card-record-1', 'badge-record-1');
-        clearStatus('status-record-1');
-    });
-
-    // ---- 記録2送信 ----
-    document.getElementById('btn-submit-record-2').addEventListener('click', async () => {
-        const ok = validate([
-            { id: 'driver-name-2', label: '運転者' },
-            { id: 'start-time-2', label: '出発時刻' },
-            { id: 'end-time-2', label: '到着時刻' },
-            { id: 'start-meter-2', label: '出発メーター' },
-            { id: 'end-meter-2', label: '到着メーター' },
-        ]);
-        if (!ok) { showStatus('status-record-2', 'error', '必須項目を入力してください'); return; }
-
-        showStatus('status-record-2', 'sending', '送信中...');
-        const err = await submitSection('record2');
-        if (err) { showStatus('status-record-2', 'error', err); return; }
-        submitted.record2 = true;
-        lockSection('card-record-2', 'badge-record-2');
-        clearStatus('status-record-2');
-    });
-
-    // ---- 記録3送信 ----
-    document.getElementById('btn-submit-record-3').addEventListener('click', async () => {
-        const ok = validate([
-            { id: 'driver-name-3', label: '運転者' },
-            { id: 'start-time-3', label: '出発時刻' },
-            { id: 'end-time-3', label: '到着時刻' },
-            { id: 'start-meter-3', label: '出発メーター' },
-            { id: 'end-meter-3', label: '到着メーター' },
-        ]);
-        if (!ok) { showStatus('status-record-3', 'error', '必須項目を入力してください'); return; }
-
-        showStatus('status-record-3', 'sending', '送信中...');
-        const err = await submitSection('record3');
-        if (err) { showStatus('status-record-3', 'error', err); return; }
-        submitted.record3 = true;
-        lockSection('card-record-3', 'badge-record-3');
-        clearStatus('status-record-3');
-    });
-
-    // ---- 乗車後チェック送信 ----
-    document.getElementById('btn-submit-post-check').addEventListener('click', async () => {
-        const ok = validate([
-            { id: 'post-check-time', label: '確認時刻' },
-            { id: 'post-checker', label: '確認者' },
-        ]);
-        if (!ok) { showStatus('status-post-check', 'error', '必須項目を入力してください'); return; }
-
-        showStatus('status-post-check', 'sending', '送信中...');
-        const err = await submitSection('postCheck');
-        if (err) { showStatus('status-post-check', 'error', err); return; }
-        submitted.postCheck = true;
-        lockSection('card-post-check', 'badge-post-check');
-        clearStatus('status-post-check');
+        // 取消ボタン
+        document.getElementById(`btn-cancel-record-${num}`)?.addEventListener('click', () => {
+            if (confirm("出発を取り消して入力をやり直しますか？")) {
+                localStorage.removeItem(`dr_driving_${num}`);
+                removeDrivingState(num);
+            }
+        });
     });
 });
 
-// ---- 時刻矛盾チェック（リアルタイム） ----
-function checkTimeConflict(n) {
-    const st = document.getElementById(`start-time-${n}`)?.value;
-    const et = document.getElementById(`end-time-${n}`)?.value;
-    const endEl = document.getElementById(`end-time-${n}`);
-    if (!st || !et || !endEl) return;
-    endEl.classList.toggle('error', et < st);
+// 画面を「運転中」にする
+function applyDrivingState(num) {
+    if (localStorage.getItem(`dr_driving_${num}`) !== 'true') return;
+    const depInputs = document.getElementById(`record-${num}-departure-inputs`);
+    if (depInputs) { depInputs.style.pointerEvents = 'none'; depInputs.style.opacity = '0.6'; }
+    const startBtn = document.getElementById(`btn-start-record-${num}`);
+    if (startBtn) startBtn.style.display = 'none';
+    const arrivalArea = document.getElementById(`record-${num}-arrival`);
+    if (arrivalArea) arrivalArea.style.display = 'block';
+
+    const badge = document.getElementById(`badge-record-${num}`);
+    if (badge && !badge.innerHTML.includes('送信済')) {
+        badge.innerHTML = '🚗 運転中'; badge.className = 'task-status badge-driving';
+    }
 }
 
-// ---- フォームデータ収集 ----
+// 画面を「出発前」に戻す
+function removeDrivingState(num) {
+    const depInputs = document.getElementById(`record-${num}-departure-inputs`);
+    if (depInputs) { depInputs.style.pointerEvents = 'auto'; depInputs.style.opacity = '1'; }
+    const startBtn = document.getElementById(`btn-start-record-${num}`);
+    if (startBtn) startBtn.style.display = 'block';
+    const arrivalArea = document.getElementById(`record-${num}-arrival`);
+    if (arrivalArea) arrivalArea.style.display = 'none';
+
+    const badge = document.getElementById(`badge-record-${num}`);
+    if (badge && !badge.innerHTML.includes('送信済')) {
+        badge.innerHTML = '未送信'; badge.className = 'task-status badge-warning';
+    }
+}
+
+// ---- データ収集処理 ----
 function collectData() {
     const g = id => document.getElementById(id)?.value ?? '';
     const r = name => document.querySelector(`input[name="${name}"]:checked`)?.value ?? '';
 
-    const isRecord2Visible = document.getElementById('card-record-2')?.style.display !== 'none';
-    const isRecord3Visible = document.getElementById('card-record-3')?.style.display !== 'none';
-
-    const calcDist = (start, end) => {
-        const s = parseFloat(start), e = parseFloat(end);
-        return (!isNaN(s) && !isNaN(e) && e >= s) ? String((e - s).toFixed(1)) : '0';
-    };
+    const isR2 = g('start-meter-2') !== '' || g('driver-name-2') !== '';
+    const isR3 = g('start-meter-3') !== '' || g('driver-name-3') !== '';
+    const calcDist = (start, end) => { const s = parseFloat(start), e = parseFloat(end); return (!isNaN(s) && !isNaN(e) && e >= s) ? String((e - s).toFixed(1)) : '0'; };
 
     const sm1 = g('start-meter-1'), em1 = g('end-meter-1');
     const sm2 = g('start-meter-2'), em2 = g('end-meter-2');
     const sm3 = g('start-meter-3'), em3 = g('end-meter-3');
-
-    const d1 = calcDist(sm1, em1);
-    const d2 = isRecord2Visible ? calcDist(sm2, em2) : '0';
-    const d3 = isRecord3Visible ? calcDist(sm3, em3) : '0';
+    const d1 = calcDist(sm1, em1); const d2 = isR2 ? calcDist(sm2, em2) : '0'; const d3 = isR3 ? calcDist(sm3, em3) : '0';
     const total = (parseFloat(d1) || 0) + (parseFloat(d2) || 0) + (parseFloat(d3) || 0);
 
     return {
-        date: g('report-date'),
-        vehicleId: g('vehicle-id'),
-        passcode: localStorage.getItem(KEY_PASSCODE) || '',
+        date: g('report-date'), vehicleId: g('vehicle-id'), passcode: localStorage.getItem(KEY_PASSCODE) || '',
+        preCheckTime: g('pre-check-time'), preCheckMethod: r('pre-check-method'), preChecker: g('pre-checker'), preAlcohol: r('pre-alcohol'), preAlcoholVal: g('pre-alcohol-val'),
 
-        preCheckTime: g('pre-check-time'),
-        preCheckMethod: r('pre-check-method'),
-        preChecker: g('pre-checker'),
-        preAlcohol: r('pre-alcohol'),
-        preAlcoholVal: g('pre-alcohol-val'),
+        driver1: g('driver-name-1'), destination1: g('destination-1'), startTime1: g('start-time-1'), endTime1: g('end-time-1'), startMeter1: sm1, endMeter1: em1, distance1: d1, preInspection1: r('pre-inspection-1'), vehicleReturn1: g('vehicle-return-1'),
+        driver2: isR2 ? g('driver-name-2') : '', destination2: isR2 ? g('destination-2') : '', startTime2: isR2 ? g('start-time-2') : '', endTime2: isR2 ? g('end-time-2') : '', startMeter2: isR2 ? sm2 : '', endMeter2: isR2 ? em2 : '', distance2: d2, preInspection2: isR2 ? r('pre-inspection-2') : '', vehicleReturn2: isR2 ? g('vehicle-return-2') : '',
+        driver3: isR3 ? g('driver-name-3') : '', destination3: isR3 ? g('destination-3') : '', startTime3: isR3 ? g('start-time-3') : '', endTime3: isR3 ? g('end-time-3') : '', startMeter3: isR3 ? sm3 : '', endMeter3: isR3 ? em3 : '', distance3: d3, preInspection3: isR3 ? r('pre-inspection-3') : '', vehicleReturn3: isR3 ? g('vehicle-return-3') : '',
 
-        driver1: g('driver-name-1'),
-        destination1: g('destination-1'),
-        startTime1: g('start-time-1'),
-        endTime1: g('end-time-1'),
-        startMeter1: sm1,
-        endMeter1: em1,
-        distance1: d1,
-        preInspection1: r('pre-inspection-1'),
-        vehicleReturn1: g('vehicle-return-1'),
-
-        driver2: isRecord2Visible ? g('driver-name-2') : '',
-        destination2: isRecord2Visible ? g('destination-2') : '',
-        startTime2: isRecord2Visible ? g('start-time-2') : '',
-        endTime2: isRecord2Visible ? g('end-time-2') : '',
-        startMeter2: isRecord2Visible ? sm2 : '',
-        endMeter2: isRecord2Visible ? em2 : '',
-        distance2: d2,
-        preInspection2: isRecord2Visible ? r('pre-inspection-2') : '',
-        vehicleReturn2: isRecord2Visible ? g('vehicle-return-2') : '',
-
-        driver3: isRecord3Visible ? g('driver-name-3') : '',
-        destination3: isRecord3Visible ? g('destination-3') : '',
-        startTime3: isRecord3Visible ? g('start-time-3') : '',
-        endTime3: isRecord3Visible ? g('end-time-3') : '',
-        startMeter3: isRecord3Visible ? sm3 : '',
-        endMeter3: isRecord3Visible ? em3 : '',
-        distance3: d3,
-        preInspection3: isRecord3Visible ? r('pre-inspection-3') : '',
-        vehicleReturn3: isRecord3Visible ? g('vehicle-return-3') : '',
-
-        postCheckTime: g('post-check-time'),
-        postCheckMethod: r('post-check-method'),
-        postChecker: g('post-checker'),
-        postAlcohol: r('post-alcohol'),
-
-        refuelAmount: g('refuel-amount'),
-        refuelMeter: g('refuel-meter'),
-        notes: g('notes'),
-
-        totalDistance: String(total.toFixed(1)),
-        isOver400km: total > 400,
+        postCheckTime: g('post-check-time'), postCheckMethod: r('post-check-method'), postChecker: g('post-checker'), postAlcohol: r('post-alcohol'),
+        refuelAmount: g('refuel-amount'), refuelMeter: g('refuel-meter'), notes: g('notes'),
+        totalDistance: String(total.toFixed(1)), isOver400km: total > 400,
     };
 }
