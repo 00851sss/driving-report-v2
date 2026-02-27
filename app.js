@@ -21,6 +21,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // タブ切り替え処理
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+        });
+    });
+
     document.getElementById('btn-add-vehicle')?.addEventListener('click', () => addItemToList('vehicle'));
     document.getElementById('btn-add-driver')?.addEventListener('click', () => addItemToList('driver'));
     document.getElementById('btn-add-checker')?.addEventListener('click', () => addItemToList('checker'));

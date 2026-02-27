@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSubmit('btn-submit-record-2', 'record2', 'record-2', [{ id: 'destination-2' }, { id: 'end-time-2' }, { id: 'end-meter-2' }]);
     setupSubmit('btn-submit-record-3', 'record3', 'record-3', [{ id: 'destination-3' }, { id: 'end-time-3' }, { id: 'end-meter-3' }]);
     setupSubmit('btn-submit-post-check', 'postCheck', 'post-check', [{ id: 'post-check-time' }, { id: 'post-checker' }]);
+    setupSubmit('btn-submit-refuel', 'refuel', 'refuel', []); // 必須項目はなしで送信可能
 });
 
 function setupAlcoholToggle(radioName, groupId, inputId) {

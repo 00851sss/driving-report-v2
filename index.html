@@ -13,41 +13,63 @@
 
         <div class="modal-overlay" id="settings-modal" role="dialog">
             <div class="modal-sheet">
-                <div class="modal-title">⚙ 共通設定</div>
-                <div class="setting-block">
-                    <div class="setting-block-title">GAS URL</div>
-                    <input type="text" id="gas-url-input" placeholder="https://script.google.com/...">
+                <div class="modal-title" style="border-bottom:none; padding-bottom:0;">⚙ 設定</div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tab-vehicle">車両</button>
+                    <button class="tab-btn" data-tab="tab-driver">運転者</button>
+                    <button class="tab-btn" data-tab="tab-checker">確認者</button>
+                    <button class="tab-btn" data-tab="tab-general">⚙ 共通</button>
                 </div>
-                <div class="setting-block">
-                    <div class="setting-block-title">パスコード</div>
-                    <input type="password" id="passcode-input" placeholder="送信用パスコード">
-                </div>
-                <div class="setting-block">
-                    <div class="setting-block-title">車両リスト</div>
-                    <div class="tag-list" id="vehicle-tag-list"></div>
-                    <div class="input-add-row">
-                        <input type="text" id="input-add-vehicle" placeholder="車両名を入力">
-                        <button class="btn-add" id="btn-add-vehicle">＋ 追加</button>
+
+                <div class="tab-content active" id="tab-vehicle">
+                    <div class="setting-block">
+                        <div class="setting-block-title">車両リスト</div>
+                        <div class="tag-list" id="vehicle-tag-list"></div>
+                        <div class="input-add-row">
+                            <input type="text" id="input-add-vehicle" placeholder="車両名を入力">
+                            <button class="btn-add" id="btn-add-vehicle">＋ 追加</button>
+                        </div>
                     </div>
                 </div>
-                <div class="setting-block">
-                    <div class="setting-block-title">運転者リスト</div>
-                    <div class="tag-list" id="driver-tag-list"></div>
-                    <div class="input-add-row">
-                        <input type="text" id="input-add-driver" placeholder="名前を入力">
-                        <button class="btn-add" id="btn-add-driver">＋ 追加</button>
+
+                <div class="tab-content" id="tab-driver">
+                    <div class="setting-block">
+                        <div class="setting-block-title">運転者リスト</div>
+                        <div class="tag-list" id="driver-tag-list"></div>
+                        <div class="input-add-row">
+                            <input type="text" id="input-add-driver" placeholder="名前を入力">
+                            <button class="btn-add" id="btn-add-driver">＋ 追加</button>
+                        </div>
                     </div>
                 </div>
-                <div class="setting-block">
-                    <div class="setting-block-title">確認者リスト</div>
-                    <div class="tag-list" id="checker-tag-list"></div>
-                    <div class="input-add-row">
-                        <input type="text" id="input-add-checker" placeholder="名前を入力">
-                        <button class="btn-add" id="btn-add-checker">＋ 追加</button>
+
+                <div class="tab-content" id="tab-checker">
+                    <div class="setting-block">
+                        <div class="setting-block-title">確認者リスト</div>
+                        <div class="tag-list" id="checker-tag-list"></div>
+                        <div class="input-add-row">
+                            <input type="text" id="input-add-checker" placeholder="名前を入力">
+                            <button class="btn-add" id="btn-add-checker">＋ 追加</button>
+                        </div>
                     </div>
                 </div>
-                <button class="btn-submit" id="btn-save-settings">✔ 保存</button>
-                <button class="btn-secondary" id="btn-close-settings">✕ 閉じる</button>
+
+                <div class="tab-content" id="tab-general">
+                    <div class="setting-block">
+                        <div class="setting-block-title">GAS URL</div>
+                        <input type="text" id="gas-url-input" placeholder="https://script.google.com/...">
+                    </div>
+                    <div class="setting-block">
+                        <div class="setting-block-title">パスコード</div>
+                        <input type="password" id="passcode-input" placeholder="送信用パスコード">
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <button class="btn-submit" id="btn-save-settings" style="margin-top: 0;">✔ 保存</button>
+                    <button class="btn-secondary" id="btn-close-settings" style="margin-top: 12px;">✕ 閉じる</button>
+                </div>
             </div>
         </div>
 
@@ -445,7 +467,7 @@
             </header>
             <div class="section-body" style="padding: 20px 16px;">
                 <p style="font-size: 0.85rem; color: var(--color-text-sub); margin-bottom: 10px;">
-                    給油情報は他の項目と一緒に送信されます。入力後ホームにお戻りください。</p>
+                    給油・特記事項のみを単独で送信することも可能です。</p>
                 <div class="field-row">
                     <div class="field-group">
                         <label class="field-label" for="refuel-amount">給油量 (L)</label>
@@ -460,7 +482,8 @@
                     <label class="field-label" for="notes">備考</label>
                     <input type="text" id="notes" placeholder="特記事項など">
                 </div>
-                <button class="btn-submit" style="margin-top: 20px;" onclick="switchView('view-home')">✔ 入力完了</button>
+                <div class="status-msg" id="status-refuel"></div>
+                <button class="btn-submit" id="btn-submit-refuel" style="margin-top: 20px;">✔ 送信</button>
             </div>
         </div>
 
