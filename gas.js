@@ -4,8 +4,8 @@
 
 // ---- 起動時: 当日データをGASから読み込む ----
 async function loadDayData() {
-    const url = localStorage.getItem(KEY_GAS_URL) || '';
-    const pass = localStorage.getItem(KEY_PASSCODE) || '';
+    const url = appData.gasUrl;
+    const pass = appData.passcode;
     const date = document.getElementById('report-date')?.value;
     const vid = document.getElementById('vehicle-id')?.value;
 
@@ -22,7 +22,7 @@ async function loadDayData() {
         const result = await res.json();
         if (result.status !== 'success' || !result.values) return;
 
-        applyDayData(result.values);
+        applyDayData(result.values, result.lastEndMeter);
     } catch (e) {
         console.warn('[gas.js] loadDayData failed:', e.message);
         // エラーは通知しない（任意読込なので失敗してもOK）
@@ -34,7 +34,7 @@ async function loadDayData() {
  * values: [[row1...], [row2...], [row3...]] (列0=A)
  * C列=index2 が基準
  */
-function applyDayData(values) {
+function applyDayData(values, lastEndMeter) {
     const v = (row, col) => {
         if (!values[row] || values[row][col] === undefined) return '';
         return String(values[row][col]);
@@ -58,7 +58,8 @@ function applyDayData(values) {
 
     // 出発メーター: 前回到着メーターとして引継ぎ（同日データがない場合）
     // 前回メーターは end-meter-1 の値があれば start-meter-1 に引継ぎ
-    const prevEndMeter = v(0, 19);
+    // or GASから返却された lastEndMeter を適用
+    const prevEndMeter = v(0, 19) || lastEndMeter;
     if (prevEndMeter) {
         const sm1 = document.getElementById('start-meter-1');
         if (sm1 && !sm1.value) sm1.value = prevEndMeter;
@@ -94,8 +95,8 @@ function setIfEmpty(id, val) {
 
 // ---- セクション別送信 ----
 async function submitSection(section) {
-    const url = localStorage.getItem(KEY_GAS_URL) || '';
-    const pass = localStorage.getItem(KEY_PASSCODE) || '';
+    const url = appData.gasUrl;
+    const pass = appData.passcode;
 
     if (!url) return 'GAS URLが設定されていません';
     if (!pass) return 'パスコードが設定されていません';
@@ -122,5 +123,53 @@ async function submitSection(section) {
         return result.message || 'GASでエラーが発生しました';
     } catch (e) {
         return `通信エラー: ${e.message}`;
+    }
+}
+
+// ---- マスタデータ同期 ----
+async function syncMasterData() {
+    const url = appData.gasUrl;
+    const pass = appData.passcode;
+    const msgEl = document.getElementById('status-sync');
+
+    if (!url || !pass || !url.startsWith('https://')) {
+        if (msgEl) { msgEl.textContent = 'GAS URLとパスコードを正しく設定してください'; msgEl.className = 'status-msg visible error'; }
+        return;
+    }
+
+    if (msgEl) { msgEl.textContent = '同期中...'; msgEl.className = 'status-msg visible sending'; }
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'getMaster', passcode: pass }),
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const result = await res.json();
+
+        if (result.status !== 'success') {
+            throw new Error(result.message || 'マスタデータ取得に失敗しました');
+        }
+
+        // リストを上書き（重複や空欄はGAS側で処理済み）
+        appData.vehicles = (result.vehicles || []);
+        appData.drivers = (result.drivers || []);
+        appData.checkers = (result.checkers || []);
+
+        // フロントエンドのUIに反映して保存
+        saveSettings();
+        ['vehicle', 'driver', 'checker'].forEach(type => {
+            renderTagList(type);
+            updateSelectOptions(type);
+        });
+
+        if (msgEl) { msgEl.textContent = '同期完了！'; msgEl.className = 'status-msg visible success'; }
+        setTimeout(() => { if (msgEl) msgEl.className = 'status-msg'; }, 3000);
+
+    } catch (e) {
+        console.error('[gas.js] syncMasterData:', e);
+        if (msgEl) { msgEl.textContent = `エラー: ${e.message}`; msgEl.className = 'status-msg visible error'; }
     }
 }

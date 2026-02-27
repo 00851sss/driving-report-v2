@@ -37,6 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-add-driver')?.addEventListener('click', () => addItemToList('driver'));
     document.getElementById('btn-add-checker')?.addEventListener('click', () => addItemToList('checker'));
 
+    document.getElementById('btn-sync-master')?.addEventListener('click', () => {
+        if (typeof syncMasterData === 'function') syncMasterData();
+    });
+
     loadSettings();
 });
 
@@ -45,7 +49,9 @@ let appData = {
     drivers: [],
     checkers: [],
     gasUrl: '',
-    passcode: ''
+    passcode: '',
+    defaultVehicle: '',
+    defaultDriver: ''
 };
 
 function loadSettings() {
@@ -58,18 +64,35 @@ function loadSettings() {
     document.getElementById('gas-url-input').value = appData.gasUrl || '';
     document.getElementById('passcode-input').value = appData.passcode || '';
 
-    document.getElementById('gas-url-input').addEventListener('change', saveSettings);
-    document.getElementById('passcode-input').addEventListener('change', saveSettings);
-
     ['vehicle', 'driver', 'checker'].forEach(type => {
         renderTagList(type);
         updateSelectOptions(type);
     });
+
+    // オプション生成後に選択状態を復元
+    const vSel = document.getElementById('default-vehicle');
+    if (vSel) {
+        vSel.value = appData.defaultVehicle || '';
+        vSel.addEventListener('change', saveSettings);
+    }
+    const dSel = document.getElementById('default-driver');
+    if (dSel) {
+        dSel.value = appData.defaultDriver || '';
+        dSel.addEventListener('change', saveSettings);
+    }
+
+    document.getElementById('gas-url-input').addEventListener('change', saveSettings);
+    document.getElementById('passcode-input').addEventListener('change', saveSettings);
 }
 
 function saveSettings() {
     appData.gasUrl = document.getElementById('gas-url-input').value.trim();
     appData.passcode = document.getElementById('passcode-input').value.trim();
+    const vSel = document.getElementById('default-vehicle');
+    if (vSel) appData.defaultVehicle = vSel.value;
+    const dSel = document.getElementById('default-driver');
+    if (dSel) appData.defaultDriver = dSel.value;
+
     localStorage.setItem('app-settings', JSON.stringify(appData));
 }
 
@@ -137,10 +160,10 @@ function updateSelectOptions(type) {
 
     if (type === 'vehicle') {
         list = appData.vehicles;
-        selectors = ['vehicle-id'];
+        selectors = ['vehicle-id', 'default-vehicle'];
     } else if (type === 'driver') {
         list = appData.drivers;
-        selectors = ['driver-name-1', 'driver-name-2', 'driver-name-3'];
+        selectors = ['driver-name-1', 'driver-name-2', 'driver-name-3', 'default-driver'];
     } else if (type === 'checker') {
         list = appData.checkers;
         selectors = ['pre-checker', 'post-checker'];

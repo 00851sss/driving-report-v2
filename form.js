@@ -17,6 +17,31 @@ document.addEventListener('DOMContentLoaded', () => {
         dateInput.value = `${yyyy}-${mm}-${dd}`;
     }
 
+    // デフォルト値の自動セット
+    if (appData.defaultVehicle) {
+        const vId = document.getElementById('vehicle-id');
+        if (vId) vId.value = appData.defaultVehicle;
+    }
+    if (appData.defaultDriver) {
+        ['driver-name-1', 'driver-name-2', 'driver-name-3'].forEach(id => {
+            const dId = document.getElementById(id);
+            if (dId && !dId.value) dId.value = appData.defaultDriver;
+        });
+    }
+
+    // 日付や車両が変更されたらデータを再取得
+    document.getElementById('report-date')?.addEventListener('change', () => {
+        if (typeof loadDayData === 'function') loadDayData();
+    });
+    document.getElementById('vehicle-id')?.addEventListener('change', () => {
+        if (typeof loadDayData === 'function') loadDayData();
+    });
+
+    // 起動時のデータ取得を遅延実行（gas.jsのロード完了後を担保）
+    setTimeout(() => {
+        if (typeof loadDayData === 'function') loadDayData();
+    }, 100);
+
     setupAlcoholToggle('pre-alcohol', 'pre-alcohol-val-group', 'pre-alcohol-val');
     setupAlcoholToggle('post-alcohol', null, null);
 

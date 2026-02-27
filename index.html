@@ -24,6 +24,13 @@
 
                 <div class="tab-content active" id="tab-vehicle">
                     <div class="setting-block">
+                        <div class="setting-block-title">デフォルト車両 (起動時に選択)</div>
+                        <select id="default-vehicle" class="control-input"
+                            style="width: 100%; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; font-size: 1rem; margin-bottom: 12px; background-color: var(--color-input-bg); color: var(--color-text);">
+                            <option value="">未選択</option>
+                        </select>
+                    </div>
+                    <div class="setting-block">
                         <div class="setting-block-title">車両リスト</div>
                         <div class="tag-list" id="vehicle-tag-list"></div>
                         <div class="input-add-row">
@@ -34,6 +41,13 @@
                 </div>
 
                 <div class="tab-content" id="tab-driver">
+                    <div class="setting-block">
+                        <div class="setting-block-title">デフォルト運転者 (起動時に選択)</div>
+                        <select id="default-driver" class="control-input"
+                            style="width: 100%; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; font-size: 1rem; margin-bottom: 12px; background-color: var(--color-input-bg); color: var(--color-text);">
+                            <option value="">未選択</option>
+                        </select>
+                    </div>
                     <div class="setting-block">
                         <div class="setting-block-title">運転者リスト</div>
                         <div class="tag-list" id="driver-tag-list"></div>
@@ -56,6 +70,14 @@
                 </div>
 
                 <div class="tab-content" id="tab-general">
+                    <div class="setting-block">
+                        <div class="setting-block-title">マスタデータ同期</div>
+                        <p style="font-size: 0.8rem; color: var(--color-text-sub); margin-bottom: 8px;">
+                            GAS（スプレッドシート）から、車両・運転者・確認者のリストを取得します。</p>
+                        <button class="btn-secondary" id="btn-sync-master" style="width: 100%; margin-top: 0;">⟳
+                            GASからリストを取得</button>
+                        <div class="status-msg" id="status-sync"></div>
+                    </div>
                     <div class="setting-block">
                         <div class="setting-block-title">GAS URL</div>
                         <input type="text" id="gas-url-input" placeholder="https://script.google.com/...">
