@@ -1,96 +1,202 @@
-// ---- localStorage キー ----
-const KEY_GAS_URL = 'dr_gas_url';
-const KEY_PASSCODE = 'dr_passcode';
-const KEY_VEHICLES = 'dr_vehicles';
-const KEY_DRIVERS = 'dr_drivers';
-const KEY_CHECKERS = 'dr_checkers';
+// --- 初期設定と状態管理 ---
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
 
-// ---- 画面の切り替え機能 ----
-function switchView(viewId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    const target = document.getElementById(viewId);
-    if (target) { target.classList.add('active'); window.scrollTo(0, 0); }
-}
-window.switchView = switchView;
+    const themeToggleBtn = document.getElementById('btn-theme-toggle');
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', toggleTheme);
+    }
 
-// ---- 設定の読み書き ----
+    const settingsBtn = document.getElementById('btn-settings');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            document.getElementById('settings-modal').classList.add('open');
+        });
+    }
+
+    const closeSettingsBtn = document.getElementById('btn-close-settings');
+    if (closeSettingsBtn) {
+        closeSettingsBtn.addEventListener('click', () => {
+            document.getElementById('settings-modal').classList.remove('open');
+        });
+    }
+
+    document.getElementById('btn-add-vehicle')?.addEventListener('click', () => addItemToList('vehicle'));
+    document.getElementById('btn-add-driver')?.addEventListener('click', () => addItemToList('driver'));
+    document.getElementById('btn-add-checker')?.addEventListener('click', () => addItemToList('checker'));
+
+    loadSettings();
+});
+
+let appData = {
+    vehicles: [],
+    drivers: [],
+    checkers: [],
+    gasUrl: '',
+    passcode: ''
+};
+
 function loadSettings() {
-    document.getElementById('gas-url-input').value = localStorage.getItem(KEY_GAS_URL) || '';
-    document.getElementById('passcode-input').value = localStorage.getItem(KEY_PASSCODE) || '';
-    const vehicles = getList(KEY_VEHICLES); const drivers = getList(KEY_DRIVERS); const checkers = getList(KEY_CHECKERS);
-    renderTagList('vehicle-tag-list', vehicles, KEY_VEHICLES);
-    renderTagList('driver-tag-list', drivers, KEY_DRIVERS);
-    renderTagList('checker-tag-list', checkers, KEY_CHECKERS);
-    refreshAllDropdowns();
+    const saved = localStorage.getItem('app-settings');
+    if (saved) {
+        try {
+            appData = { ...appData, ...JSON.parse(saved) };
+        } catch (e) { }
+    }
+    document.getElementById('gas-url-input').value = appData.gasUrl || '';
+    document.getElementById('passcode-input').value = appData.passcode || '';
+
+    document.getElementById('gas-url-input').addEventListener('change', saveSettings);
+    document.getElementById('passcode-input').addEventListener('change', saveSettings);
+
+    ['vehicle', 'driver', 'checker'].forEach(type => {
+        renderTagList(type);
+        updateSelectOptions(type);
+    });
 }
 
 function saveSettings() {
-    localStorage.setItem(KEY_GAS_URL, document.getElementById('gas-url-input').value.trim());
-    localStorage.setItem(KEY_PASSCODE, document.getElementById('passcode-input').value.trim());
+    appData.gasUrl = document.getElementById('gas-url-input').value.trim();
+    appData.passcode = document.getElementById('passcode-input').value.trim();
+    localStorage.setItem('app-settings', JSON.stringify(appData));
 }
 
-// ---- リスト管理・タグ描画・ドロップダウン ----
-function getList(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } }
-function saveList(key, arr) { localStorage.setItem(key, JSON.stringify(arr)); }
-function addToList(key, value, tagContainerId) {
-    const val = value.trim(); if (!val) return;
-    const list = getList(key); if (list.includes(val)) return;
-    list.push(val); saveList(key, list);
-    renderTagList(tagContainerId, list, key); refreshAllDropdowns();
+function addItemToList(type) {
+    const input = document.getElementById(`input-add-${type}`);
+    const name = input.value.trim();
+    if (!name) return;
+
+    if (type === 'vehicle' && !appData.vehicles.includes(name)) {
+        appData.vehicles.push(name);
+    } else if (type === 'driver' && !appData.drivers.includes(name)) {
+        appData.drivers.push(name);
+    } else if (type === 'checker' && !appData.checkers.includes(name)) {
+        appData.checkers.push(name);
+    }
+
+    input.value = '';
+    saveSettings();
+    renderTagList(type);
+    updateSelectOptions(type);
 }
-function renderTagList(containerId, list, key) {
-    const container = document.getElementById(containerId); if (!container) return;
-    container.innerHTML = list.length === 0 ? '<span style="font-size:0.8rem;color:#aaa">未登録</span>' : '';
-    list.forEach(item => {
-        const tag = document.createElement('span'); tag.className = 'tag';
-        tag.innerHTML = `${item}<button class="tag-del" data-key="${key}" data-val="${item}">✕</button>`;
+
+function removeItemFromList(type, name) {
+    if (type === 'vehicle') {
+        appData.vehicles = appData.vehicles.filter(v => v !== name);
+    } else if (type === 'driver') {
+        appData.drivers = appData.drivers.filter(d => d !== name);
+    } else if (type === 'checker') {
+        appData.checkers = appData.checkers.filter(c => c !== name);
+    }
+    saveSettings();
+    renderTagList(type);
+    updateSelectOptions(type);
+}
+
+function renderTagList(type) {
+    const container = document.getElementById(`${type}-tag-list`);
+    if (!container) return;
+    container.innerHTML = '';
+
+    let list = [];
+    if (type === 'vehicle') list = appData.vehicles;
+    else if (type === 'driver') list = appData.drivers;
+    else if (type === 'checker') list = appData.checkers;
+
+    list.forEach(name => {
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        const text = document.createElement('span');
+        text.textContent = name;
+        const delBtn = document.createElement('button');
+        delBtn.className = 'tag-del';
+        delBtn.innerHTML = '✕';
+        delBtn.onclick = () => removeItemFromList(type, name);
+
+        tag.appendChild(text);
+        tag.appendChild(delBtn);
         container.appendChild(tag);
     });
-    container.querySelectorAll('.tag-del').forEach(btn => {
-        btn.addEventListener('click', () => {
-            saveList(btn.dataset.key, getList(btn.dataset.key).filter(v => v !== btn.dataset.val));
-            renderTagList(containerId, getList(btn.dataset.key), btn.dataset.key); refreshAllDropdowns();
+}
+
+function updateSelectOptions(type) {
+    let list = [];
+    let selectors = [];
+
+    if (type === 'vehicle') {
+        list = appData.vehicles;
+        selectors = ['vehicle-id'];
+    } else if (type === 'driver') {
+        list = appData.drivers;
+        selectors = ['driver-name-1', 'driver-name-2', 'driver-name-3'];
+    } else if (type === 'checker') {
+        list = appData.checkers;
+        selectors = ['pre-checker', 'post-checker'];
+    }
+
+    selectors.forEach(id => {
+        const selectEl = document.getElementById(id);
+        if (!selectEl) return;
+
+        const currentVal = selectEl.value;
+        const defaultOption = selectEl.options[0];
+        selectEl.innerHTML = '';
+
+        if (defaultOption) {
+            selectEl.appendChild(defaultOption);
+        } else {
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = "";
+            defaultOpt.textContent = "未選択";
+            selectEl.appendChild(defaultOpt);
+        }
+
+        list.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = opt.textContent = item;
+            selectEl.appendChild(opt);
         });
+
+        if (list.includes(currentVal)) {
+            selectEl.value = currentVal;
+        }
     });
 }
-function updateDropdown(id, list) {
-    const sel = document.getElementById(id); if (!sel) return;
-    const current = sel.value; sel.innerHTML = `<option value="">-- 選択 --</option>`;
-    list.forEach(item => { const opt = document.createElement('option'); opt.value = item; opt.textContent = item; sel.appendChild(opt); });
-    if (list.includes(current)) sel.value = current;
+
+// --- テーマ切り替えロジック ---
+function initTheme() {
+    const savedTheme = localStorage.getItem('app-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        updateThemeIcon('dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        updateThemeIcon('light');
+    }
 }
-function refreshAllDropdowns() {
-    const v = getList(KEY_VEHICLES), d = getList(KEY_DRIVERS), c = getList(KEY_CHECKERS);
-    updateDropdown('vehicle-id', v);
-    ['1', '2', '3'].forEach(n => updateDropdown(`driver-name-${n}`, d));
-    updateDropdown('pre-checker', c); updateDropdown('post-checker', c);
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('app-theme', newTheme);
+    updateThemeIcon(newTheme);
 }
 
-// ---- 設定モーダル制御 ----
-function openSettings() { loadSettings(); document.getElementById('settings-modal').classList.add('open'); }
-function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
+function updateThemeIcon(theme) {
+    const btn = document.getElementById('btn-theme-toggle');
+    if (btn) {
+        // ダークモードなら「月(🌓)」、ライトモードなら「太陽(☀)」のような白黒アイコン
+        btn.innerHTML = theme === 'dark' ? '◐' : '◑';
+    }
+}
 
-// ---- 初期化 ----
-document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date();
-    document.getElementById('report-date').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    loadSettings();
-
-    document.getElementById('report-date').addEventListener('change', loadDayData);
-    document.getElementById('vehicle-id').addEventListener('change', loadDayData);
-
-    document.getElementById('btn-settings').addEventListener('click', openSettings);
-    document.getElementById('btn-close-settings').addEventListener('click', closeSettings);
-    document.getElementById('btn-save-settings').addEventListener('click', () => { saveSettings(); closeSettings(); });
-
-    document.getElementById('btn-add-vehicle').addEventListener('click', () => { addToList(KEY_VEHICLES, document.getElementById('input-add-vehicle').value, 'vehicle-tag-list'); document.getElementById('input-add-vehicle').value = ''; });
-    document.getElementById('btn-add-driver').addEventListener('click', () => { addToList(KEY_DRIVERS, document.getElementById('input-add-driver').value, 'driver-tag-list'); document.getElementById('input-add-driver').value = ''; });
-    document.getElementById('btn-add-checker').addEventListener('click', () => { addToList(KEY_CHECKERS, document.getElementById('input-add-checker').value, 'checker-tag-list'); document.getElementById('input-add-checker').value = ''; });
-
-    document.getElementById('btn-copy-meter-2')?.addEventListener('click', () => { const e1 = document.getElementById('end-meter-1').value; if (e1) document.getElementById('start-meter-2').value = e1; });
-    document.getElementById('btn-copy-meter-3')?.addEventListener('click', () => { const e2 = document.getElementById('end-meter-2').value; if (e2) document.getElementById('start-meter-3').value = e2; });
-
-    document.querySelectorAll('input[name="pre-alcohol"]').forEach(r => {
-        r.addEventListener('change', e => document.getElementById('pre-alcohol-val-group').style.display = e.target.value === '有' ? '' : 'none');
-    });
-});
+// --- View切り替え ---
+function switchView(viewId) {
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    window.scrollTo(0, 0);
+}

@@ -7,30 +7,63 @@
 }
 
 :root {
-    --color-bg: #f5f6f8;
+    /* ----- Light Theme ----- */
+    --color-bg: #F0F4F8;
     --color-surface: #ffffff;
-    --color-border: #dcdfe4;
-    --color-text: #1a1a1c;
-    --color-text-sub: #666d75;
-    --color-accent: #0066cc;
-    --color-btn-primary: #0066cc;
+    --color-border: #E2E8F0;
+    --color-text: #0F172A;
+    --color-text-sub: #64748B;
+    --color-accent: #2563EB;
+    --color-btn-primary: #1E3A8A;
     --color-btn-primary-text: #ffffff;
     --color-btn-secondary: #ffffff;
-    --color-error: #cc0000;
-    --color-success: #008800;
-    --color-warning: #cc6600;
-    --radius: 10px;
-    --gap: 12px;
+    --color-error: #EF4444;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+
+    --color-input-bg: #F8FAFC;
+    --color-input-focus: #ffffff;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+
+    --radius: 16px;
+    --gap: 16px;
+}
+
+[data-theme="dark"] {
+    /* ----- Dark Theme ----- */
+    --color-bg: #0F172A;
+    --color-surface: #1E293B;
+    --color-border: #334155;
+    --color-text: #F8FAFC;
+    --color-text-sub: #94A3B8;
+    --color-accent: #3B82F6;
+    --color-btn-primary: #3B82F6;
+    --color-btn-primary-text: #ffffff;
+    --color-btn-secondary: #0F172A;
+    --color-error: #F87171;
+    --color-success: #34D399;
+    --color-warning: #FBBF24;
+
+    --color-input-bg: #0F172A;
+    --color-input-focus: #1E293B;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
 }
 
 html,
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-size: 16px;
-    line-height: 1.5;
+    line-height: 1.6;
     background: var(--color-bg);
     color: var(--color-text);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
 }
 
 .app-container {
@@ -52,21 +85,43 @@ body {
     justify-content: space-between;
 }
 
+@supports (backdrop-filter: blur(12px)) {
+    .app-header {
+        background: transparent;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    :root .app-header {
+        background: rgba(255, 255, 255, 0.85);
+    }
+
+    [data-theme="dark"] .app-header {
+        background: rgba(30, 41, 59, 0.85);
+    }
+}
+
 .app-header h2 {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 600;
-    text-align: center;
     flex: 1;
+    text-align: left;
+    margin: 0;
 }
 
 .btn-icon {
     background: none;
     border: 1px solid var(--color-border);
     border-radius: 6px;
-    padding: 6px 10px;
+    padding: 6px 12px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 1.1rem;
+    /* 記号が綺麗に見えるように少し大きく */
     color: var(--color-text);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-back {
@@ -74,6 +129,7 @@ body {
     color: var(--color-accent);
     font-weight: bold;
     padding: 6px 0;
+    font-size: 0.95rem;
 }
 
 /* ---- View 切り替え ---- */
@@ -100,7 +156,7 @@ body {
 
 /* ---- Dashboard Task List ---- */
 .task-list {
-    padding: 16px;
+    padding: 0 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -110,18 +166,25 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 16px;
+    padding: 22px 20px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .task-btn:hover {
-    background: #fdfdfd;
-    border-color: #bbbbbb;
+    background: var(--color-bg);
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.task-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 .task-name {
@@ -132,48 +195,36 @@ body {
 
 .task-status {
     font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 24px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
 }
 
 .badge-warning {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .badge-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* ---- 追加：運転中バッジと到着エリア ---- */
 .badge-driving {
-    background: #cce5ff;
-    color: #004085;
-    border: 1px solid #b8daff;
-}
-
-.phase-arrival {
-    display: none;
-    margin-top: 20px;
-    border-top: 2px dashed #dcdfe4;
-    padding-top: 20px;
-}
-
-.time-input-row {
-    display: flex;
-    gap: 8px;
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--color-accent);
+    border: 1px solid rgba(37, 99, 235, 0.3);
 }
 
 /* ---- Forms & Cards ---- */
 .section-card {
-    margin: 0 16px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
 }
 
 .section-body {
@@ -211,17 +262,32 @@ input[type="date"],
 select,
 textarea {
     width: 100%;
-    padding: 10px 12px;
+    padding: 12px 14px;
     border: 1px solid var(--color-border);
-    border-radius: 6px;
+    border-radius: 10px;
     font-size: 1rem;
-    background: var(--color-surface);
+    background: var(--color-input-bg);
+    transition: all 0.2s ease;
+    color: var(--color-text);
+}
+
+.control-input {
+    height: 48px;
+    padding: 0 14px;
+}
+
+select.control-input {
+    text-overflow: ellipsis;
+    padding-right: 32px;
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
     outline: none;
     border-color: var(--color-accent);
+    background: var(--color-input-focus);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 input.error,
@@ -232,7 +298,7 @@ select.error {
 select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 10px center;
+    background-position: right 12px center;
     padding-right: 30px;
     appearance: none;
 }
@@ -241,7 +307,7 @@ select {
 .radio-group {
     display: flex;
     border: 1px solid var(--color-border);
-    border-radius: 6px;
+    border-radius: 10px;
     overflow: hidden;
 }
 
@@ -264,9 +330,9 @@ select {
 }
 
 .radio-group label:has(input:checked) {
-    background: #e6f0fa;
+    background: rgba(37, 99, 235, 0.1);
     color: var(--color-accent);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .distance-display {
@@ -275,8 +341,8 @@ select {
     gap: 4px;
     padding: 10px 12px;
     border: 1px solid var(--color-border);
-    border-radius: 6px;
-    background: #f9f9f9;
+    border-radius: 10px;
+    background: var(--color-input-bg);
     color: var(--color-text-sub);
 }
 
@@ -289,55 +355,89 @@ select {
 /* ---- Buttons ---- */
 .btn-submit {
     width: 100%;
-    padding: 14px;
+    padding: 16px;
     background: var(--color-btn-primary);
     color: var(--color-btn-primary-text);
     border: none;
-    border-radius: var(--radius);
-    font-size: 1rem;
-    font-weight: bold;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
     cursor: pointer;
-    margin-top: 8px;
-    box-shadow: 0 2px 4px rgba(0, 102, 204, 0.3);
+    margin-top: 12px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-submit:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-submit:active {
-    transform: scale(0.98);
+    transform: translateY(1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background: var(--color-btn-secondary);
     color: var(--color-text);
     border: 1px solid var(--color-border);
-    border-radius: 6px;
-    font-size: 0.9rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-/* ---- QR Scan Button (Dummy) ---- */
+.btn-secondary:hover {
+    background: var(--color-bg);
+    border-color: var(--color-accent);
+}
+
+/* 時計アイコン用 */
+.btn-time {
+    width: 48px;
+    padding: 0;
+    font-size: 1.4rem;
+    /* 時計マークを大きく */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .btn-qr-dummy {
+    height: 48px;
     width: 60px;
-    height: 100%;
-    background: #fff;
-    color: var(--color-error);
-    border: 2px solid var(--color-error);
-    border-radius: 6px;
-    font-size: 1.1rem;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #3B82F6, #1E3A8A);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.4rem;
     font-weight: bold;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-qr-dummy:hover {
-    background: #ffeeee;
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
-/* ---- Status Message ---- */
+.btn-qr-dummy:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+/* ---- Status Message & Arrival Area ---- */
 .status-msg {
     font-size: 0.85rem;
     padding: 8px 12px;
@@ -350,13 +450,25 @@ select {
 }
 
 .status-msg.sending {
-    background: #f0f0f0;
+    background: var(--color-bg);
     color: var(--color-text-sub);
 }
 
 .status-msg.error {
-    background: #fff0f0;
+    background: rgba(239, 68, 68, 0.1);
     color: var(--color-error);
+}
+
+.phase-arrival {
+    display: none;
+    margin-top: 20px;
+    border-top: 2px dashed var(--color-border);
+    padding-top: 20px;
+}
+
+.time-input-row {
+    display: flex;
+    gap: 8px;
 }
 
 /* ---- Settings Modal ---- */
@@ -436,7 +548,8 @@ select {
     padding: 0 16px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 6px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
+    color: var(--color-text);
 }
