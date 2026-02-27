@@ -121,27 +121,27 @@
             </div>
 
             <div class="task-list">
-                <button class="task-btn" onclick="switchView('view-pre-check')">
+                <button class="task-btn" onclick="openSectionView('view-pre-check', 'badge-pre-check')">
                     <span class="task-name">アルコールチェック 1</span>
                     <span class="task-status badge-warning" id="badge-pre-check">未送信</span>
                 </button>
-                <button class="task-btn" onclick="switchView('view-post-check')">
+                <button class="task-btn" onclick="openSectionView('view-post-check', 'badge-post-check')">
                     <span class="task-name">アルコールチェック 2</span>
                     <span class="task-status badge-warning" id="badge-post-check">未送信</span>
                 </button>
-                <button class="task-btn" onclick="switchView('view-record-1')">
+                <button class="task-btn" onclick="openSectionView('view-record-1', 'badge-record-1')">
                     <span class="task-name">運行記録 1</span>
                     <span class="task-status badge-warning" id="badge-record-1">未送信</span>
                 </button>
-                <button class="task-btn" onclick="switchView('view-record-2')">
+                <button class="task-btn" onclick="openSectionView('view-record-2', 'badge-record-2')">
                     <span class="task-name">運行記録 2</span>
                     <span class="task-status badge-warning" id="badge-record-2">未送信</span>
                 </button>
-                <button class="task-btn" onclick="switchView('view-record-3')">
+                <button class="task-btn" onclick="openSectionView('view-record-3', 'badge-record-3')">
                     <span class="task-name">運行記録 3</span>
                     <span class="task-status badge-warning" id="badge-record-3">未送信</span>
                 </button>
-                <button class="task-btn" onclick="switchView('view-refuel')">
+                <button class="task-btn" onclick="openSectionView('view-refuel', 'badge-refuel')">
                     <span class="task-name">給油・特記</span>
                     <span class="task-status badge-warning" id="badge-refuel">入力可</span>
                 </button>
@@ -510,6 +510,13 @@
         </div>
 
     </div>
+
+    <!-- グローバルローディング用オーバーレイ -->
+    <div id="global-loading" class="global-loading" style="display: none;">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-message">処理中...</div>
+    </div>
+
     <script src="app.js"></script>
     <script src="form.js"></script>
     <script src="gas.js"></script>

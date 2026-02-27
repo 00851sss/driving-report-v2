@@ -11,6 +11,8 @@ async function loadDayData() {
 
     if (!url || !pass || !date || !vid) return;
 
+    if (window.showLoading) window.showLoading('データ読込中...');
+
     try {
         const res = await fetch(url, {
             method: 'POST',
@@ -19,13 +21,16 @@ async function loadDayData() {
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const result = await res.json();
-        if (result.status !== 'success' || !result.values) return;
+        if (result.status !== 'success' || !result.values) throw new Error('データの中身がありません');
 
         applyDayData(result.values, result.lastEndMeter);
     } catch (e) {
         console.warn('[gas.js] loadDayData failed:', e.message);
         // エラーは通知しない（任意読込なので失敗してもOK）
+    } finally {
+        if (window.hideLoading) window.hideLoading();
     }
 }
 
@@ -46,51 +51,79 @@ function applyDayData(values, lastEndMeter) {
         return m ? `${m[1]}:${m[2]}` : String(val);
     };
 
-    // Row0 (記録1 + 乗車前チェック)
-    setIfEmpty('pre-check-time', fmtTime(v(0, 6)));
-    setIfEmpty('pre-checker', v(0, 11));
-    setIfEmpty('driver-name-1', v(0, 2));
-    setIfEmpty('destination-1', v(0, 3));
-    setIfEmpty('start-time-1', fmtTime(v(0, 16)));
-    setIfEmpty('end-time-1', fmtTime(v(0, 17)));
-    setIfEmpty('start-meter-1', v(0, 18));
-    setIfEmpty('end-meter-1', v(0, 19));
+    const setVal = (id, val) => {
+        if (!val) return;
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = val;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    };
 
-    // 出発メーター: 前回到着メーターとして引継ぎ（同日データがない場合）
-    // 前回メーターは end-meter-1 の値があれば start-meter-1 に引継ぎ
-    // or GASから返却された lastEndMeter を適用
+    // Row0 (記録1 + 乗車前チェック)
+    setVal('pre-check-time', fmtTime(v(0, 6)));
+    setVal('pre-checker', v(0, 11));
+    if (v(0, 6) && window.markAsDone) window.markAsDone('pre-check');
+
+    setVal('driver-name-1', v(0, 2));
+    setVal('destination-1', v(0, 3));
+    setVal('start-time-1', fmtTime(v(0, 16)));
+    setVal('end-time-1', fmtTime(v(0, 17)));
+    setVal('start-meter-1', v(0, 18));
+    setVal('end-meter-1', v(0, 19));
+
+    // 出発メーター: 前回到着メーターとして引継ぎ
     const prevEndMeter = v(0, 19) || lastEndMeter;
-    if (prevEndMeter) {
+    if (prevEndMeter && !v(0, 18)) {
         const sm1 = document.getElementById('start-meter-1');
         if (sm1 && !sm1.value) sm1.value = prevEndMeter;
     }
 
+    if (v(0, 19) && window.markAsDone) {
+        window.markAsDone('record-1');
+        if (window.removeDrivingState) window.removeDrivingState('1');
+    } else if (v(0, 16) && window.markAsDriving) {
+        window.markAsDriving('1');
+    }
+
     // Row1 (記録2 + 乗車後チェック)
-    setIfEmpty('post-check-time', fmtTime(v(1, 6)));
-    setIfEmpty('post-checker', v(1, 11));
-    setIfEmpty('driver-name-2', v(1, 2));
-    setIfEmpty('destination-2', v(1, 3));
-    setIfEmpty('start-time-2', fmtTime(v(1, 16)));
-    setIfEmpty('end-time-2', fmtTime(v(1, 17)));
-    setIfEmpty('start-meter-2', v(1, 18));
-    setIfEmpty('end-meter-2', v(1, 19));
+    setVal('post-check-time', fmtTime(v(1, 6)));
+    setVal('post-checker', v(1, 11));
+    if (v(1, 6) && window.markAsDone) window.markAsDone('post-check');
+
+    setVal('driver-name-2', v(1, 2));
+    setVal('destination-2', v(1, 3));
+    setVal('start-time-2', fmtTime(v(1, 16)));
+    setVal('end-time-2', fmtTime(v(1, 17)));
+    setVal('start-meter-2', v(1, 18));
+    setVal('end-meter-2', v(1, 19));
+
+    if (v(1, 19) && window.markAsDone) {
+        window.markAsDone('record-2');
+        if (window.removeDrivingState) window.removeDrivingState('2');
+    } else if (v(1, 16) && window.markAsDriving) {
+        window.markAsDriving('2');
+    }
 
     // Row2 (記録3)
-    setIfEmpty('driver-name-3', v(2, 2));
-    setIfEmpty('destination-3', v(2, 3));
-    setIfEmpty('start-time-3', fmtTime(v(2, 16)));
-    setIfEmpty('end-time-3', fmtTime(v(2, 17)));
-    setIfEmpty('start-meter-3', v(2, 18));
-    setIfEmpty('end-meter-3', v(2, 19));
+    setVal('driver-name-3', v(2, 2));
+    setVal('destination-3', v(2, 3));
+    setVal('start-time-3', fmtTime(v(2, 16)));
+    setVal('end-time-3', fmtTime(v(2, 17)));
+    setVal('start-meter-3', v(2, 18));
+    setVal('end-meter-3', v(2, 19));
+
+    if (v(2, 19) && window.markAsDone) {
+        window.markAsDone('record-3');
+        if (window.removeDrivingState) window.removeDrivingState('3');
+    } else if (v(2, 16) && window.markAsDriving) {
+        window.markAsDriving('3');
+    }
 
     // 距離再計算
-    ['1', '2', '3'].forEach(n => calcDistance(`start-meter-${n}`, `end-meter-${n}`, `calc-distance-${n}`));
-}
-
-function setIfEmpty(id, val) {
-    if (!val) return;
-    const el = document.getElementById(id);
-    if (el && !el.value) el.value = val;
+    ['1', '2', '3'].forEach(n => {
+        if (window.calcDistance) window.calcDistance(`start-meter-${n}`, `end-meter-${n}`, `calc-distance-${n}`);
+    });
 }
 
 // ---- セクション別送信 ----
@@ -108,6 +141,9 @@ async function submitSection(section) {
     if (!vid) return '車両を選択してください';
 
     const data = collectData();
+    data.section = section; // 新しいGASの「部分更新」判定用に追加
+
+    if (window.showLoading) window.showLoading('送信中...');
 
     try {
         const res = await fetch(url, {
@@ -123,6 +159,8 @@ async function submitSection(section) {
         return result.message || 'GASでエラーが発生しました';
     } catch (e) {
         return `通信エラー: ${e.message}`;
+    } finally {
+        if (window.hideLoading) window.hideLoading();
     }
 }
 
@@ -138,6 +176,7 @@ async function syncMasterData() {
     }
 
     if (msgEl) { msgEl.textContent = '同期中...'; msgEl.className = 'status-msg visible sending'; }
+    if (window.showLoading) window.showLoading('マスタデータ同期中...');
 
     try {
         const res = await fetch(url, {
@@ -171,5 +210,7 @@ async function syncMasterData() {
     } catch (e) {
         console.error('[gas.js] syncMasterData:', e);
         if (msgEl) { msgEl.textContent = `エラー: ${e.message}`; msgEl.className = 'status-msg visible error'; }
+    } finally {
+        if (window.hideLoading) window.hideLoading();
     }
 }

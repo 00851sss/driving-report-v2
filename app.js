@@ -235,3 +235,30 @@ function switchView(viewId) {
     document.getElementById(viewId).classList.add('active');
     window.scrollTo(0, 0);
 }
+
+// --- セクションを開く際の確認 ---
+window.openSectionView = function (viewId, badgeId) {
+    const badge = document.getElementById(badgeId);
+    if (badge && badge.innerHTML.includes('送信済')) {
+        const ok = confirm('この項目はすでに送信済みです。\n新しく再送信（上書き）してよろしいですか？');
+        if (!ok) return; // キャンセルされたら開かない
+    }
+    switchView(viewId);
+};
+
+// --- グローバルローディング制御 ---
+window.showLoading = function (message = '処理中...') {
+    const loader = document.getElementById('global-loading');
+    const msgEl = document.getElementById('loading-message');
+    if (loader) {
+        if (msgEl) msgEl.textContent = message;
+        loader.style.display = 'flex';
+    }
+};
+
+window.hideLoading = function () {
+    const loader = document.getElementById('global-loading');
+    if (loader) {
+        loader.style.display = 'none';
+    }
+};
