@@ -81,12 +81,11 @@ function applyDayData(values, lastEndMeter) {
     setVal('end-meter-1', v(0, 19));
 
     // 出発メーター: 前回到着メーターとして引継ぎ
-    const prevEndMeter = v(0, 19) || lastEndMeter;
+    const prevEndMeter = lastEndMeter; // 昨日の最終メーター
     if (prevEndMeter && !v(0, 18)) {
         const sm1 = document.getElementById('start-meter-1');
         if (sm1 && !sm1.value) {
-            sm1.value = prevEndMeter;
-            sm1.dispatchEvent(new Event('input'));
+            setVal('start-meter-1', prevEndMeter);
         }
     }
 
@@ -115,8 +114,7 @@ function applyDayData(values, lastEndMeter) {
     if (v(1, 18)) {
         setVal('start-meter-2', v(1, 18));
     } else if (autoMeter2 && sm2 && !sm2.value) {
-        sm2.value = autoMeter2;
-        sm2.dispatchEvent(new Event('input'));
+        setVal('start-meter-2', autoMeter2);
     }
 
     setVal('end-meter-2', v(1, 19));
@@ -142,8 +140,7 @@ function applyDayData(values, lastEndMeter) {
     if (v(2, 18)) {
         setVal('start-meter-3', v(2, 18));
     } else if (autoMeter3 && sm3 && !sm3.value) {
-        sm3.value = autoMeter3;
-        sm3.dispatchEvent(new Event('input'));
+        setVal('start-meter-3', autoMeter3);
     }
 
     setVal('end-meter-3', v(2, 19));

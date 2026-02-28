@@ -110,6 +110,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupDistanceCalc(1); setupDistanceCalc(2); setupDistanceCalc(3);
 
+    // ★ 到着メーター入力時に、次の記録の出発メーターへ自動コピー
+    const setupAutoCopy = (fromId, toId) => {
+        const fromEl = document.getElementById(fromId);
+        const toEl = document.getElementById(toId);
+        if (fromEl && toEl) {
+            fromEl.addEventListener('input', (e) => {
+                // 次の出発メーターが空欄の場合のみ自動で埋める
+                if (!toEl.value) {
+                    toEl.value = e.target.value;
+                    toEl.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+            // 変更確定時（フォーカスが外れた時など）に強制的に再評価して確実に引き継ぎ
+            fromEl.addEventListener('change', (e) => {
+                if (!toEl.value || toEl.value === '') {
+                    toEl.value = e.target.value;
+                    toEl.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+        }
+    };
+    setupAutoCopy('end-meter-1', 'start-meter-2');
+    setupAutoCopy('end-meter-2', 'start-meter-3');
+
+    // ★ 運転者の自動引き継ぎ動作
+    const setupAutoDriver = (fromId, toId) => {
+        const fromEl = document.getElementById(fromId);
+        const toEl = document.getElementById(toId);
+        if (fromEl && toEl) {
+            fromEl.addEventListener('change', (e) => {
+                if (!toEl.value) {
+                    toEl.value = e.target.value;
+                }
+            });
+        }
+    };
+    setupAutoDriver('driver-name-1', 'driver-name-2');
+    setupAutoDriver('driver-name-2', 'driver-name-3');
+
     document.getElementById('btn-copy-meter-2')?.addEventListener('click', () => copyArrivalMeter(1, 2));
     document.getElementById('btn-copy-meter-3')?.addEventListener('click', () => copyArrivalMeter(2, 3));
 
