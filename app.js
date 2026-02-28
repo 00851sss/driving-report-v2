@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsBtn = document.getElementById('btn-settings');
     if (settingsBtn) {
         settingsBtn.addEventListener('click', () => {
-            document.getElementById('settings-modal').classList.add('open');
+            openModalWithHistory('settings-modal');
         });
     }
 
@@ -55,8 +55,70 @@ document.addEventListener('DOMContentLoaded', () => {
     // モーダルのスワイプで閉じる機能
     setupModalDragToClose();
 
+    // 履歴管理の初期化（ブラウザの戻るボタン対応）
+    initHistoryManagement();
+
     loadSettings();
 });
+
+function initHistoryManagement() {
+    // 初回の状態（ホーム）を履歴にセット
+    if (!window.history.state) {
+        window.history.replaceState({ viewId: 'view-home' }, '', '');
+    }
+
+    // ブラウザの戻る/進むボタン操作を検知
+    window.addEventListener('popstate', (event) => {
+        const state = event.state;
+
+        // 全てのモーダルを一旦閉じる
+        document.querySelectorAll('.modal-overlay.open').forEach(m => {
+            m.classList.remove('open', 'closing');
+        });
+
+        if (state) {
+            if (state.modalId) {
+                // モーダルを開く状態
+                const modal = document.getElementById(state.modalId);
+                if (modal) modal.classList.add('open');
+            } else if (state.viewId) {
+                // 通常のView切り替え
+                internalSwitchView(state.viewId);
+            }
+        } else {
+            internalSwitchView('view-home');
+        }
+    });
+}
+
+/**
+ * 履歴を積みつつモーダルを開く
+ */
+function openModalWithHistory(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    modal.classList.add('open');
+    window.history.pushState({ modalId: modalId }, '', '');
+}
+
+/**
+ * モーダルを閉じる（履歴を一つ戻すことで popstate に任せる）
+ */
+window.closeModal = function (modalEl) {
+    if (!modalEl) return;
+
+    // もし現在の履歴がこのモーダルのものなら、戻るボタンをシミュレートする
+    if (window.history.state && window.history.state.modalId === modalEl.id) {
+        window.history.back();
+    } else {
+        // そうでなければ（履歴管理外で開かれた場合など）直接閉じる
+        modalEl.classList.add('closing');
+        setTimeout(() => {
+            modalEl.classList.remove('open', 'closing');
+        }, 300);
+    }
+}
 
 function handleUrlHash() {
     const hash = window.location.hash;
@@ -90,10 +152,12 @@ function initDestinationModal() {
                 currentDestinationTargetId = id;
                 inputArea.value = el.value || ''; // 現在の値をテキストエリアにセット
                 renderDestinationModalChips();
-                modal.classList.add('open');
+                openModalWithHistory('destination-1' === id ? 'destination-modal' : 'destination-modal'); // IDに関わらずモーダル自体を開く
             });
         }
     });
+
+    // ※修正：行番号がズレるため destination-modal も History 対応させる
 
     // 決定ボタン
     btnOk.addEventListener('click', () => {
@@ -123,25 +187,55 @@ function renderDestinationModalChips() {
     container.innerHTML = '';
     const list = appData.destinations || [];
 
-    list.forEach(name => {
-        const chip = document.createElement('div');
-        chip.className = 'tag';
-        chip.style.cursor = 'pointer';
-        chip.style.backgroundColor = 'var(--color-bg)';
-        chip.style.border = '1px solid var(--color-border)';
-        chip.textContent = name;
+    // お気に入りを優先してソート
+    const sortedList = [...list].sort((a, b) => {
+        const aFav = (typeof a === 'object' && a.favorite) ? 1 : 0;
+        const bFav = (typeof b === 'object' && b.favorite) ? 1 : 0;
+        return bFav - aFav;
+    });
 
-        chip.addEventListener('click', () => {
-            const currentText = inputArea.value.trim();
-            if (currentText) {
-                // 既に何か入力されていれば、カンマやスペースなどで繋ぐか、そのままくっつけるか（ここではスペース）
-                inputArea.value = currentText + " " + name;
+    // 現在の入力値を配列化（チェック状態の判定用、全角・半角スペース両方対応）
+    const currentValues = inputArea.value.split(/[\s　]+/).filter(v => v.length > 0);
+
+    sortedList.forEach((item) => {
+        const name = typeof item === 'object' ? item.name : item;
+        const isFav = typeof item === 'object' && item.favorite;
+        const isChecked = currentValues.includes(name);
+
+        const wrapper = document.createElement('label');
+        wrapper.className = 'checkbox-item' + (isChecked ? ' checked' : '') + (isFav ? ' priority' : '');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = isChecked;
+
+        const labelText = document.createElement('span');
+        labelText.className = 'item-label';
+        labelText.textContent = name;
+
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(labelText);
+
+        checkbox.addEventListener('change', () => {
+            // デザイン用のクラス切り替え
+            if (checkbox.checked) {
+                wrapper.classList.add('checked');
             } else {
-                inputArea.value = name;
+                wrapper.classList.remove('checked');
             }
+
+            let vals = inputArea.value.split(/[\s　]+/).filter(v => v.length > 0);
+            if (checkbox.checked) {
+                if (!vals.includes(name)) {
+                    vals.push(name);
+                }
+            } else {
+                vals = vals.filter(v => v !== name);
+            }
+            inputArea.value = vals.join(' ');
         });
 
-        container.appendChild(chip);
+        container.appendChild(wrapper);
     });
 }
 
@@ -461,11 +555,22 @@ function updateThemeIcon(theme) {
     }
 }
 
-// --- View切り替え（内部用） ---
-function switchView(viewId) {
+// --- View切り替え（内部用：履歴に追加しない） ---
+function internalSwitchView(viewId) {
     document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
     window.scrollTo(0, 0);
+}
+
+// --- View切り替え（通常用：履歴に追加する） ---
+function switchView(viewId) {
+    const currentView = document.querySelector('.view.active');
+    if (currentView && currentView.id === viewId) return;
+
+    internalSwitchView(viewId);
+
+    // 履歴に状態を追加
+    window.history.pushState({ viewId: viewId }, '', '');
 }
 
 // --- 安全な画面遷移（未送信チェック付き） ---
