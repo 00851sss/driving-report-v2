@@ -49,6 +49,7 @@
 }
 
 [data-theme="dark"] {
+    color-scheme: dark;
     /* ----- Dark Theme (Muted Pastel) ----- */
     --color-bg: #0F172A;
     --color-surface: #1E293B;
@@ -414,6 +415,8 @@ input[type="number"],
 input[type="date"],
 select,
 textarea {
+    appearance: none;
+    -webkit-appearance: none;
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid var(--color-border);
@@ -433,7 +436,10 @@ textarea {
 select.control-input {
     padding-right: 36px;
     text-align: left;
-    /* 中央揃えなどの干渉を防ぐ */
+    /* 文字が矢印と重ならないようにする */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 input:focus,
