@@ -235,11 +235,26 @@ function setupRecordPhases(recordNum) {
             if (btnStart.getAttribute('data-active') === "true") {
                 const ok = await window.showCustomConfirm('出発状態を取り消し、入力内容を解除しますか？');
                 if (ok) {
-                    removeDrivingState(recordNum);
+                    // ▼ 出発取消：入力をクリアしてGASへ空データを同期送信
                     driverEl.value = '';
                     sTimeEl.value = '';
                     sMeterEl.value = '';
-                    if (msgEl) msgEl.className = 'status-msg'; // エラー消去
+                    if (msgEl) { msgEl.textContent = '取消を同期中...'; msgEl.className = 'status-msg visible sending'; }
+
+                    btnStart.disabled = true;
+                    btnStart.style.opacity = '0.5';
+
+                    const err = await submitSection(`record${recordNum}`);
+
+                    btnStart.disabled = false;
+                    btnStart.style.opacity = '1';
+
+                    if (err) {
+                        if (msgEl) { msgEl.textContent = '同期エラー: ' + err; msgEl.className = 'status-msg visible error'; }
+                    } else {
+                        removeDrivingState(recordNum);
+                        if (msgEl) msgEl.className = 'status-msg'; // エラー消去
+                    }
                 }
                 return;
             }
@@ -256,6 +271,25 @@ function setupRecordPhases(recordNum) {
                 return;
             }
 
+            // ▼ 出発：GASへ部分データを同期送信
+            if (msgEl) { msgEl.textContent = '出発状態を同期中...'; msgEl.className = 'status-msg visible sending'; }
+
+            // 二重送信・操作防止
+            btnStart.disabled = true;
+            btnStart.innerHTML = '🔄 同期中...';
+            btnStart.style.opacity = '0.7';
+
+            const err = await submitSection(`record${recordNum}`);
+
+            btnStart.disabled = false;
+            btnStart.innerHTML = '出発';
+            btnStart.style.opacity = '1';
+
+            if (err) {
+                if (msgEl) { msgEl.textContent = '同期に失敗しました: ' + err; msgEl.className = 'status-msg visible error'; }
+                return;
+            }
+
             if (msgEl) msgEl.className = 'status-msg'; // 成功時エラー消去
             markAsDriving(recordNum);
             switchView('view-home'); // 出発したらホームに戻る
@@ -266,13 +300,35 @@ function setupRecordPhases(recordNum) {
         btnCancel.addEventListener('click', async () => {
             const ok = await window.showCustomConfirm('出発状態を取り消し、入力内容を解除しますか？');
             if (ok) {
-                removeDrivingState(recordNum);
+                const msgEl = document.getElementById(`status-record-${recordNum}`);
+                if (msgEl) { msgEl.textContent = '取消を同期中...'; msgEl.className = 'status-msg visible sending'; }
+
+                // 全項目クリア（出発項目含む）
+                document.getElementById(`driver-name-${recordNum}`).value = '';
+                document.getElementById(`start-time-${recordNum}`).value = '';
+                document.getElementById(`start-meter-${recordNum}`).value = '';
                 document.getElementById(`destination-${recordNum}`).value = '';
                 document.getElementById(`end-time-${recordNum}`).value = '';
                 document.getElementById(`end-meter-${recordNum}`).value = '';
                 document.getElementById(`vehicle-return-${recordNum}`).value = '';
                 document.getElementById(`start-meter-${recordNum}`).dispatchEvent(new Event('input'));
-                markAsUnsent(`record-${recordNum}`);
+
+                btnCancel.disabled = true;
+                btnCancel.style.opacity = '0.5';
+
+                // 出発・到着ともに空の状態でGASへ同期送信
+                const err = await submitSection(`record${recordNum}`);
+
+                btnCancel.disabled = false;
+                btnCancel.style.opacity = '1';
+
+                if (err) {
+                    if (msgEl) { msgEl.textContent = '同期エラー: ' + err; msgEl.className = 'status-msg visible error'; }
+                } else {
+                    if (msgEl) msgEl.className = 'status-msg';
+                    removeDrivingState(recordNum);
+                    markAsUnsent(`record-${recordNum}`);
+                }
             }
         });
     }
