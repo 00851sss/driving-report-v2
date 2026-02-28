@@ -567,6 +567,16 @@ select {
     border-color: var(--color-accent);
 }
 
+.btn-submit:disabled,
+.btn-secondary:disabled,
+.btn-time:disabled,
+button:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    transform: none !important;
+}
+
 /* 時計アイコン用 */
 .btn-time {
     width: 48px;

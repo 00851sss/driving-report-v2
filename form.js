@@ -16,7 +16,7 @@ window.markAsDriving = function (num) {
     const badge = document.getElementById(`badge-record-${num}`);
     if (badge) { badge.innerHTML = '<span class="material-symbols-rounded">play_circle</span> 運転中'; badge.className = 'task-status badge-driving'; }
     const depInputs = document.getElementById(`record-${num}-departure-inputs`);
-    if (depInputs) depInputs.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    if (depInputs) depInputs.querySelectorAll('input, select, button').forEach(el => el.disabled = true);
     const btnStart = document.getElementById(`btn-start-record-${num}`);
     if (btnStart) btnStart.style.display = 'none';
     const arrivalSection = document.getElementById(`record-${num}-arrival`);
@@ -24,7 +24,7 @@ window.markAsDriving = function (num) {
 };
 window.removeDrivingState = function (num) {
     const depInputs = document.getElementById(`record-${num}-departure-inputs`);
-    if (depInputs) depInputs.querySelectorAll('input, select').forEach(el => el.disabled = false);
+    if (depInputs) depInputs.querySelectorAll('input, select, button').forEach(el => el.disabled = false);
     const btnStart = document.getElementById(`btn-start-record-${num}`);
     if (btnStart) btnStart.style.display = 'block';
     const arrivalSection = document.getElementById(`record-${num}-arrival`);

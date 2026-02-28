@@ -811,7 +811,9 @@ function setupModalDragToClose() {
 
             // 少しでも下に引っ張ったら即座に反映
             if (currentY > 0) {
-                e.preventDefault(); // 画面自体のスクロールを防ぐ
+                if (e.cancelable) {
+                    e.preventDefault(); // 画面自体のスクロールを防ぐ
+                }
                 sheet.style.transform = `translateY(${currentY}px)`;
             }
         };
