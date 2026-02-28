@@ -149,9 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAutoDriver('driver-name-1', 'driver-name-2');
     setupAutoDriver('driver-name-2', 'driver-name-3');
 
-    document.getElementById('btn-copy-meter-2')?.addEventListener('click', () => copyArrivalMeter(1, 2));
-    document.getElementById('btn-copy-meter-3')?.addEventListener('click', () => copyArrivalMeter(2, 3));
-
     setupRecordPhases(1); setupRecordPhases(2); setupRecordPhases(3);
 
     // 送信ボタンの処理
@@ -247,16 +244,6 @@ function setupDistanceCalc(recordNum) {
 
     if (startInput) startInput.addEventListener('input', calc);
     if (endInput) endInput.addEventListener('input', calc);
-}
-
-function copyArrivalMeter(fromNum, toNum) {
-    const fromVal = document.getElementById(`end-meter-${fromNum}`).value;
-    if (fromVal) {
-        document.getElementById(`start-meter-${toNum}`).value = fromVal;
-        document.getElementById(`start-meter-${toNum}`).dispatchEvent(new Event('input'));
-    } else {
-        if (window.showCustomAlert) window.showCustomAlert(`記録${fromNum}の到着メーターが入力されていません。`);
-    }
 }
 
 function setupRecordPhases(recordNum) {

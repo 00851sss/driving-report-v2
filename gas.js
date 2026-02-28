@@ -103,9 +103,10 @@ function applyDayData(values, lastEndMeter) {
 
     // 記録1の運転者と到着メーターを、記録2の初期値として自動セット
     const autoDriver2 = v(0, 2);
-    const autoMeter2 = v(0, 19);
+    // 記録2の出発メーターは、記録1の到着メーターを優先。無ければ現在DOMにある記録1の値を採用。
+    const autoMeter2 = v(0, 19) || document.getElementById('end-meter-1')?.value;
 
-    setVal('driver-name-2', v(1, 2) || (v(0, 19) ? autoDriver2 : ''));
+    setVal('driver-name-2', v(1, 2) || (autoMeter2 ? autoDriver2 : ''));
     setVal('destination-2', v(1, 3));
     setVal('start-time-2', fmtTime(v(1, 16)));
 
@@ -129,9 +130,9 @@ function applyDayData(values, lastEndMeter) {
     // Row2 (記録3)
     // 記録2の運転者と到着メーターを、記録3の初期値として自動セット
     const autoDriver3 = v(1, 2) || autoDriver2;
-    const autoMeter3 = v(1, 19);
+    const autoMeter3 = v(1, 19) || document.getElementById('end-meter-2')?.value;
 
-    setVal('driver-name-3', v(2, 2) || (v(1, 19) ? autoDriver3 : ''));
+    setVal('driver-name-3', v(2, 2) || (autoMeter3 ? autoDriver3 : ''));
     setVal('destination-3', v(2, 3));
     setVal('start-time-3', fmtTime(v(2, 16)));
 
