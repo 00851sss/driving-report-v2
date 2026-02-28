@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-add-vehicle')?.addEventListener('click', () => addItemToList('vehicle'));
     document.getElementById('btn-add-driver')?.addEventListener('click', () => addItemToList('driver'));
     document.getElementById('btn-add-checker')?.addEventListener('click', () => addItemToList('checker'));
+    document.getElementById('btn-add-destination')?.addEventListener('click', () => addItemToList('destination'));
 
     document.getElementById('btn-sync-master')?.addEventListener('click', () => {
         if (typeof syncMasterData === 'function') syncMasterData();
@@ -48,6 +49,7 @@ let appData = {
     vehicles: [],
     drivers: [],
     checkers: [],
+    destinations: [],
     gasUrl: '',
     passcode: '',
     defaultVehicle: '',
@@ -64,7 +66,7 @@ function loadSettings() {
     document.getElementById('gas-url-input').value = appData.gasUrl || '';
     document.getElementById('passcode-input').value = appData.passcode || '';
 
-    ['vehicle', 'driver', 'checker'].forEach(type => {
+    ['vehicle', 'driver', 'checker', 'destination'].forEach(type => {
         renderTagList(type);
         updateSelectOptions(type);
     });
@@ -107,6 +109,8 @@ function addItemToList(type) {
         appData.drivers.push(name);
     } else if (type === 'checker' && !appData.checkers.includes(name)) {
         appData.checkers.push(name);
+    } else if (type === 'destination' && !appData.destinations.includes(name)) {
+        appData.destinations.push(name);
     }
 
     input.value = '';
@@ -122,6 +126,8 @@ function removeItemFromList(type, name) {
         appData.drivers = appData.drivers.filter(d => d !== name);
     } else if (type === 'checker') {
         appData.checkers = appData.checkers.filter(c => c !== name);
+    } else if (type === 'destination') {
+        appData.destinations = appData.destinations.filter(d => d !== name);
     }
     saveSettings();
     renderTagList(type);
@@ -137,6 +143,7 @@ function renderTagList(type) {
     if (type === 'vehicle') list = appData.vehicles;
     else if (type === 'driver') list = appData.drivers;
     else if (type === 'checker') list = appData.checkers;
+    else if (type === 'destination') list = appData.destinations || [];
 
     list.forEach(name => {
         const tag = document.createElement('div');
@@ -167,6 +174,9 @@ function updateSelectOptions(type) {
     } else if (type === 'checker') {
         list = appData.checkers;
         selectors = ['pre-checker', 'post-checker'];
+    } else if (type === 'destination') {
+        list = appData.destinations || [];
+        selectors = ['destination-1', 'destination-2', 'destination-3'];
     }
 
     selectors.forEach(id => {

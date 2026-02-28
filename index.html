@@ -19,6 +19,7 @@
                     <button class="tab-btn active" data-tab="tab-vehicle">車両</button>
                     <button class="tab-btn" data-tab="tab-driver">運転者</button>
                     <button class="tab-btn" data-tab="tab-checker">確認者</button>
+                    <button class="tab-btn" data-tab="tab-destination">訪問先</button>
                     <button class="tab-btn" data-tab="tab-general">⚙ 共通</button>
                 </div>
 
@@ -65,6 +66,17 @@
                         <div class="input-add-row">
                             <input type="text" id="input-add-checker" placeholder="名前を入力">
                             <button class="btn-add" id="btn-add-checker">＋ 追加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-destination">
+                    <div class="setting-block">
+                        <div class="setting-block-title">訪問先リスト</div>
+                        <div class="tag-list" id="destination-tag-list"></div>
+                        <div class="input-add-row">
+                            <input type="text" id="input-add-destination" placeholder="訪問先を入力">
+                            <button class="btn-add" id="btn-add-destination">＋ 追加</button>
                         </div>
                     </div>
                 </div>
@@ -284,7 +296,9 @@
                     <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
                     <div class="field-group">
                         <label class="field-label" for="destination-1">訪問先・現場名等</label>
-                        <input type="text" id="destination-1" placeholder="到着した場所">
+                        <select id="destination-1" class="control-input">
+                            <option value="">未選択</option>
+                        </select>
                     </div>
                     <div class="field-row">
                         <div class="field-group">
@@ -365,7 +379,9 @@
                     <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
                     <div class="field-group">
                         <label class="field-label" for="destination-2">訪問先・現場名等</label>
-                        <input type="text" id="destination-2" placeholder="到着した場所">
+                        <select id="destination-2" class="control-input">
+                            <option value="">未選択</option>
+                        </select>
                     </div>
                     <div class="field-row">
                         <div class="field-group">
@@ -446,7 +462,9 @@
                     <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
                     <div class="field-group">
                         <label class="field-label" for="destination-3">訪問先・現場名等</label>
-                        <input type="text" id="destination-3" placeholder="到着した場所">
+                        <select id="destination-3" class="control-input">
+                            <option value="">未選択</option>
+                        </select>
                     </div>
                     <div class="field-row">
                         <div class="field-group">

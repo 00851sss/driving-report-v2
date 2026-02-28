@@ -55,6 +55,14 @@ function applyDayData(values, lastEndMeter) {
         if (!val) return;
         const el = document.getElementById(id);
         if (el) {
+            if (el.tagName === 'SELECT') {
+                // セレクトボックスにその値が存在しない場合は、一時的に選択肢を追加する（過去の自由入力データ用）
+                if (!Array.from(el.options).some(opt => opt.value === String(val))) {
+                    const newOpt = document.createElement('option');
+                    newOpt.value = newOpt.textContent = val;
+                    el.appendChild(newOpt);
+                }
+            }
             el.value = val;
             el.dispatchEvent(new Event('input', { bubbles: true }));
         }
@@ -232,10 +240,11 @@ async function syncMasterData() {
         appData.vehicles = (result.vehicles || []);
         appData.drivers = (result.drivers || []);
         appData.checkers = (result.checkers || []);
+        appData.destinations = (result.destinations || []);
 
         // フロントエンドのUIに反映して保存
         saveSettings();
-        ['vehicle', 'driver', 'checker'].forEach(type => {
+        ['vehicle', 'driver', 'checker', 'destination'].forEach(type => {
             renderTagList(type);
             updateSelectOptions(type);
         });
