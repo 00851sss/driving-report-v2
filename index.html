@@ -105,480 +105,479 @@
                     <button class="btn-secondary" id="btn-close-settings" style="margin-top: 12px;">✕ 閉じる</button>
                 </div>
             </div>
-            <div class="modal-overlay" id="destination-modal" role="dialog">
-                <div class="modal-sheet">
-                    <div class="modal-title" style="border-bottom:none; padding-bottom:0;">訪問先・現場名等</div>
-                    <div class="section-body" style="padding: 16px;">
-                        <label class="field-label">自由入力・編集</label>
-                        <textarea id="destination-modal-input" class="control-input" rows="3"
-                            placeholder="ここに入力または下のリストから追加..." style="width: 100%; margin-bottom: 12px;"></textarea>
+        </div>
 
-                        <label class="field-label">リストから追加</label>
-                        <div class="tag-list" id="destination-modal-chip-list" style="margin-bottom: 16px;">
-                            <!-- JSでチップが生成されます -->
-                        </div>
+        <div class="modal-overlay" id="destination-modal" role="dialog">
+            <div class="modal-sheet">
+                <div class="modal-title" style="border-bottom:none; padding-bottom:0;">訪問先・現場名等</div>
+                <div class="section-body" style="padding: 16px;">
+                    <label class="field-label">自由入力・編集</label>
+                    <textarea id="destination-modal-input" class="control-input" rows="3"
+                        placeholder="ここに入力または下のリストから追加..." style="width: 100%; margin-bottom: 12px;"></textarea>
+
+                    <label class="field-label">リストから追加</label>
+                    <div class="tag-list" id="destination-modal-chip-list" style="margin-bottom: 16px;">
+                        <!-- JSでチップが生成されます -->
                     </div>
-                    <div style="margin-top: 10px; display: flex; gap: 8px;">
-                        <button class="btn-submit" id="btn-dest-modal-ok" style="margin-top: 0; flex: 1;">✔ 決定</button>
-                        <button class="btn-secondary" id="btn-dest-modal-cancel" style="margin-top: 0; flex: 1;">✕
-                            キャンセル</button>
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 8px;">
+                    <button class="btn-submit" id="btn-dest-modal-ok" style="margin-top: 0; flex: 1;">✔ 決定</button>
+                    <button class="btn-secondary" id="btn-dest-modal-cancel" style="margin-top: 0; flex: 1;">✕
+                        キャンセル</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-home" class="view active">
+            <header class="app-header">
+                <h2>運行日報</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-icon" id="btn-reload-data"
+                        onclick="if(window.resetForm) window.resetForm(); if(typeof loadDayData === 'function') loadDayData();"
+                        aria-label="データ更新">⟳</button>
+                    <button class="btn-icon" id="btn-theme-toggle" aria-label="テーマ切替">◑</button>
+                    <button class="btn-icon" id="btn-settings" aria-label="設定">⚙&#xFE0E;</button>
+                </div>
+            </header>
+
+            <div class="section-card" style="margin: 16px 16px 24px 16px;">
+                <div class="section-body" style="padding: 16px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <div style="flex: 1 1 120px;">
+                            <input type="date" id="report-date" class="control-input">
+                        </div>
+                        <div style="flex: 2 1 180px; display: flex; gap: 8px;">
+                            <select id="vehicle-id" class="control-input" style="flex: 1;">
+                                <option value="">未選択</option>
+                            </select>
+                            <button id="btn-qr-scan" class="btn-qr-dummy">▦</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div id="view-home" class="view active">
-                <header class="app-header">
-                    <h2>運行日報</h2>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-icon" id="btn-reload-data"
-                            onclick="if(window.resetForm) window.resetForm(); if(typeof loadDayData === 'function') loadDayData();"
-                            aria-label="データ更新">⟳</button>
-                        <button class="btn-icon" id="btn-theme-toggle" aria-label="テーマ切替">◑</button>
-                        <button class="btn-icon" id="btn-settings" aria-label="設定">⚙&#xFE0E;</button>
-                    </div>
-                </header>
-
-                <div class="section-card" style="margin: 16px 16px 24px 16px;">
-                    <div class="section-body" style="padding: 16px;">
-                        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                            <div style="flex: 1 1 120px;">
-                                <input type="date" id="report-date" class="control-input">
-                            </div>
-                            <div style="flex: 2 1 180px; display: flex; gap: 8px;">
-                                <select id="vehicle-id" class="control-input" style="flex: 1;">
-                                    <option value="">未選択</option>
-                                </select>
-                                <button id="btn-qr-scan" class="btn-qr-dummy">▦</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-list">
-                    <button class="task-btn" onclick="openSectionView('view-pre-check', 'badge-pre-check')">
-                        <span class="task-name">アルコールチェック 1</span>
-                        <span class="task-status badge-warning" id="badge-pre-check">未送信</span>
-                    </button>
-                    <button class="task-btn" onclick="openSectionView('view-post-check', 'badge-post-check')">
-                        <span class="task-name">アルコールチェック 2</span>
-                        <span class="task-status badge-warning" id="badge-post-check">未送信</span>
-                    </button>
-                    <button class="task-btn" onclick="openSectionView('view-record-1', 'badge-record-1')">
-                        <span class="task-name">運行記録 1</span>
-                        <span class="task-status badge-warning" id="badge-record-1">未送信</span>
-                    </button>
-                    <button class="task-btn" onclick="openSectionView('view-record-2', 'badge-record-2')">
-                        <span class="task-name">運行記録 2</span>
-                        <span class="task-status badge-warning" id="badge-record-2">未送信</span>
-                    </button>
-                    <button class="task-btn" onclick="openSectionView('view-record-3', 'badge-record-3')">
-                        <span class="task-name">運行記録 3</span>
-                        <span class="task-status badge-warning" id="badge-record-3">未送信</span>
-                    </button>
-                    <button class="task-btn" onclick="openSectionView('view-refuel', 'badge-refuel')">
-                        <span class="task-name">給油・特記</span>
-                        <span class="task-status badge-warning" id="badge-refuel">入力可</span>
-                    </button>
-                </div>
+            <div class="task-list">
+                <button class="task-btn" onclick="openSectionView('view-pre-check', 'badge-pre-check')">
+                    <span class="task-name">アルコールチェック 1</span>
+                    <span class="task-status badge-warning" id="badge-pre-check">未送信</span>
+                </button>
+                <button class="task-btn" onclick="openSectionView('view-post-check', 'badge-post-check')">
+                    <span class="task-name">アルコールチェック 2</span>
+                    <span class="task-status badge-warning" id="badge-post-check">未送信</span>
+                </button>
+                <button class="task-btn" onclick="openSectionView('view-record-1', 'badge-record-1')">
+                    <span class="task-name">運行記録 1</span>
+                    <span class="task-status badge-warning" id="badge-record-1">未送信</span>
+                </button>
+                <button class="task-btn" onclick="openSectionView('view-record-2', 'badge-record-2')">
+                    <span class="task-name">運行記録 2</span>
+                    <span class="task-status badge-warning" id="badge-record-2">未送信</span>
+                </button>
+                <button class="task-btn" onclick="openSectionView('view-record-3', 'badge-record-3')">
+                    <span class="task-name">運行記録 3</span>
+                    <span class="task-status badge-warning" id="badge-record-3">未送信</span>
+                </button>
+                <button class="task-btn" onclick="openSectionView('view-refuel', 'badge-refuel')">
+                    <span class="task-name">給油・特記</span>
+                    <span class="task-status badge-warning" id="badge-refuel">入力可</span>
+                </button>
             </div>
+        </div>
 
-            <div id="view-pre-check" class="view">
-                <header class="app-header">
-                    <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
-                    <h2 style="text-align: center;">アルコールチェック 1</h2>
-                    <div style="width: 60px;"></div>
-                </header>
-                <div class="section-body" style="padding: 20px 16px;">
-                    <div class="field-row">
-                        <div class="field-group" style="flex:1">
-                            <label class="field-label" for="pre-check-time">確認時刻</label>
-                            <div class="time-input-row">
-                                <input type="time" id="pre-check-time" style="flex:1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('pre-check-time')">⏱&#xFE0E;</button>
-                            </div>
+        <div id="view-pre-check" class="view">
+            <header class="app-header">
+                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <h2 style="text-align: center;">アルコールチェック 1</h2>
+                <div style="width: 60px;"></div>
+            </header>
+            <div class="section-body" style="padding: 20px 16px;">
+                <div class="field-row">
+                    <div class="field-group" style="flex:1">
+                        <label class="field-label" for="pre-check-time">確認時刻</label>
+                        <div class="time-input-row">
+                            <input type="time" id="pre-check-time" style="flex:1;">
+                            <button class="btn-secondary btn-time"
+                                onclick="setCurrentTime('pre-check-time')">⏱&#xFE0E;</button>
                         </div>
-                        <div class="field-group" style="flex:1">
-                            <label class="field-label">確認方法</label>
-                            <div class="radio-group" role="group">
-                                <label><input type="radio" name="pre-check-method" value="対面"
-                                        checked><span>対面</span></label>
-                                <label><input type="radio" name="pre-check-method" value="電話"><span>電話</span></label>
-                            </div>
+                    </div>
+                    <div class="field-group" style="flex:1">
+                        <label class="field-label">確認方法</label>
+                        <div class="radio-group" role="group">
+                            <label><input type="radio" name="pre-check-method" value="対面"
+                                    checked><span>対面</span></label>
+                            <label><input type="radio" name="pre-check-method" value="電話"><span>電話</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="pre-checker">確認者</label>
+                    <select id="pre-checker">
+                        <option value="">未選択</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">酒気帯び</label>
+                    <div class="radio-group" role="group">
+                        <label><input type="radio" name="pre-alcohol" value="無" checked><span>無</span></label>
+                        <label><input type="radio" name="pre-alcohol" value="有"><span>有</span></label>
+                    </div>
+                </div>
+                <div class="field-group" id="pre-alcohol-val-group" style="display:none">
+                    <label class="field-label" for="pre-alcohol-val">アルコール数値</label>
+                    <input type="text" id="pre-alcohol-val" placeholder="例: 0.00">
+                </div>
+                <div class="status-msg" id="status-pre-check"></div>
+                <button class="btn-submit" id="btn-submit-pre-check">✔ 送信</button>
+            </div>
+        </div>
+
+        <div id="view-post-check" class="view">
+            <header class="app-header">
+                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <h2 style="text-align: center;">アルコールチェック 2</h2>
+                <div style="width: 60px;"></div>
+            </header>
+            <div class="section-body" style="padding: 20px 16px;">
+                <div class="field-row">
+                    <div class="field-group" style="flex:1">
+                        <label class="field-label" for="post-check-time">確認時刻</label>
+                        <div class="time-input-row">
+                            <input type="time" id="post-check-time" style="flex:1;">
+                            <button class="btn-secondary btn-time"
+                                onclick="setCurrentTime('post-check-time')">⏱&#xFE0E;</button>
+                        </div>
+                    </div>
+                    <div class="field-group" style="flex:1">
+                        <label class="field-label">確認方法</label>
+                        <div class="radio-group" role="group">
+                            <label><input type="radio" name="post-check-method" value="対面"
+                                    checked><span>対面</span></label>
+                            <label><input type="radio" name="post-check-method" value="電話"><span>電話</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="post-checker">確認者</label>
+                    <select id="post-checker">
+                        <option value="">未選択</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">酒気帯び</label>
+                    <div class="radio-group" role="group">
+                        <label><input type="radio" name="post-alcohol" value="無" checked><span>無</span></label>
+                        <label><input type="radio" name="post-alcohol" value="有"><span>有</span></label>
+                    </div>
+                </div>
+                <div class="status-msg" id="status-post-check"></div>
+                <button class="btn-submit" id="btn-submit-post-check">✔ 送信</button>
+            </div>
+        </div>
+
+        <div id="view-record-1" class="view">
+            <header class="app-header">
+                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <h2 style="text-align: center;">運行記録 1</h2>
+                <div style="width: 60px;"></div>
+            </header>
+            <div class="section-body" style="padding: 20px 16px;">
+                <div id="record-1-departure-inputs">
+                    <div class="field-group">
+                        <label class="field-label">点検実施</label>
+                        <div class="radio-group" role="group">
+                            <label><input type="radio" name="pre-inspection-1" value="実施" checked><span>済</span></label>
+                            <label><input type="radio" name="pre-inspection-1" value="未実施"><span>未</span></label>
                         </div>
                     </div>
                     <div class="field-group">
-                        <label class="field-label" for="pre-checker">確認者</label>
-                        <select id="pre-checker">
+                        <label class="field-label" for="driver-name-1">運転者</label>
+                        <select id="driver-name-1">
                             <option value="">未選択</option>
                         </select>
                     </div>
-                    <div class="field-group">
-                        <label class="field-label">酒気帯び</label>
-                        <div class="radio-group" role="group">
-                            <label><input type="radio" name="pre-alcohol" value="無" checked><span>無</span></label>
-                            <label><input type="radio" name="pre-alcohol" value="有"><span>有</span></label>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label" for="start-time-1">出発時刻</label>
+                            <div class="time-input-row">
+                                <input type="time" id="start-time-1" style="flex: 1;">
+                                <button class="btn-secondary btn-time"
+                                    onclick="setCurrentTime('start-time-1')">⏱&#xFE0E;</button>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="start-meter-1">出発メーター (km)</label>
+                            <input type="number" id="start-meter-1" placeholder="0">
                         </div>
                     </div>
-                    <div class="field-group" id="pre-alcohol-val-group" style="display:none">
-                        <label class="field-label" for="pre-alcohol-val">アルコール数値</label>
-                        <input type="text" id="pre-alcohol-val" placeholder="例: 0.00">
+                </div>
+                <button class="btn-submit" id="btn-start-record-1" style="background-color: var(--color-warning);">▶
+                    出発</button>
+
+                <div id="record-1-arrival" class="phase-arrival">
+                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
+                    <div class="field-group">
+                        <label class="field-label" for="destination-1">訪問先・現場名等</label>
+                        <input type="text" id="destination-1" class="control-input" placeholder="タップして編集..." readonly
+                            style="cursor: pointer; background-color: var(--color-bg);">
                     </div>
-                    <div class="status-msg" id="status-pre-check"></div>
-                    <button class="btn-submit" id="btn-submit-pre-check">✔ 送信</button>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label" for="end-time-1">到着時刻</label>
+                            <div class="time-input-row">
+                                <input type="time" id="end-time-1" style="flex: 1;">
+                                <button class="btn-secondary btn-time"
+                                    onclick="setCurrentTime('end-time-1')">⏱&#xFE0E;</button>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="end-meter-1">到着メーター (km)</label>
+                            <input type="number" id="end-meter-1" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">走行距離</label>
+                        <div class="distance-display"><span class="value" id="calc-distance-1">—</span><span>
+                                km</span>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="vehicle-return-1">車両持帰</label>
+                        <select id="vehicle-return-1">
+                            <option value="">未選択</option>
+                            <option value="会社">会社</option>
+                            <option value="持帰">持帰</option>
+                        </select>
+                    </div>
+                    <div class="status-msg" id="status-record-1"></div>
+                    <button class="btn-submit" id="btn-submit-record-1">✔ 到着・送信</button>
+                    <button class="btn-secondary" id="btn-cancel-record-1"
+                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
+                        出発取消</button>
                 </div>
             </div>
+        </div>
 
-            <div id="view-post-check" class="view">
-                <header class="app-header">
-                    <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
-                    <h2 style="text-align: center;">アルコールチェック 2</h2>
-                    <div style="width: 60px;"></div>
-                </header>
-                <div class="section-body" style="padding: 20px 16px;">
-                    <div class="field-row">
-                        <div class="field-group" style="flex:1">
-                            <label class="field-label" for="post-check-time">確認時刻</label>
-                            <div class="time-input-row">
-                                <input type="time" id="post-check-time" style="flex:1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('post-check-time')">⏱&#xFE0E;</button>
-                            </div>
-                        </div>
-                        <div class="field-group" style="flex:1">
-                            <label class="field-label">確認方法</label>
-                            <div class="radio-group" role="group">
-                                <label><input type="radio" name="post-check-method" value="対面"
-                                        checked><span>対面</span></label>
-                                <label><input type="radio" name="post-check-method" value="電話"><span>電話</span></label>
-                            </div>
+        <div id="view-record-2" class="view">
+            <header class="app-header">
+                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <h2 style="text-align: center;">運行記録 2</h2>
+                <div style="width: 60px;"></div>
+            </header>
+            <div class="section-body" style="padding: 20px 16px;">
+                <button class="btn-secondary" id="btn-copy-meter-2" style="margin-bottom: 10px;">⬇
+                    前回メーターを引継ぎ</button>
+                <div id="record-2-departure-inputs">
+                    <div class="field-group">
+                        <label class="field-label">点検実施</label>
+                        <div class="radio-group" role="group">
+                            <label><input type="radio" name="pre-inspection-2" value="実施" checked><span>済</span></label>
+                            <label><input type="radio" name="pre-inspection-2" value="未実施"><span>未</span></label>
                         </div>
                     </div>
                     <div class="field-group">
-                        <label class="field-label" for="post-checker">確認者</label>
-                        <select id="post-checker">
+                        <label class="field-label" for="driver-name-2">運転者</label>
+                        <select id="driver-name-2">
                             <option value="">未選択</option>
                         </select>
                     </div>
-                    <div class="field-group">
-                        <label class="field-label">酒気帯び</label>
-                        <div class="radio-group" role="group">
-                            <label><input type="radio" name="post-alcohol" value="無" checked><span>無</span></label>
-                            <label><input type="radio" name="post-alcohol" value="有"><span>有</span></label>
-                        </div>
-                    </div>
-                    <div class="status-msg" id="status-post-check"></div>
-                    <button class="btn-submit" id="btn-submit-post-check">✔ 送信</button>
-                </div>
-            </div>
-
-            <div id="view-record-1" class="view">
-                <header class="app-header">
-                    <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
-                    <h2 style="text-align: center;">運行記録 1</h2>
-                    <div style="width: 60px;"></div>
-                </header>
-                <div class="section-body" style="padding: 20px 16px;">
-                    <div id="record-1-departure-inputs">
-                        <div class="field-group">
-                            <label class="field-label">点検実施</label>
-                            <div class="radio-group" role="group">
-                                <label><input type="radio" name="pre-inspection-1" value="実施"
-                                        checked><span>済</span></label>
-                                <label><input type="radio" name="pre-inspection-1" value="未実施"><span>未</span></label>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label" for="driver-name-1">運転者</label>
-                            <select id="driver-name-1">
-                                <option value="">未選択</option>
-                            </select>
-                        </div>
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label class="field-label" for="start-time-1">出発時刻</label>
-                                <div class="time-input-row">
-                                    <input type="time" id="start-time-1" style="flex: 1;">
-                                    <button class="btn-secondary btn-time"
-                                        onclick="setCurrentTime('start-time-1')">⏱&#xFE0E;</button>
-                                </div>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="start-meter-1">出発メーター (km)</label>
-                                <input type="number" id="start-meter-1" placeholder="0">
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-submit" id="btn-start-record-1" style="background-color: var(--color-warning);">▶
-                        出発</button>
-
-                    <div id="record-1-arrival" class="phase-arrival">
-                        <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
-                        <div class="field-group">
-                            <label class="field-label" for="destination-1">訪問先・現場名等</label>
-                            <input type="text" id="destination-1" class="control-input" placeholder="タップして編集..."
-                                readonly style="cursor: pointer; background-color: var(--color-bg);">
-                        </div>
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label class="field-label" for="end-time-1">到着時刻</label>
-                                <div class="time-input-row">
-                                    <input type="time" id="end-time-1" style="flex: 1;">
-                                    <button class="btn-secondary btn-time"
-                                        onclick="setCurrentTime('end-time-1')">⏱&#xFE0E;</button>
-                                </div>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="end-meter-1">到着メーター (km)</label>
-                                <input type="number" id="end-meter-1" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label">走行距離</label>
-                            <div class="distance-display"><span class="value" id="calc-distance-1">—</span><span>
-                                    km</span>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label" for="vehicle-return-1">車両持帰</label>
-                            <select id="vehicle-return-1">
-                                <option value="">未選択</option>
-                                <option value="会社">会社</option>
-                                <option value="持帰">持帰</option>
-                            </select>
-                        </div>
-                        <div class="status-msg" id="status-record-1"></div>
-                        <button class="btn-submit" id="btn-submit-record-1">✔ 到着・送信</button>
-                        <button class="btn-secondary" id="btn-cancel-record-1"
-                            style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
-                            出発取消</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-record-2" class="view">
-                <header class="app-header">
-                    <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
-                    <h2 style="text-align: center;">運行記録 2</h2>
-                    <div style="width: 60px;"></div>
-                </header>
-                <div class="section-body" style="padding: 20px 16px;">
-                    <button class="btn-secondary" id="btn-copy-meter-2" style="margin-bottom: 10px;">⬇
-                        前回メーターを引継ぎ</button>
-                    <div id="record-2-departure-inputs">
-                        <div class="field-group">
-                            <label class="field-label">点検実施</label>
-                            <div class="radio-group" role="group">
-                                <label><input type="radio" name="pre-inspection-2" value="実施"
-                                        checked><span>済</span></label>
-                                <label><input type="radio" name="pre-inspection-2" value="未実施"><span>未</span></label>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label" for="driver-name-2">運転者</label>
-                            <select id="driver-name-2">
-                                <option value="">未選択</option>
-                            </select>
-                        </div>
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label class="field-label" for="start-time-2">出発時刻</label>
-                                <div class="time-input-row">
-                                    <input type="time" id="start-time-2" style="flex: 1;">
-                                    <button class="btn-secondary btn-time"
-                                        onclick="setCurrentTime('start-time-2')">⏱&#xFE0E;</button>
-                                </div>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="start-meter-2">出発メーター (km)</label>
-                                <input type="number" id="start-meter-2" placeholder="0">
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-submit" id="btn-start-record-2" style="background-color: var(--color-warning);">▶
-                        出発</button>
-                    <div id="record-2-arrival" class="phase-arrival">
-                        <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
-                        <div class="field-group">
-                            <label class="field-label" for="destination-2">訪問先・現場名等</label>
-                            <input type="text" id="destination-2" class="control-input" placeholder="タップして編集..."
-                                readonly style="cursor: pointer; background-color: var(--color-bg);">
-                        </div>
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label class="field-label" for="end-time-2">到着時刻</label>
-                                <div class="time-input-row">
-                                    <input type="time" id="end-time-2" style="flex: 1;">
-                                    <button class="btn-secondary btn-time"
-                                        onclick="setCurrentTime('end-time-2')">⏱&#xFE0E;</button>
-                                </div>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="end-meter-2">到着メーター (km)</label>
-                                <input type="number" id="end-meter-2" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label">走行距離</label>
-                            <div class="distance-display"><span class="value" id="calc-distance-2">—</span><span>
-                                    km</span>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label" for="vehicle-return-2">車両持帰</label>
-                            <select id="vehicle-return-2">
-                                <option value="">未選択</option>
-                                <option value="会社">会社</option>
-                                <option value="持帰">持帰</option>
-                            </select>
-                        </div>
-                        <div class="status-msg" id="status-record-2"></div>
-                        <button class="btn-submit" id="btn-submit-record-2">✔ 到着・送信</button>
-                        <button class="btn-secondary" id="btn-cancel-record-2"
-                            style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
-                            出発取消</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-record-3" class="view">
-                <header class="app-header">
-                    <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
-                    <h2 style="text-align: center;">運行記録 3</h2>
-                    <div style="width: 60px;"></div>
-                </header>
-                <div class="section-body" style="padding: 20px 16px;">
-                    <button class="btn-secondary" id="btn-copy-meter-3" style="margin-bottom: 10px;">⬇
-                        前回メーターを引継ぎ</button>
-                    <div id="record-3-departure-inputs">
-                        <div class="field-group">
-                            <label class="field-label">点検実施</label>
-                            <div class="radio-group" role="group">
-                                <label><input type="radio" name="pre-inspection-3" value="実施"
-                                        checked><span>済</span></label>
-                                <label><input type="radio" name="pre-inspection-3" value="未実施"><span>未</span></label>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label" for="driver-name-3">運転者</label>
-                            <select id="driver-name-3">
-                                <option value="">未選択</option>
-                            </select>
-                        </div>
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label class="field-label" for="start-time-3">出発時刻</label>
-                                <div class="time-input-row">
-                                    <input type="time" id="start-time-3" style="flex: 1;">
-                                    <button class="btn-secondary btn-time"
-                                        onclick="setCurrentTime('start-time-3')">⏱&#xFE0E;</button>
-                                </div>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="start-meter-3">出発メーター (km)</label>
-                                <input type="number" id="start-meter-3" placeholder="0">
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-submit" id="btn-start-record-3" style="background-color: var(--color-warning);">▶
-                        出発</button>
-                    <div id="record-3-arrival" class="phase-arrival">
-                        <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
-                        <div class="field-group">
-                            <label class="field-label" for="destination-3">訪問先・現場名等</label>
-                            <input type="text" id="destination-3" class="control-input" placeholder="タップして編集..."
-                                readonly style="cursor: pointer; background-color: var(--color-bg);">
-                        </div>
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label class="field-label" for="end-time-3">到着時刻</label>
-                                <div class="time-input-row">
-                                    <input type="time" id="end-time-3" style="flex: 1;">
-                                    <button class="btn-secondary btn-time"
-                                        onclick="setCurrentTime('end-time-3')">⏱&#xFE0E;</button>
-                                </div>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="end-meter-3">到着メーター (km)</label>
-                                <input type="number" id="end-meter-3" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label">走行距離</label>
-                            <div class="distance-display"><span class="value" id="calc-distance-3">—</span><span>
-                                    km</span>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label" for="vehicle-return-3">車両持帰</label>
-                            <select id="vehicle-return-3">
-                                <option value="">未選択</option>
-                                <option value="会社">会社</option>
-                                <option value="持帰">持帰</option>
-                            </select>
-                        </div>
-                        <div class="status-msg" id="status-record-3"></div>
-                        <button class="btn-submit" id="btn-submit-record-3">✔ 到着・送信</button>
-                        <button class="btn-secondary" id="btn-cancel-record-3"
-                            style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
-                            出発取消</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-refuel" class="view">
-                <header class="app-header">
-                    <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
-                    <h2 style="text-align: center;">給油・特記</h2>
-                    <div style="width: 60px;"></div>
-                </header>
-                <div class="section-body" style="padding: 20px 16px;">
-                    <p style="font-size: 0.85rem; color: var(--color-text-sub); margin-bottom: 10px;">
-                        給油・特記事項のみを単独で送信することも可能です。</p>
                     <div class="field-row">
                         <div class="field-group">
-                            <label class="field-label" for="refuel-amount">給油量 (L)</label>
-                            <input type="number" id="refuel-amount" placeholder="0">
+                            <label class="field-label" for="start-time-2">出発時刻</label>
+                            <div class="time-input-row">
+                                <input type="time" id="start-time-2" style="flex: 1;">
+                                <button class="btn-secondary btn-time"
+                                    onclick="setCurrentTime('start-time-2')">⏱&#xFE0E;</button>
+                            </div>
                         </div>
                         <div class="field-group">
-                            <label class="field-label" for="refuel-meter">給油メーター (km)</label>
-                            <input type="number" id="refuel-meter" placeholder="0">
+                            <label class="field-label" for="start-meter-2">出発メーター (km)</label>
+                            <input type="number" id="start-meter-2" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-submit" id="btn-start-record-2" style="background-color: var(--color-warning);">▶
+                    出発</button>
+                <div id="record-2-arrival" class="phase-arrival">
+                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
+                    <div class="field-group">
+                        <label class="field-label" for="destination-2">訪問先・現場名等</label>
+                        <input type="text" id="destination-2" class="control-input" placeholder="タップして編集..." readonly
+                            style="cursor: pointer; background-color: var(--color-bg);">
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label" for="end-time-2">到着時刻</label>
+                            <div class="time-input-row">
+                                <input type="time" id="end-time-2" style="flex: 1;">
+                                <button class="btn-secondary btn-time"
+                                    onclick="setCurrentTime('end-time-2')">⏱&#xFE0E;</button>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="end-meter-2">到着メーター (km)</label>
+                            <input type="number" id="end-meter-2" placeholder="0">
                         </div>
                     </div>
                     <div class="field-group">
-                        <label class="field-label" for="notes">備考</label>
-                        <input type="text" id="notes" placeholder="特記事項など">
+                        <label class="field-label">走行距離</label>
+                        <div class="distance-display"><span class="value" id="calc-distance-2">—</span><span>
+                                km</span>
+                        </div>
                     </div>
-                    <div class="status-msg" id="status-refuel"></div>
-                    <button class="btn-submit" id="btn-submit-refuel" style="margin-top: 20px;">✔ 送信</button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- グローバルローディング用オーバーレイ -->
-        <div id="global-loading" class="global-loading" style="display: none;">
-            <div class="spinner"></div>
-            <div class="loading-text" id="loading-message">処理中...</div>
-        </div>
-
-        <!-- カスタムポップアップ (Alert / Confirm) -->
-        <div class="modal-overlay" id="custom-popup" role="dialog" style="display: none; z-index: 10000;">
-            <div class="modal-sheet" style="min-height: auto; padding-bottom: 24px;">
-                <div class="modal-title" style="border-bottom: none; padding-bottom: 8px;">お知らせ</div>
-                <div id="popup-message"
-                    style="padding: 0 16px 24px; font-size: 0.95rem; color: var(--color-text); text-align: center; white-space: pre-wrap;">
-                </div>
-                <div style="display: flex; gap: 12px; padding: 0 16px;">
-                    <button id="btn-popup-cancel" class="btn-secondary" style="flex: 1; display: none;">キャンセル</button>
-                    <button id="btn-popup-ok" class="btn-primary" style="flex: 1;">OK</button>
+                    <div class="field-group">
+                        <label class="field-label" for="vehicle-return-2">車両持帰</label>
+                        <select id="vehicle-return-2">
+                            <option value="">未選択</option>
+                            <option value="会社">会社</option>
+                            <option value="持帰">持帰</option>
+                        </select>
+                    </div>
+                    <div class="status-msg" id="status-record-2"></div>
+                    <button class="btn-submit" id="btn-submit-record-2">✔ 到着・送信</button>
+                    <button class="btn-secondary" id="btn-cancel-record-2"
+                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
+                        出発取消</button>
                 </div>
             </div>
         </div>
 
-        <script src="app.js"></script>
-        <script src="form.js"></script>
-        <script src="gas.js"></script>
+        <div id="view-record-3" class="view">
+            <header class="app-header">
+                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <h2 style="text-align: center;">運行記録 3</h2>
+                <div style="width: 60px;"></div>
+            </header>
+            <div class="section-body" style="padding: 20px 16px;">
+                <button class="btn-secondary" id="btn-copy-meter-3" style="margin-bottom: 10px;">⬇
+                    前回メーターを引継ぎ</button>
+                <div id="record-3-departure-inputs">
+                    <div class="field-group">
+                        <label class="field-label">点検実施</label>
+                        <div class="radio-group" role="group">
+                            <label><input type="radio" name="pre-inspection-3" value="実施" checked><span>済</span></label>
+                            <label><input type="radio" name="pre-inspection-3" value="未実施"><span>未</span></label>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="driver-name-3">運転者</label>
+                        <select id="driver-name-3">
+                            <option value="">未選択</option>
+                        </select>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label" for="start-time-3">出発時刻</label>
+                            <div class="time-input-row">
+                                <input type="time" id="start-time-3" style="flex: 1;">
+                                <button class="btn-secondary btn-time"
+                                    onclick="setCurrentTime('start-time-3')">⏱&#xFE0E;</button>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="start-meter-3">出発メーター (km)</label>
+                            <input type="number" id="start-meter-3" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-submit" id="btn-start-record-3" style="background-color: var(--color-warning);">▶
+                    出発</button>
+                <div id="record-3-arrival" class="phase-arrival">
+                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
+                    <div class="field-group">
+                        <label class="field-label" for="destination-3">訪問先・現場名等</label>
+                        <input type="text" id="destination-3" class="control-input" placeholder="タップして編集..." readonly
+                            style="cursor: pointer; background-color: var(--color-bg);">
+                    </div>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label" for="end-time-3">到着時刻</label>
+                            <div class="time-input-row">
+                                <input type="time" id="end-time-3" style="flex: 1;">
+                                <button class="btn-secondary btn-time"
+                                    onclick="setCurrentTime('end-time-3')">⏱&#xFE0E;</button>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="end-meter-3">到着メーター (km)</label>
+                            <input type="number" id="end-meter-3" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">走行距離</label>
+                        <div class="distance-display"><span class="value" id="calc-distance-3">—</span><span>
+                                km</span>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="vehicle-return-3">車両持帰</label>
+                        <select id="vehicle-return-3">
+                            <option value="">未選択</option>
+                            <option value="会社">会社</option>
+                            <option value="持帰">持帰</option>
+                        </select>
+                    </div>
+                    <div class="status-msg" id="status-record-3"></div>
+                    <button class="btn-submit" id="btn-submit-record-3">✔ 到着・送信</button>
+                    <button class="btn-secondary" id="btn-cancel-record-3"
+                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
+                        出発取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-refuel" class="view">
+            <header class="app-header">
+                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <h2 style="text-align: center;">給油・特記</h2>
+                <div style="width: 60px;"></div>
+            </header>
+            <div class="section-body" style="padding: 20px 16px;">
+                <p style="font-size: 0.85rem; color: var(--color-text-sub); margin-bottom: 10px;">
+                    給油・特記事項のみを単独で送信することも可能です。</p>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label" for="refuel-amount">給油量 (L)</label>
+                        <input type="number" id="refuel-amount" placeholder="0">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="refuel-meter">給油メーター (km)</label>
+                        <input type="number" id="refuel-meter" placeholder="0">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="notes">備考</label>
+                    <input type="text" id="notes" placeholder="特記事項など">
+                </div>
+                <div class="status-msg" id="status-refuel"></div>
+                <button class="btn-submit" id="btn-submit-refuel" style="margin-top: 20px;">✔ 送信</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- グローバルローディング用オーバーレイ -->
+    <div id="global-loading" class="global-loading" style="display: none;">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-message">処理中...</div>
+    </div>
+
+    <!-- カスタムポップアップ (Alert / Confirm) -->
+    <div class="modal-overlay" id="custom-popup" role="dialog" style="display: none; z-index: 10000;">
+        <div class="modal-sheet" style="min-height: auto; padding-bottom: 24px;">
+            <div class="modal-title" style="border-bottom: none; padding-bottom: 8px;">お知らせ</div>
+            <div id="popup-message"
+                style="padding: 0 16px 24px; font-size: 0.95rem; color: var(--color-text); text-align: center; white-space: pre-wrap;">
+            </div>
+            <div style="display: flex; gap: 12px; padding: 0 16px;">
+                <button id="btn-popup-cancel" class="btn-secondary" style="flex: 1; display: none;">キャンセル</button>
+                <button id="btn-popup-ok" class="btn-primary" style="flex: 1;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="form.js"></script>
+    <script src="gas.js"></script>
 </body>
 
 </html>
