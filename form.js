@@ -35,11 +35,14 @@ window.markAsUnsent = function (taskId, defaultText = '未送信') {
     if (badge) { badge.innerHTML = defaultText; badge.className = 'task-status badge-warning'; }
 };
 
-// --- フォーム全体のリセット（日付/車両変更時用） ---
 window.resetForm = function () {
-    // 1. 各種入力のクリア
-    const inputs = document.querySelectorAll('.control-input:not(#report-date):not(#vehicle-id)');
-    inputs.forEach(el => el.value = '');
+    // 1. 各種入力のクリア (ラジオボタン、日付、車両IDを除く)
+    const inputs = document.querySelectorAll('input:not([type="radio"]), select, textarea');
+    inputs.forEach(el => {
+        if (el.id !== 'report-date' && el.id !== 'vehicle-id') {
+            el.value = '';
+        }
+    });
     document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
     document.querySelectorAll('.status-msg').forEach(el => el.className = 'status-msg');
 

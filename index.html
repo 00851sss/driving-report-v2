@@ -99,6 +99,9 @@
             <header class="app-header">
                 <h2>運行日報</h2>
                 <div style="display: flex; gap: 8px;">
+                    <button class="btn-icon" id="btn-reload-data"
+                        onclick="if(window.resetForm) window.resetForm(); if(typeof loadDayData === 'function') loadDayData();"
+                        aria-label="データ更新">⟳</button>
                     <button class="btn-icon" id="btn-theme-toggle" aria-label="テーマ切替">◑</button>
                     <button class="btn-icon" id="btn-settings" aria-label="設定">⚙&#xFE0E;</button>
                 </div>
