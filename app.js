@@ -166,10 +166,16 @@ function loadSettings() {
     if (saved) {
         try {
             appData = { ...appData, ...JSON.parse(saved) };
-            // 文字列配列の旧車両データをオブジェクト配列にマイグレーション
+            // データ構造のマイグレーション
             if (appData.vehicles && appData.vehicles.length > 0 && typeof appData.vehicles[0] === 'string') {
                 appData.vehicles = appData.vehicles.map(v => ({ plate: v, nickname: '' }));
             }
+            // 運転者・確認者・訪問先のマイグレーション
+            ['drivers', 'checkers', 'destinations'].forEach(key => {
+                if (appData[key] && appData[key].length > 0 && typeof appData[key][0] === 'string') {
+                    appData[key] = appData[key].map(name => ({ name: name, favorite: false }));
+                }
+            });
         } catch (e) { }
     }
     document.getElementById('gas-url-input').value = appData.gasUrl || '';
@@ -230,12 +236,13 @@ function addItemToList(type) {
 
     if (!name) return;
 
-    if (type === 'driver' && !appData.drivers.includes(name)) {
-        appData.drivers.push(name);
-    } else if (type === 'checker' && !appData.checkers.includes(name)) {
-        appData.checkers.push(name);
-    } else if (type === 'destination' && !appData.destinations.includes(name)) {
-        appData.destinations.push(name);
+    const newItem = { name: name, favorite: false };
+    if (type === 'driver' && !appData.drivers.some(d => d.name === name)) {
+        appData.drivers.push(newItem);
+    } else if (type === 'checker' && !appData.checkers.some(c => c.name === name)) {
+        appData.checkers.push(newItem);
+    } else if (type === 'destination' && !appData.destinations.some(d => d.name === name)) {
+        appData.destinations.push(newItem);
     }
 
     input.value = '';
@@ -258,11 +265,11 @@ async function removeItemFromList(type, name) {
     if (type === 'vehicle') {
         appData.vehicles = appData.vehicles.filter(v => v.plate !== name.plate);
     } else if (type === 'driver') {
-        appData.drivers = appData.drivers.filter(d => d !== name);
+        appData.drivers = appData.drivers.filter(d => (typeof d === 'string' ? d : d.name) !== (typeof name === 'string' ? name : name.name));
     } else if (type === 'checker') {
-        appData.checkers = appData.checkers.filter(c => c !== name);
+        appData.checkers = appData.checkers.filter(c => (typeof c === 'string' ? c : c.name) !== (typeof name === 'string' ? name : name.name));
     } else if (type === 'destination') {
-        appData.destinations = appData.destinations.filter(d => d !== name);
+        appData.destinations = appData.destinations.filter(d => (typeof d === 'string' ? d : d.name) !== (typeof name === 'string' ? name : name.name));
     }
     saveSettings();
     renderTagList(type);
@@ -300,7 +307,7 @@ function renderTagList(type) {
             nameLabel.textContent = item.nickname || '車両';
             subLabel.textContent = item.plate;
         } else {
-            nameLabel.textContent = item;
+            nameLabel.textContent = typeof item === 'object' ? item.name : item;
             subLabel.style.display = 'none';
         }
 
@@ -326,6 +333,17 @@ function renderTagList(type) {
             qrBtn.innerHTML = '<span class="material-symbols-rounded">qr_code_2</span>';
             qrBtn.onclick = () => typeof showVehicleQR === 'function' && showVehicleQR(item);
             actions.appendChild(qrBtn);
+        }
+
+        // Favorite Button (Driver, Checker, Destination)
+        if (type !== 'vehicle') {
+            const favBtn = document.createElement('button');
+            const isFav = typeof item === 'object' && item.favorite;
+            favBtn.className = `icon-btn fav ${isFav ? 'active' : ''}`;
+            favBtn.title = isFav ? 'お気に入り解除' : 'お気に入り登録';
+            favBtn.innerHTML = `<span class="material-symbols-rounded">${isFav ? 'star' : 'grade'}</span>`;
+            favBtn.onclick = () => toggleFavorite(type, item);
+            actions.appendChild(favBtn);
         }
 
         // Delete Button
@@ -373,13 +391,22 @@ function updateSelectOptions(type) {
             selectEl.appendChild(defaultOpt);
         }
 
-        list.forEach(item => {
+        const sortedList = [...list].sort((a, b) => {
+            const aFav = typeof a === 'object' && a.favorite ? 1 : 0;
+            const bFav = typeof b === 'object' && b.favorite ? 1 : 0;
+            return bFav - aFav; // お気に入りを上に
+        });
+
+        sortedList.forEach(item => {
             const opt = document.createElement('option');
             if (type === 'vehicle' && typeof item === 'object') {
                 opt.value = item.plate || '';
                 opt.textContent = item.nickname ? `${item.nickname} (${item.plate})` : item.plate;
             } else {
-                opt.value = opt.textContent = item;
+                const val = typeof item === 'object' ? item.name : item;
+                const isFav = typeof item === 'object' && item.favorite;
+                opt.value = opt.textContent = val;
+                if (isFav) opt.textContent = `★ ${val}`;
             }
             selectEl.appendChild(opt);
         });
@@ -388,10 +415,19 @@ function updateSelectOptions(type) {
             if (list.some(v => (v.plate || v) === currentVal)) {
                 selectEl.value = currentVal;
             }
-        } else if (list.includes(currentVal)) {
-            selectEl.value = currentVal;
+        } else {
+            const exists = list.some(i => (typeof i === 'object' ? i.name : i) === currentVal);
+            if (exists) selectEl.value = currentVal;
         }
     });
+}
+
+function toggleFavorite(type, item) {
+    if (typeof item !== 'object') return;
+    item.favorite = !item.favorite;
+    saveSettings();
+    renderTagList(type);
+    updateSelectOptions(type);
 }
 
 // --- テーマ切り替えロジック ---

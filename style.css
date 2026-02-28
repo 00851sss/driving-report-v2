@@ -848,17 +848,36 @@ select {
 }
 
 /* 削除ボタン: 赤 */
-.icon-btn.delete {
-    color: var(--color-error);
-    border-color: rgba(var(--color-error-rgb), 0.3);
-    background: rgba(var(--color-error-rgb), 0.05);
-}
-
 .icon-btn.delete:hover {
     background: var(--color-error);
     color: #fff;
     border-color: var(--color-error);
     box-shadow: 0 4px 12px rgba(var(--color-error-rgb), 0.3);
+}
+
+/* お気に入りボタン: 黄 (ゴールド) */
+.icon-btn.fav {
+    color: var(--color-text-sub);
+    border-color: var(--color-border);
+}
+
+.icon-btn.fav.active {
+    color: #facc15;
+    background: rgba(250, 204, 21, 0.1);
+    border-color: rgba(250, 204, 21, 0.4);
+}
+
+.icon-btn.fav:hover {
+    border-color: #facc15;
+    color: #facc15;
+    background: rgba(250, 204, 21, 0.15);
+}
+
+.icon-btn.fav.active:hover {
+    background: #facc15;
+    color: #fff;
+    border-color: #facc15;
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
 }
 
 .icon-btn .material-symbols-rounded {
