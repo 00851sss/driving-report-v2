@@ -10,11 +10,11 @@ function setCurrentTime(inputId) {
 // UI状態をコントロールする関数
 window.markAsDone = function (taskId) {
     const badge = document.getElementById(`badge-${taskId}`);
-    if (badge) { badge.innerHTML = '✔ 送信済'; badge.className = 'task-status badge-success'; }
+    if (badge) { badge.innerHTML = '<span class="material-symbols-rounded">check_circle</span> 送信済'; badge.className = 'task-status badge-success'; }
 };
 window.markAsDriving = function (num) {
     const badge = document.getElementById(`badge-record-${num}`);
-    if (badge) { badge.innerHTML = '▶ 運転中'; badge.className = 'task-status badge-driving'; }
+    if (badge) { badge.innerHTML = '<span class="material-symbols-rounded">play_circle</span> 運転中'; badge.className = 'task-status badge-driving'; }
     const depInputs = document.getElementById(`record-${num}-departure-inputs`);
     if (depInputs) depInputs.querySelectorAll('input, select').forEach(el => el.disabled = true);
     const btnStart = document.getElementById(`btn-start-record-${num}`);
@@ -116,17 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const toEl = document.getElementById(toId);
         if (fromEl && toEl) {
             fromEl.addEventListener('input', (e) => {
-                // 次の出発メーターが空欄の場合のみ自動で埋める
-                if (!toEl.value) {
+                // 次の出発メーターが空欄か、または前回の自動コピーから引き続いている場合のみ上書く
+                if (!toEl.value || toEl.dataset.autoCopiedFrom === fromId) {
                     toEl.value = e.target.value;
+                    toEl.dataset.autoCopiedFrom = fromId; // 自動コピーされた印をつける
                     toEl.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             });
-            // 変更確定時（フォーカスが外れた時など）に強制的に再評価して確実に引き継ぎ
-            fromEl.addEventListener('change', (e) => {
-                if (!toEl.value || toEl.value === '') {
-                    toEl.value = e.target.value;
-                    toEl.dispatchEvent(new Event('input', { bubbles: true }));
+            // ユーザーが手動で出発メーターを書き換えた場合は、自動コピーの印を解除
+            toEl.addEventListener('input', (e) => {
+                if (e.isTrusted) { // ユーザーの直接操作
+                    delete toEl.dataset.autoCopiedFrom;
                 }
             });
         }
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ▼ 送信中のUIロック（二重送信防止）
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '🔄 送信中...';
+                btn.innerHTML = ' 送信中...';
                 btn.style.opacity = '0.7';
             }
             if (msgEl) { msgEl.textContent = '送信中...'; msgEl.className = 'status-msg visible sending'; }
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ▼ 送信完了後のUIロック解除
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '✔ 到着・送信'; // 元のテキスト（CSS等で上書きされるため仮）
+                btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span> 到着・送信'; // 元のテキスト（CSS等で上書きされるため仮）
                 btn.style.opacity = '1';
             }
 
@@ -302,7 +302,7 @@ function setupRecordPhases(recordNum) {
 
             // 二重送信・操作防止
             btnStart.disabled = true;
-            btnStart.innerHTML = '🔄 同期中...';
+            btnStart.innerHTML = ' 同期中...';
             btnStart.style.opacity = '0.7';
 
             const err = await submitSection(`record${recordNum}`);

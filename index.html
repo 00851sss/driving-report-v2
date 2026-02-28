@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>運行日報</title>
+    <!-- Google Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet" />
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,14 +16,16 @@
 
         <div class="modal-overlay" id="settings-modal" role="dialog">
             <div class="modal-sheet">
-                <div class="modal-title" style="border-bottom:none; padding-bottom:0;">⚙ 設定</div>
+                <div class="modal-handle"></div>
+                <div class="modal-title" style="border-bottom:none; padding-bottom:0;"><span
+                        class="material-symbols-rounded">settings</span> 設定</div>
 
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="tab-vehicle">車両</button>
                     <button class="tab-btn" data-tab="tab-driver">運転者</button>
                     <button class="tab-btn" data-tab="tab-checker">確認者</button>
                     <button class="tab-btn" data-tab="tab-destination">訪問先</button>
-                    <button class="tab-btn" data-tab="tab-general">⚙ 共通</button>
+                    <button class="tab-btn" data-tab="tab-general">共通</button>
                 </div>
 
                 <div class="tab-content active" id="tab-vehicle">
@@ -36,7 +41,8 @@
                         <div class="tag-list" id="vehicle-tag-list"></div>
                         <div class="input-add-row">
                             <input type="text" id="input-add-vehicle" placeholder="車両名を入力">
-                            <button class="btn-add" id="btn-add-vehicle">＋ 追加</button>
+                            <button class="btn-add" id="btn-add-vehicle"><span
+                                    class="material-symbols-rounded">add_circle</span> 追加</button>
                         </div>
                     </div>
                 </div>
@@ -54,7 +60,8 @@
                         <div class="tag-list" id="driver-tag-list"></div>
                         <div class="input-add-row">
                             <input type="text" id="input-add-driver" placeholder="名前を入力">
-                            <button class="btn-add" id="btn-add-driver">＋ 追加</button>
+                            <button class="btn-add" id="btn-add-driver"><span
+                                    class="material-symbols-rounded">add_circle</span> 追加</button>
                         </div>
                     </div>
                 </div>
@@ -65,7 +72,8 @@
                         <div class="tag-list" id="checker-tag-list"></div>
                         <div class="input-add-row">
                             <input type="text" id="input-add-checker" placeholder="名前を入力">
-                            <button class="btn-add" id="btn-add-checker">＋ 追加</button>
+                            <button class="btn-add" id="btn-add-checker"><span
+                                    class="material-symbols-rounded">add_circle</span> 追加</button>
                         </div>
                     </div>
                 </div>
@@ -76,7 +84,8 @@
                         <div class="tag-list" id="destination-tag-list"></div>
                         <div class="input-add-row">
                             <input type="text" id="input-add-destination" placeholder="訪問先を入力">
-                            <button class="btn-add" id="btn-add-destination">＋ 追加</button>
+                            <button class="btn-add" id="btn-add-destination"><span
+                                    class="material-symbols-rounded">add_circle</span> 追加</button>
                         </div>
                     </div>
                 </div>
@@ -86,8 +95,8 @@
                         <div class="setting-block-title">マスタデータ同期</div>
                         <p style="font-size: 0.8rem; color: var(--color-text-sub); margin-bottom: 8px;">
                             GAS（スプレッドシート）から、車両・運転者・確認者のリストを取得します。</p>
-                        <button class="btn-secondary" id="btn-sync-master" style="width: 100%; margin-top: 0;">⟳
-                            GASからリストを取得</button>
+                        <button class="btn-secondary" id="btn-sync-master" style="width: 100%; margin-top: 0;"><span
+                                class="material-symbols-rounded">sync</span> GASからリストを取得</button>
                         <div class="status-msg" id="status-sync"></div>
                     </div>
                     <div class="setting-block">
@@ -101,14 +110,15 @@
                 </div>
 
                 <div style="margin-top: 10px;">
-                    <button class="btn-submit" id="btn-save-settings" style="margin-top: 0;">✔ 保存</button>
-                    <button class="btn-secondary" id="btn-close-settings" style="margin-top: 12px;">✕ 閉じる</button>
+                    <button class="btn-secondary" id="btn-close-settings" style="margin-top: 0;"><span
+                            class="material-symbols-rounded">close</span> 閉じる</button>
                 </div>
             </div>
         </div>
 
         <div class="modal-overlay" id="destination-modal" role="dialog">
             <div class="modal-sheet">
+                <div class="modal-handle"></div>
                 <div class="modal-title" style="border-bottom:none; padding-bottom:0;">訪問先・現場名等</div>
                 <div class="section-body" style="padding: 16px;">
                     <label class="field-label">自由入力・編集</label>
@@ -121,9 +131,10 @@
                     </div>
                 </div>
                 <div style="margin-top: 10px; display: flex; gap: 8px;">
-                    <button class="btn-submit" id="btn-dest-modal-ok" style="margin-top: 0; flex: 1;">✔ 決定</button>
-                    <button class="btn-secondary" id="btn-dest-modal-cancel" style="margin-top: 0; flex: 1;">✕
-                        キャンセル</button>
+                    <button class="btn-submit" id="btn-dest-modal-ok" style="margin-top: 0; flex: 1;"><span
+                            class="material-symbols-rounded">check_circle</span> 決定</button>
+                    <button class="btn-secondary" id="btn-dest-modal-cancel" style="margin-top: 0; flex: 1;"><span
+                            class="material-symbols-rounded">close</span> キャンセル</button>
                 </div>
             </div>
         </div>
@@ -134,9 +145,11 @@
                 <div style="display: flex; gap: 8px;">
                     <button class="btn-icon" id="btn-reload-data"
                         onclick="if(window.resetForm) window.resetForm(); if(typeof loadDayData === 'function') loadDayData();"
-                        aria-label="データ更新">⟳</button>
-                    <button class="btn-icon" id="btn-theme-toggle" aria-label="テーマ切替">◑</button>
-                    <button class="btn-icon" id="btn-settings" aria-label="設定">⚙&#xFE0E;</button>
+                        aria-label="データ更新"><span class="material-symbols-rounded">sync</span> </button>
+                    <button class="btn-icon" id="btn-theme-toggle" aria-label="テーマ切替"><span
+                            class="material-symbols-rounded">dark_mode</span></button>
+                    <button class="btn-icon" id="btn-settings" aria-label="設定"><span
+                            class="material-symbols-rounded">settings</span> </button>
                 </div>
             </header>
 
@@ -150,7 +163,8 @@
                             <select id="vehicle-id" class="control-input" style="flex: 1;">
                                 <option value="">未選択</option>
                             </select>
-                            <button id="btn-qr-scan" class="btn-qr-dummy">▦</button>
+                            <button id="btn-qr-scan" class="btn-qr-dummy"><span
+                                    class="material-symbols-rounded">qr_code_scanner</span></button>
                         </div>
                     </div>
                 </div>
@@ -186,7 +200,8 @@
 
         <div id="view-pre-check" class="view">
             <header class="app-header">
-                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <button class="btn-icon btn-back" onclick="safeSwitchView('view-home')"><span
+                        class="material-symbols-rounded">arrow_back_ios_new</span> 戻る</button>
                 <h2 style="text-align: center;">アルコールチェック 1</h2>
                 <div style="width: 60px;"></div>
             </header>
@@ -196,8 +211,8 @@
                         <label class="field-label" for="pre-check-time">確認時刻</label>
                         <div class="time-input-row">
                             <input type="time" id="pre-check-time" style="flex:1;">
-                            <button class="btn-secondary btn-time"
-                                onclick="setCurrentTime('pre-check-time')">⏱&#xFE0E;</button>
+                            <button class="btn-secondary btn-time" onclick="setCurrentTime('pre-check-time')"><span
+                                    class="material-symbols-rounded">timer</span></button>
                         </div>
                     </div>
                     <div class="field-group" style="flex:1">
@@ -227,13 +242,15 @@
                     <input type="text" id="pre-alcohol-val" placeholder="例: 0.00">
                 </div>
                 <div class="status-msg" id="status-pre-check"></div>
-                <button class="btn-submit" id="btn-submit-pre-check">✔ 送信</button>
+                <button class="btn-submit" id="btn-submit-pre-check"><span
+                        class="material-symbols-rounded">check_circle</span> 送信</button>
             </div>
         </div>
 
         <div id="view-post-check" class="view">
             <header class="app-header">
-                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <button class="btn-icon btn-back" onclick="safeSwitchView('view-home')"><span
+                        class="material-symbols-rounded">arrow_back_ios_new</span> 戻る</button>
                 <h2 style="text-align: center;">アルコールチェック 2</h2>
                 <div style="width: 60px;"></div>
             </header>
@@ -243,8 +260,8 @@
                         <label class="field-label" for="post-check-time">確認時刻</label>
                         <div class="time-input-row">
                             <input type="time" id="post-check-time" style="flex:1;">
-                            <button class="btn-secondary btn-time"
-                                onclick="setCurrentTime('post-check-time')">⏱&#xFE0E;</button>
+                            <button class="btn-secondary btn-time" onclick="setCurrentTime('post-check-time')"><span
+                                    class="material-symbols-rounded">timer</span></button>
                         </div>
                     </div>
                     <div class="field-group" style="flex:1">
@@ -270,13 +287,15 @@
                     </div>
                 </div>
                 <div class="status-msg" id="status-post-check"></div>
-                <button class="btn-submit" id="btn-submit-post-check">✔ 送信</button>
+                <button class="btn-submit" id="btn-submit-post-check"><span
+                        class="material-symbols-rounded">check_circle</span> 送信</button>
             </div>
         </div>
 
         <div id="view-record-1" class="view">
             <header class="app-header">
-                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <button class="btn-icon btn-back" onclick="safeSwitchView('view-home')"><span
+                        class="material-symbols-rounded">arrow_back_ios_new</span> 戻る</button>
                 <h2 style="text-align: center;">運行記録 1</h2>
                 <div style="width: 60px;"></div>
             </header>
@@ -300,8 +319,8 @@
                             <label class="field-label" for="start-time-1">出発時刻</label>
                             <div class="time-input-row">
                                 <input type="time" id="start-time-1" style="flex: 1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('start-time-1')">⏱&#xFE0E;</button>
+                                <button class="btn-secondary btn-time" onclick="setCurrentTime('start-time-1')"><span
+                                        class="material-symbols-rounded">timer</span></button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -310,11 +329,12 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-submit" id="btn-start-record-1" style="background-color: var(--color-warning);">▶
-                    出発</button>
+                <button class="btn-submit" id="btn-start-record-1" style="background-color: var(--color-warning);"><span
+                        class="material-symbols-rounded">play_circle</span> 出発</button>
 
                 <div id="record-1-arrival" class="phase-arrival">
-                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
+                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;"><span
+                            class="material-symbols-rounded">play_circle</span> 運転中... 到着時に入力</p>
                     <div class="field-group">
                         <label class="field-label" for="destination-1">訪問先・現場名等</label>
                         <input type="text" id="destination-1" class="control-input" placeholder="タップして編集..." readonly
@@ -325,8 +345,8 @@
                             <label class="field-label" for="end-time-1">到着時刻</label>
                             <div class="time-input-row">
                                 <input type="time" id="end-time-1" style="flex: 1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('end-time-1')">⏱&#xFE0E;</button>
+                                <button class="btn-secondary btn-time" onclick="setCurrentTime('end-time-1')"><span
+                                        class="material-symbols-rounded">timer</span></button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -344,22 +364,27 @@
                         <label class="field-label" for="vehicle-return-1">車両持帰</label>
                         <select id="vehicle-return-1">
                             <option value="">未選択</option>
-                            <option value="会社">会社</option>
-                            <option value="持帰">持帰</option>
+                            <option value="車両出社">車両出社</option>
+                            <option value="持帰り">持帰り</option>
+                            <option value="直行">直行</option>
+                            <option value="直帰">直帰</option>
+                            <option value="その他（特記事項に記載）">その他</option>
                         </select>
                     </div>
                     <div class="status-msg" id="status-record-1"></div>
-                    <button class="btn-submit" id="btn-submit-record-1">✔ 到着・送信</button>
+                    <button class="btn-submit" id="btn-submit-record-1"><span
+                            class="material-symbols-rounded">check_circle</span> 到着・送信</button>
                     <button class="btn-secondary" id="btn-cancel-record-1"
-                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
-                        出発取消</button>
+                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);"><span
+                            class="material-symbols-rounded">close</span> 出発取消</button>
                 </div>
             </div>
         </div>
 
         <div id="view-record-2" class="view">
             <header class="app-header">
-                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <button class="btn-icon btn-back" onclick="safeSwitchView('view-home')"><span
+                        class="material-symbols-rounded">arrow_back_ios_new</span> 戻る</button>
                 <h2 style="text-align: center;">運行記録 2</h2>
                 <div style="width: 60px;"></div>
             </header>
@@ -383,8 +408,8 @@
                             <label class="field-label" for="start-time-2">出発時刻</label>
                             <div class="time-input-row">
                                 <input type="time" id="start-time-2" style="flex: 1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('start-time-2')">⏱&#xFE0E;</button>
+                                <button class="btn-secondary btn-time" onclick="setCurrentTime('start-time-2')"><span
+                                        class="material-symbols-rounded">timer</span></button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -393,10 +418,11 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-submit" id="btn-start-record-2" style="background-color: var(--color-warning);">▶
-                    出発</button>
+                <button class="btn-submit" id="btn-start-record-2" style="background-color: var(--color-warning);"><span
+                        class="material-symbols-rounded">play_circle</span> 出発</button>
                 <div id="record-2-arrival" class="phase-arrival">
-                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
+                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;"><span
+                            class="material-symbols-rounded">play_circle</span> 運転中... 到着時に入力</p>
                     <div class="field-group">
                         <label class="field-label" for="destination-2">訪問先・現場名等</label>
                         <input type="text" id="destination-2" class="control-input" placeholder="タップして編集..." readonly
@@ -407,8 +433,8 @@
                             <label class="field-label" for="end-time-2">到着時刻</label>
                             <div class="time-input-row">
                                 <input type="time" id="end-time-2" style="flex: 1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('end-time-2')">⏱&#xFE0E;</button>
+                                <button class="btn-secondary btn-time" onclick="setCurrentTime('end-time-2')"><span
+                                        class="material-symbols-rounded">timer</span></button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -426,22 +452,27 @@
                         <label class="field-label" for="vehicle-return-2">車両持帰</label>
                         <select id="vehicle-return-2">
                             <option value="">未選択</option>
-                            <option value="会社">会社</option>
-                            <option value="持帰">持帰</option>
+                            <option value="車両出社">車両出社</option>
+                            <option value="持帰り">持帰り</option>
+                            <option value="直行">直行</option>
+                            <option value="直帰">直帰</option>
+                            <option value="その他（特記事項に記載）">その他</option>
                         </select>
                     </div>
                     <div class="status-msg" id="status-record-2"></div>
-                    <button class="btn-submit" id="btn-submit-record-2">✔ 到着・送信</button>
+                    <button class="btn-submit" id="btn-submit-record-2"><span
+                            class="material-symbols-rounded">check_circle</span> 到着・送信</button>
                     <button class="btn-secondary" id="btn-cancel-record-2"
-                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
-                        出発取消</button>
+                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);"><span
+                            class="material-symbols-rounded">close</span> 出発取消</button>
                 </div>
             </div>
         </div>
 
         <div id="view-record-3" class="view">
             <header class="app-header">
-                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <button class="btn-icon btn-back" onclick="safeSwitchView('view-home')"><span
+                        class="material-symbols-rounded">arrow_back_ios_new</span> 戻る</button>
                 <h2 style="text-align: center;">運行記録 3</h2>
                 <div style="width: 60px;"></div>
             </header>
@@ -465,8 +496,8 @@
                             <label class="field-label" for="start-time-3">出発時刻</label>
                             <div class="time-input-row">
                                 <input type="time" id="start-time-3" style="flex: 1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('start-time-3')">⏱&#xFE0E;</button>
+                                <button class="btn-secondary btn-time" onclick="setCurrentTime('start-time-3')"><span
+                                        class="material-symbols-rounded">timer</span></button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -475,10 +506,11 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-submit" id="btn-start-record-3" style="background-color: var(--color-warning);">▶
-                    出発</button>
+                <button class="btn-submit" id="btn-start-record-3" style="background-color: var(--color-warning);"><span
+                        class="material-symbols-rounded">play_circle</span> 出発</button>
                 <div id="record-3-arrival" class="phase-arrival">
-                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;">▶ 運転中... 到着時に入力</p>
+                    <p style="font-weight:bold; color: var(--color-accent); margin-bottom:12px;"><span
+                            class="material-symbols-rounded">play_circle</span> 運転中... 到着時に入力</p>
                     <div class="field-group">
                         <label class="field-label" for="destination-3">訪問先・現場名等</label>
                         <input type="text" id="destination-3" class="control-input" placeholder="タップして編集..." readonly
@@ -489,8 +521,8 @@
                             <label class="field-label" for="end-time-3">到着時刻</label>
                             <div class="time-input-row">
                                 <input type="time" id="end-time-3" style="flex: 1;">
-                                <button class="btn-secondary btn-time"
-                                    onclick="setCurrentTime('end-time-3')">⏱&#xFE0E;</button>
+                                <button class="btn-secondary btn-time" onclick="setCurrentTime('end-time-3')"><span
+                                        class="material-symbols-rounded">timer</span></button>
                             </div>
                         </div>
                         <div class="field-group">
@@ -508,22 +540,27 @@
                         <label class="field-label" for="vehicle-return-3">車両持帰</label>
                         <select id="vehicle-return-3">
                             <option value="">未選択</option>
-                            <option value="会社">会社</option>
-                            <option value="持帰">持帰</option>
+                            <option value="車両出社">車両出社</option>
+                            <option value="持帰り">持帰り</option>
+                            <option value="直行">直行</option>
+                            <option value="直帰">直帰</option>
+                            <option value="その他（特記事項に記載）">その他</option>
                         </select>
                     </div>
                     <div class="status-msg" id="status-record-3"></div>
-                    <button class="btn-submit" id="btn-submit-record-3">✔ 到着・送信</button>
+                    <button class="btn-submit" id="btn-submit-record-3"><span
+                            class="material-symbols-rounded">check_circle</span> 到着・送信</button>
                     <button class="btn-secondary" id="btn-cancel-record-3"
-                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);">✕
-                        出発取消</button>
+                        style="margin-top: 12px; color: var(--color-error); border-color: var(--color-error);"><span
+                            class="material-symbols-rounded">close</span> 出発取消</button>
                 </div>
             </div>
         </div>
 
         <div id="view-refuel" class="view">
             <header class="app-header">
-                <button class="btn-icon btn-back" onclick="switchView('view-home')">❮ 戻る</button>
+                <button class="btn-icon btn-back" onclick="safeSwitchView('view-home')"><span
+                        class="material-symbols-rounded">arrow_back_ios_new</span> 戻る</button>
                 <h2 style="text-align: center;">給油・特記</h2>
                 <div style="width: 60px;"></div>
             </header>
@@ -545,7 +582,8 @@
                     <input type="text" id="notes" placeholder="特記事項など">
                 </div>
                 <div class="status-msg" id="status-refuel"></div>
-                <button class="btn-submit" id="btn-submit-refuel" style="margin-top: 20px;">✔ 送信</button>
+                <button class="btn-submit" id="btn-submit-refuel" style="margin-top: 20px;"><span
+                        class="material-symbols-rounded">check_circle</span> 送信</button>
             </div>
         </div>
 
@@ -558,15 +596,13 @@
     </div>
 
     <!-- カスタムポップアップ (Alert / Confirm) -->
-    <div class="modal-overlay" id="custom-popup" role="dialog" style="display: none; z-index: 10000;">
-        <div class="modal-sheet" style="min-height: auto; padding-bottom: 24px;">
-            <div class="modal-title" style="border-bottom: none; padding-bottom: 8px;">お知らせ</div>
-            <div id="popup-message"
-                style="padding: 0 16px 24px; font-size: 0.95rem; color: var(--color-text); text-align: center; white-space: pre-wrap;">
-            </div>
-            <div style="display: flex; gap: 12px; padding: 0 16px;">
-                <button id="btn-popup-cancel" class="btn-secondary" style="flex: 1; display: none;">キャンセル</button>
-                <button id="btn-popup-ok" class="btn-primary" style="flex: 1;">OK</button>
+    <div class="dialog-overlay" id="custom-popup" role="dialog">
+        <div class="dialog-box">
+            <div class="dialog-title">お知らせ</div>
+            <div id="popup-message" class="dialog-message"></div>
+            <div class="dialog-actions">
+                <button id="btn-popup-cancel" class="btn-secondary" style="display: none;">キャンセル</button>
+                <button id="btn-popup-ok" class="btn-submit">OK</button>
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeSettingsBtn = document.getElementById('btn-close-settings');
     if (closeSettingsBtn) {
         closeSettingsBtn.addEventListener('click', () => {
-            document.getElementById('settings-modal').classList.remove('open');
+            window.closeModal(document.getElementById('settings-modal'));
         });
     }
 
@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 訪問先モーダル関連の初期化
     initDestinationModal();
+
+    // モーダルのスワイプで閉じる機能
+    setupModalDragToClose();
 
     loadSettings();
 });
@@ -80,13 +83,13 @@ function initDestinationModal() {
                 el.dispatchEvent(new Event('input', { bubbles: true }));
             }
         }
-        modal.classList.remove('open');
+        window.closeModal(modal);
         currentDestinationTargetId = null;
     });
 
     // キャンセルボタン
     btnCancel.addEventListener('click', () => {
-        modal.classList.remove('open');
+        window.closeModal(modal);
         currentDestinationTargetId = null;
     });
 }
@@ -228,7 +231,7 @@ function renderTagList(type) {
         text.textContent = name;
         const delBtn = document.createElement('button');
         delBtn.className = 'tag-del';
-        delBtn.innerHTML = '✕';
+        delBtn.innerHTML = '<span class="material-symbols-rounded">close</span> ';
         delBtn.onclick = () => removeItemFromList(type, name);
 
         tag.appendChild(text);
@@ -308,25 +311,70 @@ function updateThemeIcon(theme) {
     const btn = document.getElementById('btn-theme-toggle');
     if (btn) {
         // ダークモードなら「月(🌓)」、ライトモードなら「太陽(☀)」のような白黒アイコン
-        btn.innerHTML = theme === 'dark' ? '◐' : '◑';
+        btn.innerHTML = theme === 'dark' ? '<span class="material-symbols-rounded">light_mode</span>' : '<span class="material-symbols-rounded">dark_mode</span>';
     }
 }
 
-// --- View切り替え ---
+// --- View切り替え（内部用） ---
 function switchView(viewId) {
     document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
     window.scrollTo(0, 0);
 }
 
+// --- 安全な画面遷移（未送信チェック付き） ---
+window.safeSwitchView = async function (targetViewId) {
+    const currentActiveView = document.querySelector('.view.active');
+
+    // 現在ホーム画面か、移動先が現在の画面と同じなら何もしない（チェック不要）
+    if (!currentActiveView || currentActiveView.id === 'view-home' || currentActiveView.id === targetViewId) {
+        switchView(targetViewId);
+        return;
+    }
+
+    const currentViewId = currentActiveView.id;
+    let isDriving = false;
+    let hasInput = false;
+
+    // (1) 運転中バッジの確認
+    const matchRecord = currentViewId.match(/view-record-(\d)/);
+    if (matchRecord) {
+        const num = matchRecord[1];
+        const currentBadge = document.getElementById(`badge-record-${num}`);
+        if (currentBadge && currentBadge.innerHTML.includes('運転中')) {
+            isDriving = true;
+        }
+    }
+
+    // (2) 入力変更の確認
+    const currentInputs = currentActiveView.querySelectorAll('input:not([type="radio"]):not([type="time"]), select, textarea');
+    for (const el of currentInputs) {
+        if (el.value !== '' && !el.readOnly) {
+            hasInput = true;
+            break;
+        }
+    }
+
+    if (isDriving || hasInput) {
+        const ok = await window.showCustomConfirm('現在入力中（または運転中）のデータがあります。\nホームへ戻るなど別の画面へ移動してもよろしいですか？\n(※送信していないデータは失われる可能性があります)');
+        if (!ok) return;
+    }
+
+    switchView(targetViewId);
+};
+
 // --- セクションを開く際の確認 ---
 window.openSectionView = async function (viewId, badgeId) {
     const badge = document.getElementById(badgeId);
+
+    // 1. 送信済みタスクを開き直す場合の警告
     if (badge && badge.innerHTML.includes('送信済')) {
         const ok = await window.showCustomConfirm('この項目はすでに送信済みです。\n新しく再送信（上書き）してよろしいですか？');
         if (!ok) return; // キャンセルされたら開かない
     }
-    switchView(viewId);
+
+    // 2. 他のタスクが「入力途中」の場合などの全体チェックを呼び出す
+    safeSwitchView(viewId);
 };
 
 // --- グローバルローディング制御 ---
@@ -402,4 +450,79 @@ window.showCustomConfirm = function (message) {
         btnCancel.addEventListener('click', handleCancel);
         popup.style.display = 'flex';
     });
+};
+
+// --- モーダルを下へスワイプして閉じる処理 ---
+function setupModalDragToClose() {
+    const modals = [document.getElementById('settings-modal'), document.getElementById('destination-modal')];
+
+    modals.forEach(modal => {
+        if (!modal) return;
+        const sheet = modal.querySelector('.modal-sheet');
+        if (!sheet) return;
+
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        const handleStart = (e) => {
+            // スクロール可能なエリア（リスト等）を触っているときはドラッグ処理しない
+            if (sheet.scrollTop > 0) return;
+            isDragging = true;
+            startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            sheet.style.transition = 'none'; // ドラッグ中はアニメーションを切る
+        };
+
+        const handleMove = (e) => {
+            if (!isDragging) return;
+            const y = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            currentY = Math.max(0, y - startY); // 下方向のみ許可
+
+            // 少しでも下に引っ張ったら即座に反映
+            if (currentY > 0) {
+                e.preventDefault(); // 画面自体のスクロールを防ぐ
+                sheet.style.transform = `translateY(${currentY}px)`;
+            }
+        };
+
+        const handleEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            sheet.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+
+            if (currentY > 100) {
+                // 一定以上引っ張ったら滑らかに閉じる (共通関数でお任せ)
+                window.closeModal(modal);
+                // すぐに手動の translateY を解除し、.closing クラスの CSS アニメーション(modalSlideDown)に引き継ぐ
+                sheet.style.transform = '';
+            } else {
+                // 引っ張りが足りない場合は元に戻す
+                sheet.style.transform = 'translateY(0)';
+            }
+            currentY = 0;
+        };
+
+        // マウスとタッチ両方に対応
+        sheet.addEventListener('touchstart', handleStart, { passive: true });
+        sheet.addEventListener('touchmove', handleMove, { passive: false });
+        sheet.addEventListener('touchend', handleEnd);
+
+        // マウス用にハンドル（.modal-handle）自体でのみドラッグを開始できるようにする
+        const handle = sheet.querySelector('.modal-handle');
+        if (handle) {
+            handle.addEventListener('mousedown', handleStart);
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleEnd);
+        }
+    });
+}
+
+// --- モーダルを閉じる共通処理（アニメーション付き） ---
+window.closeModal = function (modal) {
+    if (!modal) return;
+    modal.classList.add('closing');
+    setTimeout(() => {
+        modal.classList.remove('open');
+        modal.classList.remove('closing');
+    }, 300);
 };
