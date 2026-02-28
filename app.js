@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 訪問先モーダル関連の初期化
     initDestinationModal();
 
+    // QRコードリーダーの初期化
+    initQRScanner();
+
     // モーダルのスワイプで閉じる機能
     setupModalDragToClose();
 
@@ -411,14 +414,26 @@ window.showCustomAlert = function (message) {
         msgEl.textContent = message;
         btnCancel.style.display = 'none'; // Alert時はキャンセル非表示
 
-        const handleOk = () => {
-            popup.style.display = 'none';
+        const cleanup = () => {
+            popup.classList.add('closing');
+            setTimeout(() => {
+                popup.style.display = 'none';
+                popup.classList.remove('open', 'closing');
+            }, 200);
             btnOk.removeEventListener('click', handleOk);
+            popup.removeEventListener('click', handleOverlayClick);
             resolve();
         };
 
+        const handleOk = () => cleanup();
+        const handleOverlayClick = (e) => {
+            if (e.target === popup) cleanup();
+        };
+
         btnOk.addEventListener('click', handleOk);
+        popup.addEventListener('click', handleOverlayClick);
         popup.style.display = 'flex';
+        popup.classList.add('open');
     });
 };
 
@@ -438,17 +453,27 @@ window.showCustomConfirm = function (message) {
         btnCancel.style.display = 'block'; // Confirm時はキャンセル表示
 
         const cleanup = () => {
-            popup.style.display = 'none';
+            popup.classList.add('closing');
+            setTimeout(() => {
+                popup.style.display = 'none';
+                popup.classList.remove('open', 'closing');
+            }, 200);
             btnOk.removeEventListener('click', handleOk);
             btnCancel.removeEventListener('click', handleCancel);
+            popup.removeEventListener('click', handleOverlayClick);
         };
 
         const handleOk = () => { cleanup(); resolve(true); };
         const handleCancel = () => { cleanup(); resolve(false); };
+        const handleOverlayClick = (e) => {
+            if (e.target === popup) handleCancel();
+        };
 
         btnOk.addEventListener('click', handleOk);
         btnCancel.addEventListener('click', handleCancel);
+        popup.addEventListener('click', handleOverlayClick);
         popup.style.display = 'flex';
+        popup.classList.add('open');
     });
 };
 
@@ -526,3 +551,76 @@ window.closeModal = function (modal) {
         modal.classList.remove('closing');
     }, 300);
 };
+
+
+// --- QRコードスキャナー制御 ---
+let html5QrCode = null;
+
+function initQRScanner() {
+    const btnScan = document.getElementById('btn-qr-scan');
+    const qrModal = document.getElementById('qr-modal');
+    const btnCancel = document.getElementById('btn-qr-cancel');
+
+    if (!btnScan || !qrModal || !btnCancel) return;
+
+    const stopScanner = () => {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(() => {
+                window.closeModal(qrModal);
+            }).catch(err => {
+                console.error("スキャナー停止エラー", err);
+                window.closeModal(qrModal);
+            });
+        } else {
+            window.closeModal(qrModal);
+        }
+    };
+
+    btnScan.addEventListener('click', () => {
+        qrModal.classList.add('open');
+
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("qr-reader");
+        }
+
+        // 読み取り精度のチューニング
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        html5QrCode.start(
+            { facingMode: "environment" },
+            config,
+            (decodedText) => {
+                // 読み取り成功時
+                const selectElement = document.getElementById('vehicle-id');
+                if (selectElement) {
+                    const options = Array.from(selectElement.options);
+                    const match = options.find(opt => opt.value === decodedText);
+
+                    if (match) {
+                        selectElement.value = decodedText;
+                        selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                    } else {
+                        window.showCustomAlert(`「${decodedText}」は車両マスターに登録されていません。`);
+                    }
+                }
+                stopScanner();
+            },
+            (errorMessage) => {
+                // 読み取り継続中のエラーは無視
+            }
+        ).catch((err) => {
+            console.error("カメラ起動エラー", err);
+            window.showCustomAlert("カメラの起動に失敗しました。ブラウザのカメラアクセス許可を確認してください。");
+            stopScanner();
+        });
+    });
+
+    btnCancel.addEventListener('click', stopScanner);
+
+    // 背景タップで閉じる
+    qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) {
+            stopScanner();
+        }
+    });
+}

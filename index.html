@@ -607,6 +607,18 @@
         </div>
     </div>
 
+    <!-- QRコードリーダー用ポップアップ -->
+    <div class="dialog-overlay" id="qr-modal" role="dialog">
+        <div class="dialog-box" style="padding: 16px;">
+            <div class="dialog-title" style="margin-bottom: 8px;">QRコード読み取り</div>
+            <div id="qr-reader" style="width: 100%; border-radius: 8px; overflow: hidden;"></div>
+            <div style="text-align: center; margin-top: 12px;">
+                <button id="btn-qr-cancel" class="btn-secondary" style="margin-top: 0;">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="app.js"></script>
     <script src="form.js"></script>
     <script src="gas.js"></script>
