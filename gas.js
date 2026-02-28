@@ -81,8 +81,8 @@ function applyDayData(values, lastEndMeter) {
     setVal('end-meter-1', v(0, 19));
 
     // 出発メーター: 前回到着メーターとして引継ぎ
-    const prevEndMeter = lastEndMeter; // 昨日の最終メーター
-    if (prevEndMeter && !v(0, 18)) {
+    const prevEndMeter = (lastEndMeter !== undefined && lastEndMeter !== null) ? String(lastEndMeter) : "";
+    if (prevEndMeter !== "" && !v(0, 18)) {
         const sm1 = document.getElementById('start-meter-1');
         if (sm1 && !sm1.value) {
             setVal('start-meter-1', prevEndMeter);
