@@ -45,14 +45,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // 訪問先モーダル関連の初期化
     initDestinationModal();
 
-    // QRコードリーダーの初期化
+    initSettings();
     initQRScanner();
+    initQRDisplay();
+
+    // URLハッシュによる自動車両選択（QRスキャン結果等で遷移してきた場合）
+    handleUrlHash();
 
     // モーダルのスワイプで閉じる機能
     setupModalDragToClose();
 
     loadSettings();
 });
+
+function handleUrlHash() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#vehicle=')) {
+        const plate = decodeURIComponent(hash.split('=')[1]);
+        const vSelect = document.getElementById('vehicle-id');
+        if (vSelect) {
+            vSelect.value = plate;
+            vSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            // ハッシュをクリアして何度も実行されないようにする
+            history.replaceState(null, null, window.location.pathname);
+        }
+    }
+}
 
 let currentDestinationTargetId = null;
 
@@ -138,11 +156,20 @@ let appData = {
     defaultDriver: ''
 };
 
+function initSettings() {
+    loadSettings(); // 既存のloadSettingsを呼び出す
+    // 必要であれば、ここで他の設定関連の初期化処理を追加
+}
+
 function loadSettings() {
     const saved = localStorage.getItem('app-settings');
     if (saved) {
         try {
             appData = { ...appData, ...JSON.parse(saved) };
+            // 文字列配列の旧車両データをオブジェクト配列にマイグレーション
+            if (appData.vehicles && appData.vehicles.length > 0 && typeof appData.vehicles[0] === 'string') {
+                appData.vehicles = appData.vehicles.map(v => ({ plate: v, nickname: '' }));
+            }
         } catch (e) { }
     }
     document.getElementById('gas-url-input').value = appData.gasUrl || '';
@@ -183,11 +210,27 @@ function saveSettings() {
 function addItemToList(type) {
     const input = document.getElementById(`input-add-${type}`);
     const name = input.value.trim();
+    if (type === 'vehicle') {
+        const nickInput = document.getElementById('input-add-vehicle-nickname');
+        const nickname = nickInput ? nickInput.value.trim() : '';
+        const plate = name; // メイン入力はナンバー
+        if (!plate && !nickname) return;
+
+        const exists = appData.vehicles.some(v => (v.plate || '') === plate);
+        if (!exists) {
+            appData.vehicles.push({ plate: plate, nickname: nickname });
+            if (nickInput) nickInput.value = '';
+            input.value = '';
+            saveSettings();
+            renderTagList(type);
+            updateSelectOptions(type);
+        }
+        return;
+    }
+
     if (!name) return;
 
-    if (type === 'vehicle' && !appData.vehicles.includes(name)) {
-        appData.vehicles.push(name);
-    } else if (type === 'driver' && !appData.drivers.includes(name)) {
+    if (type === 'driver' && !appData.drivers.includes(name)) {
         appData.drivers.push(name);
     } else if (type === 'checker' && !appData.checkers.includes(name)) {
         appData.checkers.push(name);
@@ -201,9 +244,19 @@ function addItemToList(type) {
     updateSelectOptions(type);
 }
 
-function removeItemFromList(type, name) {
+async function removeItemFromList(type, name) {
+    let displayName = name;
+    if (typeof name === 'object' && name.nickname) {
+        displayName = name.nickname;
+    } else if (typeof name === 'object' && name.plate) {
+        displayName = name.plate;
+    }
+
+    const ok = await window.showCustomConfirm(`「${displayName}」を削除してもよろしいですか？`);
+    if (!ok) return;
+
     if (type === 'vehicle') {
-        appData.vehicles = appData.vehicles.filter(v => v !== name);
+        appData.vehicles = appData.vehicles.filter(v => v.plate !== name.plate);
     } else if (type === 'driver') {
         appData.drivers = appData.drivers.filter(d => d !== name);
     } else if (type === 'checker') {
@@ -227,19 +280,64 @@ function renderTagList(type) {
     else if (type === 'checker') list = appData.checkers;
     else if (type === 'destination') list = appData.destinations || [];
 
-    list.forEach(name => {
-        const tag = document.createElement('div');
-        tag.className = 'tag';
-        const text = document.createElement('span');
-        text.textContent = name;
-        const delBtn = document.createElement('button');
-        delBtn.className = 'tag-del';
-        delBtn.innerHTML = '<span class="material-symbols-rounded">close</span> ';
-        delBtn.onclick = () => removeItemFromList(type, name);
+    list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'list-card';
 
-        tag.appendChild(text);
-        tag.appendChild(delBtn);
-        container.appendChild(tag);
+        const info = document.createElement('div');
+        info.className = 'card-info';
+
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'card-name';
+
+        const subLabel = document.createElement('div');
+        subLabel.className = 'card-sub';
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        if (type === 'vehicle' && typeof item === 'object') {
+            nameLabel.textContent = item.nickname || '車両';
+            subLabel.textContent = item.plate;
+        } else {
+            nameLabel.textContent = item;
+            subLabel.style.display = 'none';
+        }
+
+        info.appendChild(nameLabel);
+        info.appendChild(subLabel);
+        card.appendChild(info);
+
+        // Edit Button (Vehicles only)
+        if (type === 'vehicle') {
+            const editBtn = document.createElement('button');
+            editBtn.className = 'icon-btn edit';
+            editBtn.title = 'ニックネームを編集';
+            editBtn.innerHTML = '<span class="material-symbols-rounded">edit</span>';
+            editBtn.onclick = () => editVehicleNickname(item);
+            actions.appendChild(editBtn);
+        }
+
+        // QR Button (Vehicles only)
+        if (type === 'vehicle') {
+            const qrBtn = document.createElement('button');
+            qrBtn.className = 'icon-btn qr';
+            qrBtn.title = 'QRコードを表示';
+            qrBtn.innerHTML = '<span class="material-symbols-rounded">qr_code_2</span>';
+            qrBtn.onclick = () => typeof showVehicleQR === 'function' && showVehicleQR(item);
+            actions.appendChild(qrBtn);
+        }
+
+        // Delete Button
+        const delBtn = document.createElement('button');
+        delBtn.className = 'icon-btn delete';
+        delBtn.title = '削除';
+        delBtn.innerHTML = '<span class="material-symbols-rounded">delete_outline</span>';
+        delBtn.onclick = () => removeItemFromList(type, item);
+        actions.appendChild(delBtn);
+
+        card.appendChild(actions);
+        container.appendChild(card);
     });
 }
 
@@ -277,11 +375,20 @@ function updateSelectOptions(type) {
 
         list.forEach(item => {
             const opt = document.createElement('option');
-            opt.value = opt.textContent = item;
+            if (type === 'vehicle' && typeof item === 'object') {
+                opt.value = item.plate || '';
+                opt.textContent = item.nickname ? `${item.nickname} (${item.plate})` : item.plate;
+            } else {
+                opt.value = opt.textContent = item;
+            }
             selectEl.appendChild(opt);
         });
 
-        if (list.includes(currentVal)) {
+        if (type === 'vehicle') {
+            if (list.some(v => (v.plate || v) === currentVal)) {
+                selectEl.value = currentVal;
+            }
+        } else if (list.includes(currentVal)) {
             selectEl.value = currentVal;
         }
     });
@@ -477,6 +584,64 @@ window.showCustomConfirm = function (message) {
     });
 };
 
+window.showCustomPrompt = function (title, message, defaultValue = '') {
+    return new Promise((resolve) => {
+        const popup = document.getElementById('custom-prompt');
+        const titleEl = document.getElementById('prompt-title');
+        const msgEl = document.getElementById('prompt-message');
+        const inputEl = document.getElementById('prompt-input');
+        const btnOk = document.getElementById('btn-prompt-ok');
+        const btnCancel = document.getElementById('btn-prompt-cancel');
+
+        if (!popup || !inputEl || !btnOk || !btnCancel) {
+            resolve(prompt(message, defaultValue));
+            return;
+        }
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        inputEl.value = defaultValue;
+
+        const cleanup = () => {
+            popup.classList.add('closing');
+            setTimeout(() => {
+                popup.style.display = 'none';
+                popup.classList.remove('open', 'closing');
+            }, 200);
+            btnOk.removeEventListener('click', handleOk);
+            btnCancel.removeEventListener('click', handleCancel);
+            inputEl.removeEventListener('keyup', handleEnter);
+            popup.removeEventListener('click', handleOverlayClick);
+        };
+
+        const handleOk = () => { cleanup(); resolve(inputEl.value); };
+        const handleCancel = () => { cleanup(); resolve(null); };
+        const handleEnter = (e) => { if (e.key === 'Enter') handleOk(); };
+        const handleOverlayClick = (e) => { if (e.target === popup) handleCancel(); };
+
+        btnOk.addEventListener('click', handleOk);
+        btnCancel.addEventListener('click', handleCancel);
+        inputEl.addEventListener('keyup', handleEnter);
+        popup.addEventListener('click', handleOverlayClick);
+
+        popup.style.display = 'flex';
+        popup.classList.add('open');
+        setTimeout(() => inputEl.focus(), 100);
+    });
+};
+
+async function editVehicleNickname(vehicleObj) {
+    if (typeof vehicleObj !== 'object') return;
+    const newName = await window.showCustomPrompt('車両編集', '新しいニックネームを入力してください', vehicleObj.nickname || '');
+    if (newName !== null) {
+        vehicleObj.nickname = newName;
+        saveSettings();
+        renderTagList('vehicle');
+        updateSelectOptions('vehicle');
+        showStatus('ニックネームを更新しました');
+    }
+}
+
 // --- モーダルを下へスワイプして閉じる処理 ---
 function setupModalDragToClose() {
     const modals = [document.getElementById('settings-modal'), document.getElementById('destination-modal')];
@@ -619,8 +784,108 @@ function initQRScanner() {
 
     // 背景タップで閉じる
     qrModal.addEventListener('click', (e) => {
-        if (e.target === qrModal) {
-            stopScanner();
-        }
+        if (e.target === qrModal) stopScanner();
     });
+}
+
+// --- 車両別QRコード表示・生成 ---
+let currentQRVehicle = null;
+
+function initQRDisplay() {
+    const modal = document.getElementById('qr-display-modal');
+    const btnPrint = document.getElementById('btn-qr-print');
+    const btnClose = document.getElementById('btn-qr-display-close');
+
+    if (!modal || !btnPrint || !btnClose) return;
+
+    btnPrint.onclick = () => {
+        if (currentQRVehicle) printVehicleQR(currentQRVehicle);
+    };
+
+    btnClose.onclick = () => {
+        window.closeModal(modal);
+    };
+
+    modal.onclick = (e) => {
+        if (e.target === modal) window.closeModal(modal);
+    };
+}
+
+window.showVehicleQR = function (vehicle) {
+    const modal = document.getElementById('qr-display-modal');
+    const container = document.getElementById('qr-code-container');
+    const plateDisplay = document.getElementById('qr-plate-display');
+    const titleDisplay = document.getElementById('qr-display-title');
+
+    if (!modal || !container || !plateDisplay) return;
+
+    currentQRVehicle = vehicle;
+    const plate = vehicle.plate || '';
+    const nickname = vehicle.nickname || '';
+
+    titleDisplay.textContent = nickname ? `${nickname} のQRコード` : '車両QRコード';
+    plateDisplay.textContent = plate;
+    container.innerHTML = '';
+
+    // スキャン時に車両を選択するためのURLを生成
+    // hash形式で渡すことで、ページ遷移後にJSで処理しやすくする
+    const baseUrl = window.location.origin + window.location.pathname;
+    const qrText = `${baseUrl}#vehicle=${encodeURIComponent(plate)}`;
+
+    try {
+        new QRCode(container, {
+            text: qrText,
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        modal.classList.add('open');
+    } catch (e) {
+        console.error("QR生成エラー", e);
+        window.showCustomConfirm("QRコードの生成に失敗しました。");
+    }
+};
+
+function printVehicleQR(vehicle) {
+    const plate = vehicle.plate || '';
+    const nickname = vehicle.nickname || '';
+    const qrCanvas = document.querySelector('#qr-code-container canvas');
+    if (!qrCanvas) return;
+
+    const qrDataUrl = qrCanvas.toDataURL("image/png");
+    const printWindow = window.open('', '_blank');
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>車両QRプリント - ${plate}</title>
+            <style>
+                body { font-family: sans-serif; text-align: center; padding: 40px; }
+                .card { border: 2px solid #ccc; padding: 40px; display: inline-block; border-radius: 16px; }
+                .nickname { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
+                .plate { font-size: 18px; color: #666; margin-bottom: 24px; }
+                img { width: 300px; height: 300px; }
+                .hint { margin-top: 24px; color: #888; font-size: 14px; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <div class="nickname">${nickname || '車両'}</div>
+                <div class="plate">${plate}</div>
+                <img src="${qrDataUrl}">
+                <div class="hint">このQRをスキャンすると車両が自動選択されます</div>
+            </div>
+            <script>
+                window.onload = () => {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
 }

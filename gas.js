@@ -234,8 +234,15 @@ async function syncMasterData() {
             throw new Error(result.message || 'マスタデータ取得に失敗しました');
         }
 
-        // リストを上書き（重複や空欄はGAS側で処理済み）
-        appData.vehicles = (result.vehicles || []);
+        // リストを上書き（車両はニックネームを保持しつつマージ）
+        const newVehiclePlates = result.vehicles || [];
+        const oldVehicles = appData.vehicles || [];
+        appData.vehicles = newVehiclePlates.map(plate => {
+            // 既存のリストから同じナンバーのものを探してニックネームを引き継ぐ
+            const old = oldVehicles.find(v => v.plate === plate);
+            return { plate: plate, nickname: old ? old.nickname : '' };
+        });
+
         appData.drivers = (result.drivers || []);
         appData.checkers = (result.checkers || []);
         appData.destinations = (result.destinations || []);

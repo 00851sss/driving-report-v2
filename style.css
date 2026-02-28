@@ -13,10 +13,8 @@
     --color-border: #E2E8F0;
     --color-text: #0F172A;
     --color-text-sub: #64748B;
-    --color-accent: #2563EB;
-    --color-btn-primary: #1E3A8A;
-    --color-btn-primary-text: #ffffff;
-    --color-btn-secondary: #ffffff;
+    --color-primary: #2563EB;
+    --color-primary-rgb: 37, 99, 235;
     --color-error: #EF4444;
     --color-success: #10B981;
     --color-warning: #F59E0B;
@@ -39,10 +37,8 @@
     --color-border: #334155;
     --color-text: #F8FAFC;
     --color-text-sub: #94A3B8;
-    --color-accent: #3B82F6;
-    --color-btn-primary: #3B82F6;
-    --color-btn-primary-text: #ffffff;
-    --color-btn-secondary: #0F172A;
+    --color-primary: #3B82F6;
+    --color-primary-rgb: 59, 130, 246;
     --color-error: #F87171;
     --color-success: #34D399;
     --color-warning: #FBBF24;
@@ -264,12 +260,13 @@ select,
 textarea {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 12px;
     font-size: 1rem;
     background: var(--color-input-bg);
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--color-text);
+    box-sizing: border-box;
 }
 
 .control-input {
@@ -286,9 +283,9 @@ input:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    border-color: var(--color-accent);
+    border-color: var(--color-primary);
     background-color: var(--color-input-focus);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.15);
 }
 
 input.error,
@@ -640,14 +637,37 @@ select {
     background: var(--color-surface);
     width: 100%;
     max-width: 540px;
-    height: 80vh;
-    border-radius: 16px 16px 0 0;
-    overflow-y: auto;
-    padding: 12px 16px 40px;
+    height: 85vh;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    /* Sheet自体はスクロールさせずBodyで制御 */
     display: flex;
     flex-direction: column;
-    gap: 20px;
     position: relative;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    padding: 12px 16px 0;
+    flex-shrink: 0;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    z-index: 10;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal-footer {
+    padding: 12px 16px 24px;
+    flex-shrink: 0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    z-index: 10;
 }
 
 .modal-handle {
@@ -690,79 +710,235 @@ select {
     border: none;
     padding: 8px 16px;
     font-size: 0.95rem;
-    font-weight: 600;
     color: var(--color-text-sub);
     cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
     white-space: nowrap;
 }
 
 .tab-btn.active {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--color-accent);
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
+    font-weight: bold;
 }
 
 .tab-content {
     display: none;
+    animation: fadeIn 0.3s ease;
 }
 
 .tab-content.active {
     display: block;
-    animation: fadeIn 0.3s ease;
+}
+
+/* ---- Setting Lists & Cards ---- */
+.setting-block {
+    margin-bottom: 24px;
 }
 
 .setting-block-title {
-    font-size: 0.8rem;
-    font-weight: bold;
+    font-size: 0.95rem;
     color: var(--color-text-sub);
-    margin-bottom: 6px;
+    margin-bottom: 12px;
+    font-weight: 700;
 }
 
 .tag-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-height: 32px;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.tag {
-    display: inline-flex;
+.list-card {
+    display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 20px;
-    font-size: 0.85rem;
+    border-radius: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.tag-del {
-    background: none;
-    border: none;
+.list-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.08);
+}
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.card-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-sub {
+    font-size: 0.8rem;
+    color: var(--color-text-sub);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+.icon-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg);
+    border: 1.5px solid var(--color-border);
+    border-radius: 12px;
     cursor: pointer;
     color: var(--color-text-sub);
-    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 編集ボタン: 紫 */
+.icon-btn.edit {
+    color: #a855f7;
+    border-color: rgba(168, 85, 247, 0.3);
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.icon-btn.edit:hover {
+    background: #a855f7;
+    color: #fff;
+    border-color: #a855f7;
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+}
+
+/* QRボタン: 青 (プライマリ) */
+.icon-btn.qr {
+    color: var(--color-primary);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    background: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.icon-btn.qr:hover {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
+}
+
+/* 削除ボタン: 赤 */
+.icon-btn.delete {
+    color: var(--color-error);
+    border-color: rgba(var(--color-error-rgb), 0.3);
+    background: rgba(var(--color-error-rgb), 0.05);
+}
+
+.icon-btn.delete:hover {
+    background: var(--color-error);
+    color: #fff;
+    border-color: var(--color-error);
+    box-shadow: 0 4px 12px rgba(var(--color-error-rgb), 0.3);
+}
+
+.icon-btn .material-symbols-rounded {
+    font-size: 1.2rem;
 }
 
 .input-add-row {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 16px;
+    flex-direction: column;
+    position: sticky;
+    bottom: -16px;
+    /* modal-bodyのpadding分を相殺して最下部に固定 */
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: -16px;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 5;
+}
+
+@media (min-width: 400px) {
+    .input-add-row {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.input-add-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--color-bg);
+    border: 1.5px solid var(--color-border);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+.input-add-row input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .btn-add {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 0 16px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
+    gap: 6px;
+    padding: 12px 20px;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 12px;
     cursor: pointer;
-    font-weight: bold;
-    color: var(--color-text);
+    font-weight: 600;
+    color: #fff;
     white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
+}
+
+.btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.3);
+    filter: brightness(1.1);
+}
+
+.btn-add:active {
+    transform: translateY(1px);
+}
+
+.btn-add .material-symbols-rounded {
+    font-size: 1.2rem;
+    margin-right: -2px;
 }
 
 /* ==========================================
@@ -820,9 +996,15 @@ button .material-symbols-rounded {
     margin-right: 4px;
 }
 
-.btn-icon .material-symbols-rounded {
+.btn-icon .material-symbols-rounded,
+.icon-btn .material-symbols-rounded {
     margin-right: 0;
     font-size: 1.4rem;
+}
+
+.icon-btn .material-symbols-rounded {
+    font-size: 1.25rem;
+    /* アクションボタン用は少し控えめに */
 }
 
 /* ==========================================

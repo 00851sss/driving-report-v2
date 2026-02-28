@@ -17,100 +17,105 @@
         <div class="modal-overlay" id="settings-modal" role="dialog">
             <div class="modal-sheet">
                 <div class="modal-handle"></div>
-                <div class="modal-title" style="border-bottom:none; padding-bottom:0;"><span
-                        class="material-symbols-rounded">settings</span> 設定</div>
+                <div class="modal-header">
+                    <div class="modal-title" style="border-bottom:none; padding-bottom:0;"><span
+                            class="material-symbols-rounded">settings</span> 設定</div>
 
-                <div class="tabs">
-                    <button class="tab-btn active" data-tab="tab-vehicle">車両</button>
-                    <button class="tab-btn" data-tab="tab-driver">運転者</button>
-                    <button class="tab-btn" data-tab="tab-checker">確認者</button>
-                    <button class="tab-btn" data-tab="tab-destination">訪問先</button>
-                    <button class="tab-btn" data-tab="tab-general">共通</button>
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="tab-vehicle">車両</button>
+                        <button class="tab-btn" data-tab="tab-driver">運転者</button>
+                        <button class="tab-btn" data-tab="tab-checker">確認者</button>
+                        <button class="tab-btn" data-tab="tab-destination">訪問先</button>
+                        <button class="tab-btn" data-tab="tab-general">共通</button>
+                    </div>
                 </div>
 
-                <div class="tab-content active" id="tab-vehicle">
-                    <div class="setting-block">
-                        <div class="setting-block-title">デフォルト車両 (起動時に選択)</div>
-                        <select id="default-vehicle" class="control-input"
-                            style="width: 100%; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; font-size: 1rem; margin-bottom: 12px; background-color: var(--color-input-bg); color: var(--color-text);">
-                            <option value="">未選択</option>
-                        </select>
+                <div class="modal-body">
+                    <div class="tab-content active" id="tab-vehicle">
+                        <div class="setting-block">
+                            <div class="setting-block-title">デフォルト車両 (起動時に選択)</div>
+                            <select id="default-vehicle" class="control-input" style="margin-bottom: 16px;">
+                                <option value="">未選択</option>
+                            </select>
+                        </div>
+                        <div class="setting-block">
+                            <div class="setting-block-title">車両リスト</div>
+                            <div class="tag-list" id="vehicle-tag-list"></div>
+                            <div class="input-add-row" style="flex-wrap: wrap;">
+                                <input type="text" id="input-add-vehicle-nickname" placeholder="ニックネーム(任意)"
+                                    style="flex: 1; min-width: 120px;">
+                                <input type="text" id="input-add-vehicle" placeholder="車両ナンバー(必須)"
+                                    style="flex: 2; min-width: 150px;">
+                                <button class="btn-add" id="btn-add-vehicle"><span
+                                        class="material-symbols-rounded">add_circle</span> 追加</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="setting-block">
-                        <div class="setting-block-title">車両リスト</div>
-                        <div class="tag-list" id="vehicle-tag-list"></div>
-                        <div class="input-add-row">
-                            <input type="text" id="input-add-vehicle" placeholder="車両名を入力">
-                            <button class="btn-add" id="btn-add-vehicle"><span
-                                    class="material-symbols-rounded">add_circle</span> 追加</button>
+
+                    <div class="tab-content" id="tab-driver">
+                        <div class="setting-block">
+                            <div class="setting-block-title">デフォルト運転者 (起動時に選択)</div>
+                            <select id="default-driver" class="control-input" style="margin-bottom: 16px;">
+                                <option value="">未選択</option>
+                            </select>
+                        </div>
+                        <div class="setting-block">
+                            <div class="setting-block-title">運転者リスト</div>
+                            <div class="tag-list" id="driver-tag-list"></div>
+                            <div class="input-add-row">
+                                <input type="text" id="input-add-driver" placeholder="名前を入力">
+                                <button class="btn-add" id="btn-add-driver"><span
+                                        class="material-symbols-rounded">add_circle</span> 追加</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-checker">
+                        <div class="setting-block">
+                            <div class="setting-block-title">確認者リスト</div>
+                            <div class="tag-list" id="checker-tag-list"></div>
+                            <div class="input-add-row">
+                                <input type="text" id="input-add-checker" placeholder="名前を入力">
+                                <button class="btn-add" id="btn-add-checker"><span
+                                        class="material-symbols-rounded">add_circle</span> 追加</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-destination">
+                        <div class="setting-block">
+                            <div class="setting-block-title">訪問先リスト</div>
+                            <div class="tag-list" id="destination-tag-list"></div>
+                            <div class="input-add-row">
+                                <input type="text" id="input-add-destination" placeholder="訪問先を入力">
+                                <button class="btn-add" id="btn-add-destination"><span
+                                        class="material-symbols-rounded">add_circle</span> 追加</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-general">
+                        <div class="setting-block">
+                            <div class="setting-block-title">マスタデータ同期</div>
+                            <p style="font-size: 0.8rem; color: var(--color-text-sub); margin-bottom: 8px;">
+                                GAS（スプレッドシート）から、車両・運転者・確認者のリストを取得します。</p>
+                            <button class="btn-secondary" id="btn-sync-master" style="width: 100%; margin-top: 0;"><span
+                                    class="material-symbols-rounded">sync</span> GASからリストを取得</button>
+                            <div class="status-msg" id="status-sync"></div>
+                        </div>
+                        <div class="setting-block">
+                            <div class="setting-block-title">GAS URL</div>
+                            <input type="text" id="gas-url-input" placeholder="https://script.google.com/...">
+                        </div>
+                        <div class="setting-block">
+                            <div class="setting-block-title">パスコード</div>
+                            <input type="password" id="passcode-input" placeholder="送信用パスコード">
                         </div>
                     </div>
                 </div>
 
-                <div class="tab-content" id="tab-driver">
-                    <div class="setting-block">
-                        <div class="setting-block-title">デフォルト運転者 (起動時に選択)</div>
-                        <select id="default-driver" class="control-input"
-                            style="width: 100%; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; font-size: 1rem; margin-bottom: 12px; background-color: var(--color-input-bg); color: var(--color-text);">
-                            <option value="">未選択</option>
-                        </select>
-                    </div>
-                    <div class="setting-block">
-                        <div class="setting-block-title">運転者リスト</div>
-                        <div class="tag-list" id="driver-tag-list"></div>
-                        <div class="input-add-row">
-                            <input type="text" id="input-add-driver" placeholder="名前を入力">
-                            <button class="btn-add" id="btn-add-driver"><span
-                                    class="material-symbols-rounded">add_circle</span> 追加</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-checker">
-                    <div class="setting-block">
-                        <div class="setting-block-title">確認者リスト</div>
-                        <div class="tag-list" id="checker-tag-list"></div>
-                        <div class="input-add-row">
-                            <input type="text" id="input-add-checker" placeholder="名前を入力">
-                            <button class="btn-add" id="btn-add-checker"><span
-                                    class="material-symbols-rounded">add_circle</span> 追加</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-destination">
-                    <div class="setting-block">
-                        <div class="setting-block-title">訪問先リスト</div>
-                        <div class="tag-list" id="destination-tag-list"></div>
-                        <div class="input-add-row">
-                            <input type="text" id="input-add-destination" placeholder="訪問先を入力">
-                            <button class="btn-add" id="btn-add-destination"><span
-                                    class="material-symbols-rounded">add_circle</span> 追加</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-general">
-                    <div class="setting-block">
-                        <div class="setting-block-title">マスタデータ同期</div>
-                        <p style="font-size: 0.8rem; color: var(--color-text-sub); margin-bottom: 8px;">
-                            GAS（スプレッドシート）から、車両・運転者・確認者のリストを取得します。</p>
-                        <button class="btn-secondary" id="btn-sync-master" style="width: 100%; margin-top: 0;"><span
-                                class="material-symbols-rounded">sync</span> GASからリストを取得</button>
-                        <div class="status-msg" id="status-sync"></div>
-                    </div>
-                    <div class="setting-block">
-                        <div class="setting-block-title">GAS URL</div>
-                        <input type="text" id="gas-url-input" placeholder="https://script.google.com/...">
-                    </div>
-                    <div class="setting-block">
-                        <div class="setting-block-title">パスコード</div>
-                        <input type="password" id="passcode-input" placeholder="送信用パスコード">
-                    </div>
-                </div>
-
-                <div style="margin-top: 10px;">
-                    <button class="btn-secondary" id="btn-close-settings" style="margin-top: 0;"><span
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="btn-close-settings" style="margin-top: 0; width: 100%;"><span
                             class="material-symbols-rounded">close</span> 閉じる</button>
                 </div>
             </div>
@@ -607,6 +612,19 @@
         </div>
     </div>
 
+    <!-- カスタムプロンプト (Input) -->
+    <div class="dialog-overlay" id="custom-prompt" role="dialog">
+        <div class="dialog-box">
+            <div class="dialog-title" id="prompt-title">修正</div>
+            <div id="prompt-message" class="dialog-message"></div>
+            <input type="text" id="prompt-input" class="control-input" style="margin: 10px 0;">
+            <div class="dialog-actions">
+                <button id="btn-prompt-cancel" class="btn-secondary">キャンセル</button>
+                <button id="btn-prompt-ok" class="btn-submit">保存</button>
+            </div>
+        </div>
+    </div>
+
     <!-- QRコードリーダー用ポップアップ -->
     <div class="dialog-overlay" id="qr-modal" role="dialog">
         <div class="dialog-box" style="padding: 16px;">
@@ -618,7 +636,26 @@
         </div>
     </div>
 
+    <!-- 車両QRコード表示用 -->
+    <div class="dialog-overlay" id="qr-display-modal" role="dialog">
+        <div class="dialog-box" style="padding: 24px; max-width: 320px;">
+            <div class="dialog-title" id="qr-display-title">車両QRコード</div>
+            <div id="qr-code-container" style="display: flex; justify-content: center; margin: 16px 0;"></div>
+            <div id="qr-plate-display"
+                style="text-align: center; font-weight: bold; margin-bottom: 16px; color: var(--color-primary);"></div>
+            <div class="dialog-actions" style="flex-direction: column; gap: 8px;">
+                <button id="btn-qr-print" class="btn-submit"
+                    style="width: 100%; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span class="material-symbols-rounded">print</span> 印刷用画面を開く
+                </button>
+                <button id="btn-qr-display-close" class="btn-secondary" style="width: 100%; margin: 0;">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="app.js"></script>
     <script src="form.js"></script>
     <script src="gas.js"></script>
