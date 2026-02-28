@@ -42,8 +42,84 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof syncMasterData === 'function') syncMasterData();
     });
 
+    // 訪問先モーダル関連の初期化
+    initDestinationModal();
+
     loadSettings();
 });
+
+let currentDestinationTargetId = null;
+
+function initDestinationModal() {
+    const modal = document.getElementById('destination-modal');
+    const inputArea = document.getElementById('destination-modal-input');
+    const btnOk = document.getElementById('btn-dest-modal-ok');
+    const btnCancel = document.getElementById('btn-dest-modal-cancel');
+
+    if (!modal || !inputArea || !btnOk || !btnCancel) return;
+
+    // 記録1〜3の入力欄クリックでモーダルを開く
+    ['destination-1', 'destination-2', 'destination-3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => {
+                currentDestinationTargetId = id;
+                inputArea.value = el.value || ''; // 現在の値をテキストエリアにセット
+                renderDestinationModalChips();
+                modal.classList.add('open');
+            });
+        }
+    });
+
+    // 決定ボタン
+    btnOk.addEventListener('click', () => {
+        if (currentDestinationTargetId) {
+            const el = document.getElementById(currentDestinationTargetId);
+            if (el) {
+                el.value = inputArea.value.trim();
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+        modal.classList.remove('open');
+        currentDestinationTargetId = null;
+    });
+
+    // キャンセルボタン
+    btnCancel.addEventListener('click', () => {
+        modal.classList.remove('open');
+        currentDestinationTargetId = null;
+    });
+}
+
+function renderDestinationModalChips() {
+    const container = document.getElementById('destination-modal-chip-list');
+    const inputArea = document.getElementById('destination-modal-input');
+    if (!container || !inputArea) return;
+
+    container.innerHTML = '';
+    const list = appData.destinations || [];
+
+    list.forEach(name => {
+        const chip = document.createElement('div');
+        chip.className = 'tag';
+        chip.style.cursor = 'pointer';
+        chip.style.backgroundColor = 'var(--color-bg)';
+        chip.style.border = '1px solid var(--color-border)';
+        chip.textContent = name;
+
+        chip.addEventListener('click', () => {
+            const currentText = inputArea.value.trim();
+            if (currentText) {
+                // 既に何か入力されていれば、カンマやスペースなどで繋ぐか、そのままくっつけるか（ここではスペース）
+                inputArea.value = currentText + " " + name;
+            } else {
+                inputArea.value = name;
+            }
+        });
+
+        container.appendChild(chip);
+    });
+}
 
 let appData = {
     vehicles: [],
@@ -174,9 +250,6 @@ function updateSelectOptions(type) {
     } else if (type === 'checker') {
         list = appData.checkers;
         selectors = ['pre-checker', 'post-checker'];
-    } else if (type === 'destination') {
-        list = appData.destinations || [];
-        selectors = ['destination-1', 'destination-2', 'destination-3'];
     }
 
     selectors.forEach(id => {
