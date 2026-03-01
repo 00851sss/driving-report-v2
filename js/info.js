@@ -2,7 +2,7 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.1.1";
 const REPORT_URL = ""; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
