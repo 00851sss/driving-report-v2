@@ -36,16 +36,28 @@ function initQRScanner() {
             config,
             (decodedText) => {
                 // 読み取り成功時
+                // URL形式 (#vehicle=プレート) の場合はパラメータ部分を抽出
+                let vehicleId = decodedText;
+                if (decodedText.includes('#vehicle=')) {
+                    try {
+                        const hash = decodedText.split('#')[1];
+                        const params = new URLSearchParams(hash);
+                        vehicleId = params.get('vehicle') || decodedText;
+                    } catch (e) {
+                        console.warn("QR URLパースエラー", e);
+                    }
+                }
+
                 const selectElement = document.getElementById('vehicle-id');
                 if (selectElement) {
                     const options = Array.from(selectElement.options);
-                    const match = options.find(opt => opt.value === decodedText);
+                    const match = options.find(opt => opt.value === vehicleId);
 
                     if (match) {
-                        selectElement.value = decodedText;
+                        selectElement.value = vehicleId;
                         selectElement.dispatchEvent(new Event('change', { bubbles: true }));
                     } else {
-                        window.showCustomAlert(`「${decodedText}」は車両マスターに登録されていません。`);
+                        window.showCustomAlert(`「${vehicleId}」は車両マスターに登録されていません。`);
                     }
                 }
                 stopScanner();
