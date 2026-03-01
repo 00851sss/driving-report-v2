@@ -920,8 +920,7 @@ button:disabled {
     background: var(--color-surface);
     width: 100%;
     max-width: 540px;
-    height: auto;
-    max-height: 85vh;
+    height: 80vh;
     border-radius: 20px 20px 0 0;
     overflow: hidden;
     /* Sheet自体はスクロールさせずBodyで制御 */
