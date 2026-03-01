@@ -39,10 +39,17 @@ function addItemToList(type) {
 
 async function removeItemFromList(type, name) {
     let displayName = name;
-    if (typeof name === 'object' && name.nickname) {
-        displayName = name.nickname;
-    } else if (typeof name === 'object' && name.plate) {
-        displayName = name.plate;
+    if (typeof name === 'object') {
+        if (name.nickname) {
+            displayName = name.nickname;
+        } else if (name.plate) {
+            displayName = name.plate;
+        } else if (name.name) {
+            displayName = name.name;
+        } else {
+            // fallback if it's an object but has no recognizable name property
+            displayName = JSON.stringify(name);
+        }
     }
 
     const ok = await window.showCustomConfirm(`「${displayName}」を削除してもよろしいですか？`);

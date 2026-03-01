@@ -23,6 +23,7 @@
 
     /* Semantic Pastel Colors */
     --color-error: #FDA4AF;
+    --color-error-rgb: 253, 164, 175;
     --color-success: #6EE7B7;
     --color-warning: #FDBA74;
     --color-info: #BAE6FD;
@@ -59,9 +60,10 @@
 
     --color-primary: #0EA5E9;
     --color-primary-rgb: 14, 165, 233;
-    --color-accent: #818CF8;
+    --color-accent: #6366F1;
 
     --color-error: #F43F5E;
+    --color-error-rgb: 244, 63, 94;
     --color-success: #10B981;
     --color-warning: #F59E0B;
     --color-info: #38BDF8;
@@ -1136,6 +1138,12 @@ button:disabled {
 }
 
 /* 削除ボタン: 赤 */
+.icon-btn.delete {
+    color: var(--color-error);
+    border-color: rgba(var(--color-error-rgb), 0.3);
+    background: rgba(var(--color-error-rgb), 0.05);
+}
+
 .icon-btn.delete:hover {
     background: var(--color-error);
     color: #fff;

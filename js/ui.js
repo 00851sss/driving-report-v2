@@ -434,21 +434,48 @@ function setupModalDragToClose() {
         if (!sheet) return;
 
         let startY = 0;
+        let startX = 0;
         let currentY = 0;
         let isDragging = false;
+        let isScrollHandled = false; // スクロールかドラッグかを判定するフラグ
 
         const handleStart = (e) => {
-            // スクロール可能なエリア（リスト等）を触っているときはドラッグ処理しない
-            if (sheet.scrollTop > 0) return;
-            isDragging = true;
+            // スクロール可能なエリア（リスト等）を触っているときは、その要素のスクロール位置をチェック
+            const scrollArea = e.target.closest('.modal-body');
+            if (scrollArea && scrollArea.scrollTop > 0) return;
+
             startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            sheet.style.transition = 'none'; // ドラッグ中はアニメーションを切る
+            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            isDragging = true;
+            isScrollHandled = false;
+            sheet.style.transition = 'none';
         };
 
         const handleMove = (e) => {
             if (!isDragging) return;
             const y = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            currentY = Math.max(0, y - startY); // 下方向のみ許可
+            const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+
+            // 初回の少し動いた段階で、上スワイプか下スワイプか横スワイプかを判定
+            // 誤判定を防ぐため、移動量が3pxを超過してから判定する
+            if (!isScrollHandled) {
+                const diffY = y - startY;
+                const diffX = x - startX;
+
+                if (Math.abs(diffY) > 3 || Math.abs(diffX) > 3) {
+                    if (diffY < 0 || Math.abs(diffX) > Math.abs(diffY)) {
+                        // 上方向に指が動いた、または横方向の動きが大きい場合
+                        // ＝内部のスクロールや別操作を意図しているため、ドラッグをキャンセル
+                        isDragging = false;
+                        return;
+                    }
+                    isScrollHandled = true;
+                } else {
+                    return; // 判定保留
+                }
+            }
+
+            currentY = Math.max(0, y - startY);
 
             // 少しでも下に引っ張ったら即座に反映
             if (currentY > 0) {
