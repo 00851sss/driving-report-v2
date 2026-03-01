@@ -1315,23 +1315,31 @@ button:disabled {
 ========================================== */
 .material-symbols-rounded {
     font-family: 'Material Symbols Rounded' !important;
-    /* フォント指定を強制 */
-    vertical-align: middle;
+    font-weight: normal;
+    font-style: normal;
     font-size: 1.25rem;
     line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
     display: inline-flex;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga';
+
+    vertical-align: middle;
     align-items: center;
     justify-content: center;
     position: relative;
     top: 1px;
-    /* フォント読み込み失敗時のレイアウト崩れ防止策 */
+
+    /* フォント読み込み失敗時の保険 */
     width: 1em;
     height: 1em;
     overflow: hidden;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    /* ligature文字を左揃えで隠す */
 }
 
 button .material-symbols-rounded {
