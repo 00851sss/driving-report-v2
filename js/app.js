@@ -44,10 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 訪問先モーダル関連の初期化
     initDestinationModal();
-
+    // 各種初期化
     initSettings();
     initQRScanner();
     initQRDisplay();
+    initInfo(); // 通知・バージョン情報の初期化
 
     // URLハッシュによる自動車両選択（QRスキャン結果等で遷移してきた場合）
     handleUrlHash();

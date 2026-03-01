@@ -13,7 +13,9 @@
         rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=18">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
 </head>
 
 <body>
@@ -131,6 +133,32 @@
             </div>
         </div>
 
+        <!-- 更新履歴・お知らせモーダル -->
+        <div class="modal-overlay" id="info-modal" role="dialog">
+            <div class="modal-sheet">
+                <div class="modal-handle"></div>
+                <div class="modal-header">
+                    <div class="modal-title" style="border: none; padding-bottom: 0;">お知らせ</div>
+                    <div id="app-version-display"
+                        style="font-size: 0.8rem; color: var(--color-text-sub); text-align: center; margin-bottom: 8px;">
+                        v1.0.0</div>
+                </div>
+                <div class="modal-body" style="padding: 0;">
+                    <div id="update-history-list" class="update-history-container">
+                        <!-- JSで履歴が生成されます -->
+                    </div>
+                </div>
+                <div class="modal-footer"
+                    style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-top: 1px solid var(--color-border);">
+                    <button class="btn-submit" id="btn-report"
+                        style="width: 100%; margin-top: 0; background-color: var(--color-accent);">
+                        <span class="material-symbols-rounded">campaign</span> 不具合報告・要望を送る
+                    </button>
+                    <button class="btn-secondary" id="btn-close-info" style="margin-top: 0; width: 100%;">閉じる</button>
+                </div>
+            </div>
+        </div>
+
         <div class="modal-overlay" id="destination-modal" role="dialog">
             <div class="modal-sheet">
                 <div class="modal-handle"></div>
@@ -164,6 +192,10 @@
 
         <div id="view-home" class="view active">
             <header class="app-header">
+                <div id="sync-status" class="sync-status offline">
+                    <span class="status-dot"></span>
+                    <span class="status-text">オフライン</span>
+                </div>
                 <h2>運行日報</h2>
                 <div style="display: flex; gap: 8px;">
                     <button class="btn-icon" id="btn-reload-data"
@@ -171,6 +203,10 @@
                         aria-label="データ更新"><span class="material-symbols-rounded">sync</span></button>
                     <button class="btn-icon" id="btn-theme-toggle" aria-label="テーマ切替"><span
                             class="material-symbols-rounded">dark_mode</span></button>
+                    <button class="btn-icon" id="btn-info" aria-label="お知らせ" style="position: relative;">
+                        <span class="material-symbols-rounded">notifications</span>
+                        <span id="info-badge" class="badge-dot" style="display: none;"></span>
+                    </button>
                     <button class="btn-icon" id="btn-settings" aria-label="設定"><span
                             class="material-symbols-rounded">settings</span></button>
                 </div>
@@ -689,13 +725,25 @@
 
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="js/state.js?v=7"></script>
-    <script src="js/ui.js?v=7"></script>
-    <script src="js/master.js?v=7"></script>
-    <script src="js/qr.js?v=7"></script>
-    <script src="js/app.js?v=7"></script>
-    <script src="js/form.js?v=7"></script>
-    <script src="js/gas.js?v=7"></script>
+    <script src="js/state.js?v=18"></script>
+    <script src="js/ui.js?v=18"></script>
+    <script src="js/info.js?v=18"></script>
+    <script src="js/master.js?v=18"></script>
+    <script src="js/qr.js?v=18"></script>
+    <script src="js/app.js?v=18"></script>
+    <script src="js/form.js?v=18"></script>
+    <script src="js/gas.js?v=18"></script>
+
+    <script>
+        // サービスワーカーの登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed'));
+            });
+        }
+    </script>
 </body>
 
 </html>

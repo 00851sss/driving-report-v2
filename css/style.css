@@ -1363,3 +1363,61 @@ button:active:not(:disabled) {
     transform: scale(0.95) !important;
     transition: transform 0.05s ease !important;
 }
+
+/* --- 通知バッジと更新履歴 --- */
+.badge-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--color-error);
+    border: 2px solid var(--color-bg-card);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.update-history-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.history-item {
+    border-bottom: 1px dashed var(--color-border);
+    padding-bottom: 12px;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.history-version {
+    font-weight: bold;
+    color: var(--color-accent);
+    background-color: var(--color-accent-sub);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.history-date {
+    font-size: 0.8rem;
+    color: var(--color-text-sub);
+}
+
+.history-content {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--color-text);
+}
