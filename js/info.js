@@ -7,6 +7,11 @@ const REPORT_URL = ""; // TODO: ここにGoogleフォームなどのURLを設定
 
 const UPDATE_HISTORY = [
     {
+        version: "1.1.1",
+        date: "2026-03-02",
+        content: "不具合報告・要望を送る機能を追加しましたが、まだ実装されていません。"
+    },
+    {
         version: "1.1.0",
         date: "2026-03-02",
         content: "更新履歴・バージョン表示機能を追加しました。設定ボタンの隣のアイコンから過去の修正内容を確認できます。"

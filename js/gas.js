@@ -14,6 +14,7 @@ async function loadDayData() {
     if (window.showLoading) window.showLoading('データ読込中...');
 
     try {
+        if (typeof updateSyncStatus === 'function') updateSyncStatus('syncing');
         const res = await fetch(url, {
             method: 'POST',
             body: JSON.stringify({ action: 'read', date, vehicleId: vid, passcode: pass }),
@@ -30,6 +31,7 @@ async function loadDayData() {
         console.warn('[gas.js] loadDayData failed:', e.message);
         // エラーは通知しない（任意読込なので失敗してもOK）
     } finally {
+        if (typeof updateSyncStatus === 'function') updateSyncStatus();
         if (window.hideLoading) window.hideLoading();
     }
 }
@@ -188,6 +190,7 @@ async function submitSection(section) {
     if (window.showLoading) window.showLoading('送信中...');
 
     try {
+        if (typeof updateSyncStatus === 'function') updateSyncStatus('syncing');
         const res = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(data),
@@ -202,6 +205,7 @@ async function submitSection(section) {
     } catch (e) {
         return `通信エラー: ${e.message}`;
     } finally {
+        if (typeof updateSyncStatus === 'function') updateSyncStatus();
         if (window.hideLoading) window.hideLoading();
     }
 }
@@ -221,6 +225,7 @@ async function syncMasterData() {
     if (window.showLoading) window.showLoading('マスタデータ同期中...');
 
     try {
+        if (typeof updateSyncStatus === 'function') updateSyncStatus('syncing');
         const res = await fetch(url, {
             method: 'POST',
             body: JSON.stringify({ action: 'getMaster', passcode: pass }),
@@ -261,6 +266,7 @@ async function syncMasterData() {
         console.error('[gas.js] syncMasterData:', e);
         if (msgEl) { msgEl.textContent = `エラー: ${e.message}`; msgEl.className = 'status-msg visible error'; }
     } finally {
+        if (typeof updateSyncStatus === 'function') updateSyncStatus();
         if (window.hideLoading) window.hideLoading();
     }
 }

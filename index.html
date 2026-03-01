@@ -8,14 +8,14 @@
     <!-- Icons & Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;500;700&display=swap"
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="css/style.css?v=18">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
 </head>
 
 <body>
@@ -192,12 +192,12 @@
 
         <div id="view-home" class="view active">
             <header class="app-header">
+                <h2>運行日報</h2>
                 <div id="sync-status" class="sync-status offline">
                     <span class="status-dot"></span>
                     <span class="status-text">オフライン</span>
                 </div>
-                <h2>運行日報</h2>
-                <div style="display: flex; gap: 8px;">
+                <div class="header-actions">
                     <button class="btn-icon" id="btn-reload-data"
                         onclick="if(window.resetForm) window.resetForm(); if(typeof loadDayData === 'function') loadDayData();"
                         aria-label="データ更新"><span class="material-symbols-rounded">sync</span></button>
