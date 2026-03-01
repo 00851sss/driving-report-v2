@@ -163,6 +163,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (el) { el.classList.remove('error'); }
             });
 
+            // メーター整合性チェック (到着 >= 出発)
+            if (sectionId.startsWith('record')) {
+                const num = sectionId.match(/\d/)[0];
+                const sEl = document.getElementById(`start-meter-${num}`);
+                const eEl = document.getElementById(`end-meter-${num}`);
+                if (sEl && eEl) {
+                    const start = parseFloat(sEl.value);
+                    const end = parseFloat(eEl.value);
+                    if (!isNaN(start) && !isNaN(end) && end < start) {
+                        eEl.classList.add('error');
+                        if (msgEl) {
+                            msgEl.textContent = '到着メーターは出発メーター以上である必要があります';
+                            msgEl.className = 'status-msg visible error';
+                        }
+                        return;
+                    }
+                }
+            }
+
             if (!ok) {
                 if (msgEl) { msgEl.textContent = '必須項目を入力してください'; msgEl.className = 'status-msg visible error'; }
                 return;
