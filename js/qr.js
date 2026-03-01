@@ -119,7 +119,7 @@ window.showVehicleQR = function (vehicle) {
             height: 200,
             colorDark: "#000000",
             colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
+            correctLevel: QRCode.CorrectLevel.L
         });
         modal.classList.add('open');
     } catch (e) {
