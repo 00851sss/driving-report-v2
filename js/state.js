@@ -57,11 +57,32 @@ function loadSettings() {
 }
 
 function saveSettings() {
-    appData.gasUrl = document.getElementById('gas-url-input').value.trim();
-    appData.passcode = document.getElementById('passcode-input').value.trim();
+    const gasUrlEl = document.getElementById('gas-url-input');
+    const passcodeEl = document.getElementById('passcode-input');
     const vSel = document.getElementById('default-vehicle');
-    if (vSel) appData.defaultVehicle = vSel.value;
     const dSel = document.getElementById('default-driver');
+
+    // 要素が見つからない場合は保存を中止（画面読み込みが不完全な可能性）
+    if (!gasUrlEl || !passcodeEl) return;
+
+    const newGasUrl = gasUrlEl.value.trim();
+    const newPasscode = passcodeEl.value.trim();
+
+    // 重要な設定項目が「既存あり 且つ 新規が空」という異常な状態での上書きを防止
+    // (スクリプトの誤動作による消失を防ぐため)
+    if (appData.gasUrl && !newGasUrl && document.activeElement !== gasUrlEl) {
+        console.warn('Attempted to clear GAS URL automatically. Blocked.');
+    } else {
+        appData.gasUrl = newGasUrl;
+    }
+
+    if (appData.passcode && !newPasscode && document.activeElement !== passcodeEl) {
+        console.warn('Attempted to clear Passcode automatically. Blocked.');
+    } else {
+        appData.passcode = newPasscode;
+    }
+
+    if (vSel) appData.defaultVehicle = vSel.value;
     if (dSel) appData.defaultDriver = dSel.value;
 
     localStorage.setItem('app-settings', JSON.stringify(appData));
