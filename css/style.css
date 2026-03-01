@@ -131,10 +131,15 @@ body {
 
 .app-header h2 {
     font-size: 1.15rem;
-    font-weight: 600;
+    font-weight: 700;
     flex: 1;
     text-align: left;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    /* flex子要素の縮小を許可 */
 }
 
 .btn-icon {
@@ -270,6 +275,8 @@ body {
     flex-shrink: 0;
     margin: 0 !important;
     /* 他のスタイルからの干渉を徹底排除 */
+    overflow: hidden;
+    /* フォント読み込み失敗時のLigatureはみ出しを防止 */
 }
 
 /* --- Task Themes --- */
@@ -1307,6 +1314,8 @@ button:disabled {
    マテリアルアイコン設定 (Material Symbols Rounded)
 ========================================== */
 .material-symbols-rounded {
+    font-family: 'Material Symbols Rounded' !important;
+    /* フォント指定を強制 */
     vertical-align: middle;
     font-size: 1.25rem;
     line-height: 1;
@@ -1315,6 +1324,14 @@ button:disabled {
     justify-content: center;
     position: relative;
     top: 1px;
+    /* フォント読み込み失敗時のレイアウト崩れ防止策 */
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    /* ligature文字を左揃えで隠す */
 }
 
 button .material-symbols-rounded {
