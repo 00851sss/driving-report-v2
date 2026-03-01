@@ -913,7 +913,8 @@ button:disabled {
     background: var(--color-surface);
     width: 100%;
     max-width: 540px;
-    height: 85vh;
+    height: auto;
+    max-height: 85vh;
     border-radius: 20px 20px 0 0;
     overflow: hidden;
     /* Sheet自体はスクロールさせずBodyで制御 */
@@ -1025,6 +1026,10 @@ button:disabled {
 /* ---- Setting Lists & Cards ---- */
 .setting-block {
     margin-bottom: 24px;
+}
+
+.setting-block:last-child {
+    margin-bottom: 0;
 }
 
 .setting-block-title {
