@@ -1279,7 +1279,7 @@ button:disabled {
     backdrop-filter: blur(4px) !important;
     -webkit-backdrop-filter: blur(4px) !important;
     z-index: 999999 !important;
-    display: flex !important;
+    display: none;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
