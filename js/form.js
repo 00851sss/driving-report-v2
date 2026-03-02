@@ -50,6 +50,8 @@ window.resetForm = function () {
     document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
     const alcohol1Group = document.getElementById('pre-alcohol-val-group');
     if (alcohol1Group) alcohol1Group.style.display = 'none';
+    const alcohol2Group = document.getElementById('post-alcohol-val-group');
+    if (alcohol2Group) alcohol2Group.style.display = 'none';
 
     // 3. 運転状態とバッジのリセット
     [1, 2, 3].forEach(n => {
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => { if (typeof loadDayData === 'function') loadDayData(); }, 100);
 
     setupAlcoholToggle('pre-alcohol', 'pre-alcohol-val-group', 'pre-alcohol-val');
-    setupAlcoholToggle('post-alcohol', null, null);
+    setupAlcoholToggle('post-alcohol', 'post-alcohol-val-group', 'post-alcohol-val');
 
     setupDistanceCalc(1); setupDistanceCalc(2); setupDistanceCalc(3);
 
@@ -402,7 +404,7 @@ window.collectData = function () {
         driver1: g('driver-name-1'), destination1: g('destination-1'), startTime1: g('start-time-1'), endTime1: g('end-time-1'), startMeter1: g('start-meter-1'), endMeter1: g('end-meter-1'), distance1: d1, preInspection1: r('pre-inspection-1'), vehicleReturn1: g('vehicle-return-1'),
         driver2: g('driver-name-2'), destination2: g('destination-2'), startTime2: g('start-time-2'), endTime2: g('end-time-2'), startMeter2: g('start-meter-2'), endMeter2: g('end-meter-2'), distance2: d2, preInspection2: r('pre-inspection-2'), vehicleReturn2: g('vehicle-return-2'),
         driver3: g('driver-name-3'), destination3: g('destination-3'), startTime3: g('start-time-3'), endTime3: g('end-time-3'), startMeter3: g('start-meter-3'), endMeter3: g('end-meter-3'), distance3: d3, preInspection3: r('pre-inspection-3'), vehicleReturn3: g('vehicle-return-3'),
-        postCheckTime: g('post-check-time'), postCheckMethod: r('post-check-method'), postChecker: g('post-checker'), postAlcohol: r('post-alcohol'),
+        postCheckTime: g('post-check-time'), postCheckMethod: r('post-check-method'), postChecker: g('post-checker'), postAlcohol: r('post-alcohol'), postAlcoholVal: g('post-alcohol-val'),
         refuelAmount: g('refuel-amount'), refuelMeter: g('refuel-meter'), notes: g('notes'),
         totalDistance: String(total.toFixed(1)), isOver400km: total > 400,
     };
