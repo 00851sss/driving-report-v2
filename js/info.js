@@ -105,20 +105,42 @@ function openUpdateModal() {
 /**
  * 更新履歴リストを描画
  */
-function renderUpdateHistory() {
+function renderUpdateHistory(customNotifications = []) {
     const container = document.getElementById('update-history-list');
     const versionDisplay = document.getElementById('app-version-display');
     if (!container) return;
 
     if (versionDisplay) versionDisplay.textContent = `v${APP_VERSION}`;
 
-    container.innerHTML = UPDATE_HISTORY.map(item => `
-        <div class="history-item">
-            <div class="history-meta">
-                <span class="history-version">v${item.version}</span>
-                <span class="history-date">${item.date}</span>
+    // 既存の履歴アイテムに type を追加 (初期は normal)
+    const localHistory = UPDATE_HISTORY.map(item => ({ ...item, type: 'normal', pinned: false }));
+
+    // マージしてソート (pinned が上)
+    const allNotifications = [...customNotifications, ...localHistory].sort((a, b) => {
+        if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+        return new Date(b.date) - new Date(a.date);
+    });
+
+    container.innerHTML = allNotifications.map(item => {
+        const badgeHtml = `
+            <div class="history-badges">
+                ${item.pinned ? '<span class="history-badge fixed"><span class="material-symbols-rounded">push_pin</span>固定</span>' : ''}
+                ${item.type === 'emergency' ? '<span class="history-badge emergency"><span class="material-symbols-rounded">error</span>緊急</span>' : ''}
+                ${item.type === 'urgent' ? '<span class="history-badge urgent"><span class="material-symbols-rounded">priority_high</span>重要</span>' : ''}
             </div>
-            <div class="history-content">${item.content}</div>
-        </div>
-    `).join('');
+        `;
+
+        return `
+            <div class="history-item">
+                <div class="history-meta">
+                    <div class="history-main-meta">
+                        ${item.version ? `<span class="history-version">v${item.version}</span>` : ''}
+                        <span class="history-date">${item.date}</span>
+                    </div>
+                    ${badgeHtml}
+                </div>
+                <div class="history-content">${item.content}</div>
+            </div>
+        `;
+    }).join('');
 }

@@ -1,4 +1,4 @@
-*,
+﻿*,
 *::before,
 *::after {
     box-sizing: border-box;
@@ -186,7 +186,7 @@ body {
     filter: brightness(1.2);
 }
 
-/* ---- View 切り替え ---- */
+/* ---- View 蛻・ｊ譖ｿ縺・---- */
 .view {
     display: none;
 }
@@ -248,7 +248,7 @@ body {
 
 .task-icon {
     width: 44px;
-    /* サイズを固定して揃える */
+    /* 繧ｵ繧､繧ｺ繧貞崋螳壹＠縺ｦ謠・∴繧・*/
     height: 44px;
     font-size: 1.6rem !important;
     display: flex;
@@ -260,9 +260,9 @@ body {
     transition: all 0.2s ease;
     flex-shrink: 0;
     margin: 0 !important;
-    /* 他のスタイルからの干渉を徹底排除 */
+    /* 莉悶・繧ｹ繧ｿ繧､繝ｫ縺九ｉ縺ｮ蟷ｲ貂峨ｒ蠕ｹ蠎墓賜髯､ */
     overflow: hidden;
-    /* フォント読み込み失敗時のLigatureはみ出しを防止 */
+    /* 繝輔か繝ｳ繝郁ｪｭ縺ｿ霎ｼ縺ｿ螟ｱ謨玲凾縺ｮLigature縺ｯ縺ｿ蜃ｺ縺励ｒ髦ｲ豁｢ */
 }
 
 /* --- Task Themes --- */
@@ -316,7 +316,7 @@ body {
 .task-btn:hover .task-icon {
     background: var(--color-primary);
     color: #334155;
-    /* パステルカラー上の濃い色文字 */
+    /* 繝代せ繝・Ν繧ｫ繝ｩ繝ｼ荳翫・豼・＞濶ｲ譁・ｭ・*/
 }
 
 .task-btn:hover .task-name,
@@ -349,21 +349,21 @@ body {
 .badge-warning {
     background: rgba(245, 158, 11, 0.15);
     color: #D97706;
-    /* より濃いオレンジ */
+    /* 繧医ｊ豼・＞繧ｪ繝ｬ繝ｳ繧ｸ */
     border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
 .badge-success {
     background: rgba(16, 185, 129, 0.15);
     color: #059669;
-    /* より濃いグリーン */
+    /* 繧医ｊ豼・＞繧ｰ繝ｪ繝ｼ繝ｳ */
     border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 .badge-driving {
     background: rgba(37, 99, 235, 0.15);
     color: #2563EB;
-    /* より濃いブルー */
+    /* 繧医ｊ豼・＞繝悶Ν繝ｼ */
     border: 1px solid rgba(37, 99, 235, 0.4);
 }
 
@@ -431,7 +431,7 @@ textarea {
 select.control-input {
     padding-right: 36px;
     text-align: left;
-    /* 文字が矢印と重ならないようにする */
+    /* 譁・ｭ励′遏｢蜊ｰ縺ｨ驥阪↑繧峨↑縺・ｈ縺・↓縺吶ｋ */
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -488,9 +488,9 @@ select {
 
 .radio-group label:has(input:checked) {
     background: var(--color-primary);
-    /* パステルブルーを適用 */
+    /* 繝代せ繝・Ν繝悶Ν繝ｼ繧帝←逕ｨ */
     color: #0369A1;
-    /* 視認性の高い濃い色 */
+    /* 隕冶ｪ肴ｧ縺ｮ鬮倥＞豼・＞濶ｲ */
     font-weight: 800;
 }
 
@@ -578,12 +578,12 @@ button:disabled {
     transform: none !important;
 }
 
-/* 時計アイコン用 */
+/* 譎りｨ医い繧､繧ｳ繝ｳ逕ｨ */
 .btn-time {
     width: 48px;
     padding: 0;
     font-size: 1.4rem;
-    /* 時計マークを大きく */
+    /* 譎りｨ医・繝ｼ繧ｯ繧貞､ｧ縺阪￥ */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -594,9 +594,9 @@ button:disabled {
     width: 48px;
     flex-shrink: 0;
     background: #BAE6FD;
-    /* パステルブルー */
+    /* 繝代せ繝・Ν繝悶Ν繝ｼ */
     color: #0369A1;
-    /* 濃いパステルブルー用文字色 */
+    /* 豼・＞繝代せ繝・Ν繝悶Ν繝ｼ逕ｨ譁・ｭ苓牡 */
     border: none;
     border-radius: 12px;
     font-size: 1.6rem;
@@ -610,9 +610,9 @@ button:disabled {
 
 [data-theme="dark"] .btn-qr-dummy {
     background: rgba(14, 165, 233, 0.2);
-    /* 透過させたパステルブルー */
+    /* 騾城℃縺輔○縺溘ヱ繧ｹ繝・Ν繝悶Ν繝ｼ */
     color: #BAE6FD;
-    /* 明るいパステルブルー */
+    /* 譏弱ｋ縺・ヱ繧ｹ繝・Ν繝悶Ν繝ｼ */
     border: 1px solid rgba(186, 230, 253, 0.2);
 }
 
@@ -634,7 +634,7 @@ button:disabled {
 
 .btn-qr-dummy .material-symbols-rounded {
     margin-right: 0 !important;
-    /* グローバルな margin を相殺 */
+    /* 繧ｰ繝ｭ繝ｼ繝舌Ν縺ｪ margin 繧堤嶌谿ｺ */
 }
 
 /* ---- Status Message & Arrival Area ---- */
@@ -736,7 +736,7 @@ button:disabled {
 
 .grid-3 .tag {
     margin: 0 !important;
-    /* グリッド時はマージン不要 */
+    /* 繧ｰ繝ｪ繝・ラ譎ゅ・繝槭・繧ｸ繝ｳ荳崎ｦ・*/
     padding: 10px 4px;
     height: auto;
     min-height: 44px;
@@ -744,7 +744,7 @@ button:disabled {
     text-align: center;
     font-size: 0.85rem;
     white-space: normal;
-    /* 折り返しを許可 */
+    /* 謚倥ｊ霑斐＠繧定ｨｱ蜿ｯ */
     word-break: break-all;
 }
 
@@ -837,7 +837,7 @@ button:disabled {
 .dialog-actions button {
     flex: 1;
     margin-top: 0;
-    /* btn-submit等のmargin-topを打ち消す */
+    /* btn-submit遲峨・margin-top繧呈遠縺｡豸医☆ */
 }
 
 /* ---- Settings Modal ---- */
@@ -848,7 +848,7 @@ button:disabled {
     display: none;
     justify-content: center;
     align-items: flex-end;
-    /* 下からスライドアップするため */
+    /* 荳九°繧峨せ繝ｩ繧､繝峨い繝・・縺吶ｋ縺溘ａ */
     z-index: 1000;
     backdrop-filter: blur(4px);
 }
@@ -909,12 +909,12 @@ button:disabled {
     height: 80vh;
     border-radius: 20px 20px 0 0;
     overflow: hidden;
-    /* Sheet自体はスクロールさせずBodyで制御 */
+    /* Sheet閾ｪ菴薙・繧ｹ繧ｯ繝ｭ繝ｼ繝ｫ縺輔○縺咤ody縺ｧ蛻ｶ蠕｡ */
     display: flex;
     flex-direction: column;
     position: relative;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
-    /* translateY(0) を明示することで座標系を安定させる */
+    /* translateY(0) 繧呈・遉ｺ縺吶ｋ縺薙→縺ｧ蠎ｧ讓咏ｳｻ繧貞ｮ牙ｮ壹＆縺帙ｋ */
     transform: translateY(0);
 }
 
@@ -1106,7 +1106,7 @@ button:disabled {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 編集ボタン: 紫 */
+/* 邱ｨ髮・・繧ｿ繝ｳ: 邏ｫ */
 .icon-btn.edit {
     color: #a855f7;
     border-color: rgba(168, 85, 247, 0.3);
@@ -1120,7 +1120,7 @@ button:disabled {
     box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
 }
 
-/* QRボタン: 青 (プライマリ) */
+/* QR繝懊ち繝ｳ: 髱・(繝励Λ繧､繝槭Μ) */
 .icon-btn.qr {
     color: var(--color-primary);
     border-color: rgba(var(--color-primary-rgb), 0.3);
@@ -1134,7 +1134,7 @@ button:disabled {
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
-/* 削除ボタン: 赤 */
+/* 蜑企勁繝懊ち繝ｳ: 襍､ */
 .icon-btn.delete {
     color: var(--color-error);
     border-color: rgba(var(--color-error-rgb), 0.3);
@@ -1148,7 +1148,7 @@ button:disabled {
     box-shadow: 0 4px 12px rgba(var(--color-error-rgb), 0.3);
 }
 
-/* お気に入りボタン: 黄 (ゴールド) */
+/* 縺頑ｰ励↓蜈･繧翫・繧ｿ繝ｳ: 鮟・(繧ｴ繝ｼ繝ｫ繝・ */
 .icon-btn.fav {
     color: var(--color-text-sub);
     border-color: var(--color-border);
@@ -1185,7 +1185,7 @@ button:disabled {
     flex-direction: column;
     position: sticky;
     bottom: -16px;
-    /* modal-bodyのpadding分を相殺して最下部に固定 */
+    /* modal-body縺ｮpadding蛻・ｒ逶ｸ谿ｺ縺励※譛荳矩Κ縺ｫ蝗ｺ螳・*/
     background: var(--color-surface);
     border-top: 1px solid var(--color-border);
     margin-left: -16px;
@@ -1254,7 +1254,7 @@ button:disabled {
 }
 
 /* ==========================================
-   ローディングUI
+   繝ｭ繝ｼ繝・ぅ繝ｳ繧ｰUI
 ========================================== */
 .global-loading {
     position: fixed !important;
@@ -1296,7 +1296,7 @@ button:disabled {
 }
 
 /* ==========================================
-   マテリアルアイコン設定 (Material Symbols Rounded)
+   繝槭ユ繝ｪ繧｢繝ｫ繧｢繧､繧ｳ繝ｳ險ｭ螳・(Material Symbols Rounded)
 ========================================== */
 .material-symbols-rounded {
     font-family: 'Material Symbols Rounded' !important;
@@ -1321,7 +1321,7 @@ button:disabled {
     position: relative;
     top: 1px;
 
-    /* フォント読み込み失敗時の保険 */
+    /* 繝輔か繝ｳ繝郁ｪｭ縺ｿ霎ｼ縺ｿ螟ｱ謨玲凾縺ｮ菫晞匱 */
     width: 1em;
     height: 1em;
     overflow: hidden;
@@ -1339,18 +1339,18 @@ button .material-symbols-rounded {
 
 .icon-btn .material-symbols-rounded {
     font-size: 1.25rem;
-    /* アクションボタン用は少し控えめに */
+    /* 繧｢繧ｯ繧ｷ繝ｧ繝ｳ繝懊ち繝ｳ逕ｨ縺ｯ蟆代＠謗ｧ縺医ａ縺ｫ */
 }
 
 /* ==========================================
-   アニメーション・インタラクション追加
+   繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ繝ｻ繧､繝ｳ繧ｿ繝ｩ繧ｯ繧ｷ繝ｧ繝ｳ霑ｽ蜉
 ========================================== */
 button:active:not(:disabled) {
     transform: scale(0.95) !important;
     transition: transform 0.05s ease !important;
 }
 
-/* --- 同期ステータス表示 --- */
+/* --- 蜷梧悄繧ｹ繝・・繧ｿ繧ｹ陦ｨ遉ｺ --- */
 .sync-status {
     display: flex;
     align-items: center;
@@ -1371,7 +1371,7 @@ button:active:not(:disabled) {
     background-color: var(--color-text-sub);
 }
 
-/* 状態別のスタイル */
+/* 迥ｶ諷句挨縺ｮ繧ｹ繧ｿ繧､繝ｫ */
 .sync-status.online {
     color: #059669;
     border-color: rgba(16, 185, 129, 0.2);
@@ -1449,25 +1449,110 @@ button:active:not(:disabled) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    gap: 12px;
+}
+
+.history-main-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .history-version {
-    font-weight: bold;
+    font-weight: 700;
     color: var(--color-accent);
-    background-color: var(--color-accent-sub);
+    background: rgba(var(--color-primary-rgb), 0.1);
     padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
 }
 
 .history-date {
     font-size: 0.8rem;
     color: var(--color-text-sub);
+    font-weight: 500;
+}
+
+.history-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.history-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    line-height: 1;
+}
+
+.history-badge .material-symbols-rounded {
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+    display: block;
+}
+
+/* Fixed/Pinned Badge */
+.history-badge.fixed,
+.history-badge.pinned {
+    background: rgba(var(--color-primary-rgb), 0.15) !important;
+    color: var(--color-primary) !important;
+    border-color: rgba(var(--color-primary-rgb), 0.3) !important;
+}
+
+/* 邱頑･繝舌ャ繧ｸ */
+.history-badge.emergency {
+    background: rgba(var(--color-error-rgb), 0.15) !important;
+    color: #E11D48 !important;
+    border-color: rgba(var(--color-error-rgb), 0.3) !important;
+}
+
+/* Urgent Badge */
+.history-badge.urgent {
+    background: rgba(253, 186, 116, 0.2) !important;
+    color: #D97706 !important;
+    border-color: rgba(253, 186, 116, 0.4) !important;
 }
 
 .history-content {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    padding: 8px 0 12px;
+    font-size: 0.88rem;
     color: var(--color-text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-top: 4px;
+}
+
+/* 繝繝ｼ繧ｯ繝｢繝ｼ繝画凾縺ｮ繝舌ャ繧ｸ隱ｿ謨ｴ */
+[data-theme="dark"] .history-badge.emergency {
+    background: rgba(244, 63, 94, 0.2) !important;
+    color: #FDA4AF !important;
+}
+
+[data-theme="dark"] .history-badge.urgent {
+    background: rgba(245, 158, 11, 0.2) !important;
+    color: #FDBA74 !important;
+}
+
+/* 邱頑･繧｢繧ｯ繧ｻ繝ｳ繝医Λ繧､繝ｳ */
+.top-accent-line {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #f59e0b;
+    /* Color for urgent notifications */
+    z-index: 9999;
+    display: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
