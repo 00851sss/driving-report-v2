@@ -406,6 +406,6 @@ window.collectData = function () {
         driver3: g('driver-name-3'), destination3: g('destination-3'), startTime3: g('start-time-3'), endTime3: g('end-time-3'), startMeter3: g('start-meter-3'), endMeter3: g('end-meter-3'), distance3: d3, preInspection3: r('pre-inspection-3'), vehicleReturn3: g('vehicle-return-3'),
         postCheckTime: g('post-check-time'), postCheckMethod: r('post-check-method'), postChecker: g('post-checker'), postAlcohol: r('post-alcohol'), postAlcoholVal: g('post-alcohol-val'),
         refuelAmount: g('refuel-amount'), refuelMeter: g('refuel-meter'), notes: g('notes'),
-        totalDistance: String(total.toFixed(1)), isOver400km: total > 400,
+        totalDistance: String(total.toFixed(1)), isOver400km: total >= 400,
     };
 };

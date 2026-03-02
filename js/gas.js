@@ -214,12 +214,18 @@ async function submitSection(section) {
 
 // ---- マスタデータ同期 ----
 async function syncMasterData() {
-    const url = appData.gasUrl;
-    const pass = appData.passcode;
+    // UIから直接最新の入力を取得（Blurイベント前でも動作するようにする）
+    const gasUrlEl = document.getElementById('gas-url-input');
+    const passcodeEl = document.getElementById('passcode-input');
+    const url = (gasUrlEl ? gasUrlEl.value.trim() : '') || appData.gasUrl;
+    const pass = (passcodeEl ? passcodeEl.value.trim() : '') || appData.passcode;
     const msgEl = document.getElementById('status-sync');
 
     if (!url || !pass || !url.startsWith('https://')) {
-        if (msgEl) { msgEl.textContent = 'GAS URLとパスコードを正しく設定してください'; msgEl.className = 'status-msg visible error'; }
+        if (msgEl) {
+            msgEl.textContent = 'GAS URLとパスコードを正しく設定してください';
+            msgEl.className = 'status-msg visible error';
+        }
         return;
     }
 
@@ -245,22 +251,22 @@ async function syncMasterData() {
         const newVehicles = result.vehicles || [];
         const oldVehicles = appData.vehicles || [];
         appData.vehicles = newVehicles.map(v => {
-            // GASから { plate, sheetUrl } が来る場合と、文字列の場合の両方に対応
-            const plate = (typeof v === 'object') ? (v.plate || '') : String(v);
-            const gasSheetUrl = (typeof v === 'object') ? (v.sheetUrl || '') : '';
-
-            // 既存のリストから同じナンバーを探してニックネーム・URLを引き継ぐ
-            const old = oldVehicles.find(o => (typeof o === 'object' ? o.plate : o) === plate);
-            const oldNickname = old ? (old.nickname || '') : '';
-            // GASにURLがあれば優先、なければローカルの設定を維持
-            const sheetUrl = gasSheetUrl || (old ? (old.sheetUrl || '') : '');
-
+            const plate = (v && typeof v === 'object') ? (v.plate || '') : String(v);
+            const gasSheetUrl = (v && typeof v === 'object') ? (v.sheetUrl || '') : '';
+            const old = oldVehicles.find(o => (o && typeof o === 'object' ? o.plate : o) === plate);
+            const oldNickname = (old && typeof old === 'object') ? (old.nickname || '') : '';
+            const sheetUrl = gasSheetUrl || ((old && typeof old === 'object') ? (old.sheetUrl || '') : '');
             return { plate, nickname: oldNickname, sheetUrl };
-        });
+        }).filter(v => v.plate);
 
-        appData.drivers = (result.drivers || []);
-        appData.checkers = (result.checkers || []);
-        appData.destinations = (result.destinations || []);
+        // 文字列の配列だった場合を考慮し、常に {name, favorite} 形式のオブジェクト配列に変換して保存
+        const toObjList = (list) => (list || []).map(item =>
+            (typeof item === 'object' && item !== null) ? item : { name: String(item), favorite: false }
+        ).filter(i => i.name);
+
+        appData.drivers = toObjList(result.drivers);
+        appData.checkers = toObjList(result.checkers);
+        appData.destinations = toObjList(result.destinations);
 
         // お知らせの更新を追加
         if (typeof renderUpdateHistory === 'function') {
@@ -276,6 +282,10 @@ async function syncMasterData() {
 
         if (msgEl) { msgEl.textContent = '同期完了！'; msgEl.className = 'status-msg visible success'; }
         setTimeout(() => { if (msgEl) msgEl.className = 'status-msg'; }, 3000);
+
+        // スプレッドシートURLボタンの状態を更新
+        if (typeof updateSsLinkArea === 'function') updateSsLinkArea();
+
 
     } catch (e) {
         console.error('[gas.js] syncMasterData:', e);

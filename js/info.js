@@ -2,10 +2,21 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.1.1";
+const APP_VERSION = "1.2.0";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "1.2.0",
+        date: "2026-03-03",
+        content: "操作安定性を大幅に向上させました。車両スプレッドシートURLの自動取得に対応し、手動設定が不要になりました。"
+    },
+    {
+        pinned: true,
+        type: "urgent",
+        date: "2026-03-03",
+        content: "【制作途中の機能】\n・アプリ内で見る現在作成中\n・一部エラー表示設定未完成\n・その他安定性"
+    },
     {
         version: "1.1.1",
         date: "2026-03-02",

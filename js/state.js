@@ -32,8 +32,10 @@ function loadSettings() {
             });
         } catch (e) { }
     }
-    document.getElementById('gas-url-input').value = appData.gasUrl || '';
-    document.getElementById('passcode-input').value = appData.passcode || '';
+    const gasUrlEl = document.getElementById('gas-url-input');
+    const passEl = document.getElementById('passcode-input');
+    if (gasUrlEl) gasUrlEl.value = appData.gasUrl || '';
+    if (passEl) passEl.value = appData.passcode || '';
 
     ['vehicle', 'driver', 'checker', 'destination'].forEach(type => {
         renderTagList(type);
@@ -44,18 +46,31 @@ function loadSettings() {
     const vSel = document.getElementById('default-vehicle');
     if (vSel) {
         vSel.value = appData.defaultVehicle || '';
-        vSel.addEventListener('change', saveSettings);
+        if (!_listenersAdded.has('default-vehicle')) {
+            vSel.addEventListener('change', saveSettings);
+            _listenersAdded.add('default-vehicle');
+        }
     }
     const dSel = document.getElementById('default-driver');
     if (dSel) {
         dSel.value = appData.defaultDriver || '';
-        dSel.addEventListener('change', saveSettings);
+        if (!_listenersAdded.has('default-driver')) {
+            dSel.addEventListener('change', saveSettings);
+            _listenersAdded.add('default-driver');
+        }
     }
 
-    document.getElementById('gas-url-input').addEventListener('change', saveSettings);
-    document.getElementById('passcode-input').addEventListener('change', saveSettings);
+    if (gasUrlEl && !_listenersAdded.has('gas-url-input')) {
+        gasUrlEl.addEventListener('change', saveSettings);
+        _listenersAdded.add('gas-url-input');
+    }
+    if (passEl && !_listenersAdded.has('passcode-input')) {
+        passEl.addEventListener('change', saveSettings);
+        _listenersAdded.add('passcode-input');
+    }
 }
 
+const _listenersAdded = new Set();
 function saveSettings() {
     const gasUrlEl = document.getElementById('gas-url-input');
     const passcodeEl = document.getElementById('passcode-input');

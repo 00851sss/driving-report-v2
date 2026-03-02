@@ -49,13 +49,13 @@ function openModalWithHistory(modalId) {
  * モーダルを閉じる（履歴を一つ戻すことで popstate に任せる）
  */
 window.closeModal = function (modalEl) {
-    if (!modalEl) return;
+    if (!modalEl || modalEl.classList.contains('closing')) return;
 
-    // もし現在の履歴がこのモーダルのものなら、戻るボタンをシミュレートする
+    // 現在の履歴がこのモーダルのものなら、戻るボタンをシミュレートする
     if (window.history.state && window.history.state.modalId === modalEl.id) {
         window.history.back();
     } else {
-        // そうでなければ（履歴管理外で開かれた場合など）直接閉じる
+        // 直接閉じる（popstate を介さない）
         modalEl.classList.add('closing');
         setTimeout(() => {
             modalEl.classList.remove('open', 'closing');
@@ -443,107 +443,3 @@ function setupModalOverlayClickClose() {
     });
 }
 
-// --- モーダルを下へスワイプして閉じる処理 ---
-function setupModalDragToClose() {
-    const modals = [
-        document.getElementById('settings-modal'),
-        document.getElementById('destination-modal'),
-        document.getElementById('info-modal')
-    ];
-
-    modals.forEach(modal => {
-        if (!modal) return;
-        const sheet = modal.querySelector('.modal-sheet');
-        if (!sheet) return;
-
-        let startY = 0;
-        let startX = 0;
-        let currentY = 0;
-        let isDragging = false;
-        let isScrollHandled = false; // スクロールかドラッグかを判定するフラグ
-
-        const handleStart = (e) => {
-            // インタラクティブな要素（ボタン、入力欄、セレクトボックス等）を触っているときはドラッグを開始しない
-            // ただし、ハンドル部分（.modal-handle）を直接触っている場合は許可する
-            const isHandle = e.target.closest('.modal-handle');
-            const isInteractive = e.target.closest('button, input, select, textarea, label, .icon-btn');
-
-            if (isInteractive && !isHandle) return;
-
-            // スクロール可能なエリア（リスト等）を触っているときは、その要素のスクロール位置をチェック
-            const scrollArea = e.target.closest('.modal-body, .tab-content, .update-history-container');
-            if (scrollArea && scrollArea.scrollTop > 0) return;
-
-            startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-            isDragging = true;
-            isScrollHandled = false;
-            sheet.style.transition = 'none';
-        };
-
-        const handleMove = (e) => {
-            if (!isDragging) return;
-            const y = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-
-            // 初回の少し動いた段階で、上スワイプか下スワイプか横スワイプかを判定
-            // 判定閾値を少し上げ（3px -> 8px）、タップ時の微小なブレでドラッグと判定されないようにする
-            if (!isScrollHandled) {
-                const diffY = y - startY;
-                const diffX = x - startX;
-
-                if (Math.abs(diffY) > 8 || Math.abs(diffX) > 8) {
-                    if (diffY < 0 || Math.abs(diffX) > Math.abs(diffY)) {
-                        // 上方向に指が動いた、または横方向の動きが大きい場合
-                        // ＝内部のスクロールや別操作を意図しているため、ドラッグをキャンセル
-                        isDragging = false;
-                        return;
-                    }
-                    isScrollHandled = true;
-                } else {
-                    return; // 判定保留
-                }
-            }
-
-            currentY = Math.max(0, y - startY);
-
-            // 少しでも下に引っ張ったら即座に反映
-            if (currentY > 0) {
-                if (e.cancelable) {
-                    e.preventDefault(); // 画面自体のスクロールを防ぐ
-                }
-                sheet.style.transform = `translateY(${currentY}px)`;
-            }
-        };
-
-        const handleEnd = () => {
-            if (!isDragging) return;
-            isDragging = false;
-            sheet.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-
-            if (currentY > 100) {
-                // 一定以上引っ張ったら滑らかに閉じる (共通関数でお任せ)
-                window.closeModal(modal);
-                // すぐに手動の translateY を解除し、.closing クラスの CSS アニメーション(modalSlideDown)に引き継ぐ
-                sheet.style.transform = '';
-            } else {
-                // 引っ張りが足りない場合は元に戻す
-                sheet.style.transform = 'translateY(0)';
-            }
-            currentY = 0;
-        };
-
-        // マウスとタッチ両方に対応
-        sheet.addEventListener('touchstart', handleStart, { passive: true });
-        sheet.addEventListener('touchmove', handleMove, { passive: false });
-        sheet.addEventListener('touchend', handleEnd);
-
-        // マウス用にハンドル（.modal-handle）自体でのみドラッグを開始できるようにする
-        const handle = sheet.querySelector('.modal-handle');
-        if (handle) {
-            handle.addEventListener('mousedown', handleStart);
-            window.addEventListener('mousemove', handleMove);
-            window.addEventListener('mouseup', handleEnd);
-        }
-    });
-}

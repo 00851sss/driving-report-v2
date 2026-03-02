@@ -105,13 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // URLハッシュによる自動車両選択（QRスキャン結果等で遷移してきた場合）
     handleUrlHash();
 
-    // モーダルのスワイプで閉じる機能
-    setupModalDragToClose();
     // モーダル背景クリックで閉じる機能
     setupModalOverlayClickClose();
 
     // 履歴管理の初期化（ブラウザの戻るボタン対応）
     initHistoryManagement();
-
-    loadSettings();
 });
