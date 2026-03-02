@@ -254,6 +254,11 @@ async function syncMasterData() {
         appData.checkers = (result.checkers || []);
         appData.destinations = (result.destinations || []);
 
+        // お知らせの更新を追加
+        if (typeof renderUpdateHistory === 'function') {
+            renderUpdateHistory(result.notifications || []);
+        }
+
         // フロントエンドのUIに反映して保存
         saveSettings();
         ['vehicle', 'driver', 'checker', 'destination'].forEach(type => {

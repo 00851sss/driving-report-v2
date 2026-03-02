@@ -42,6 +42,19 @@ function initInfo() {
     checkVersionUpdate();
     renderUpdateHistory();
 
+    // 初回お知らせ取得
+    fetchGlobalNotifications();
+
+    // 定期取得 (3分おき)
+    setInterval(fetchGlobalNotifications, 3 * 60 * 1000);
+
+    // タブ復帰時にも更新
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            fetchGlobalNotifications();
+        }
+    });
+
     const btnInfo = document.getElementById('btn-info');
     if (btnInfo) {
         btnInfo.addEventListener('click', () => {
@@ -143,4 +156,33 @@ function renderUpdateHistory(customNotifications = []) {
             </div>
         `;
     }).join('');
+
+    // 重要なお知らせアクセントラインの制御
+    const topAccentLine = document.getElementById('top-accent-line');
+    if (topAccentLine) {
+        const urgentItem = allNotifications.find(n => n.type === 'emergency' || n.type === 'urgent');
+        if (urgentItem) {
+            topAccentLine.style.display = 'block';
+            topAccentLine.style.backgroundColor = urgentItem.type === 'emergency' ? '#e11d48' : '#f59e0b';
+        } else {
+            topAccentLine.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * お知らせ専用GASからデータを取得
+ */
+async function fetchGlobalNotifications() {
+    const INFO_GAS_URL = "https://script.google.com/macros/s/AKfycbzqfGv_e7E2-uI7_9vR5-vY7-n7n-n7n/exec";
+    try {
+        const res = await fetch(INFO_GAS_URL);
+        if (!res.ok) return;
+        const result = await res.json();
+        if (result.status === "success" && result.notifications) {
+            renderUpdateHistory(result.notifications);
+        }
+    } catch (e) {
+        console.warn("[info.js] Failed to fetch global notifications:", e);
+    }
 }
