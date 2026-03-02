@@ -73,7 +73,8 @@ function applyDayData(values, lastEndMeter) {
     // Row0 (記録1 + 乗車前チェック)
     setVal('pre-check-time', fmtTime(v(0, 6)));
     setVal('pre-checker', v(0, 11));
-    if (v(0, 6) && window.markAsDone) window.markAsDone('pre-check');
+    setVal('pre-alcohol-val', v(2, 12)); // 3行目 M列
+    if ((v(0, 6) || v(2, 12)) && window.markAsDone) window.markAsDone('pre-check');
 
     setVal('driver-name-1', v(0, 2));
     setVal('destination-1', v(0, 3));
@@ -101,7 +102,8 @@ function applyDayData(values, lastEndMeter) {
     // Row1 (記録2 + 乗車後チェック)
     setVal('post-check-time', fmtTime(v(1, 6)));
     setVal('post-checker', v(1, 11));
-    if (v(1, 6) && window.markAsDone) window.markAsDone('post-check');
+    setVal('post-alcohol-val', v(2, 14)); // 3行目 O列
+    if ((v(1, 6) || v(2, 14)) && window.markAsDone) window.markAsDone('post-check');
 
     // 記録1の運転者と到着メーターを、記録2の初期値として自動セット
     const autoDriver2 = v(0, 2);

@@ -463,8 +463,15 @@ function setupModalDragToClose() {
         let isScrollHandled = false; // スクロールかドラッグかを判定するフラグ
 
         const handleStart = (e) => {
+            // インタラクティブな要素（ボタン、入力欄、セレクトボックス等）を触っているときはドラッグを開始しない
+            // ただし、ハンドル部分（.modal-handle）を直接触っている場合は許可する
+            const isHandle = e.target.closest('.modal-handle');
+            const isInteractive = e.target.closest('button, input, select, textarea, label, .icon-btn');
+
+            if (isInteractive && !isHandle) return;
+
             // スクロール可能なエリア（リスト等）を触っているときは、その要素のスクロール位置をチェック
-            const scrollArea = e.target.closest('.modal-body');
+            const scrollArea = e.target.closest('.modal-body, .tab-content, .update-history-container');
             if (scrollArea && scrollArea.scrollTop > 0) return;
 
             startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
@@ -480,12 +487,12 @@ function setupModalDragToClose() {
             const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
 
             // 初回の少し動いた段階で、上スワイプか下スワイプか横スワイプかを判定
-            // 誤判定を防ぐため、移動量が3pxを超過してから判定する
+            // 判定閾値を少し上げ（3px -> 8px）、タップ時の微小なブレでドラッグと判定されないようにする
             if (!isScrollHandled) {
                 const diffY = y - startY;
                 const diffX = x - startX;
 
-                if (Math.abs(diffY) > 3 || Math.abs(diffX) > 3) {
+                if (Math.abs(diffY) > 8 || Math.abs(diffX) > 8) {
                     if (diffY < 0 || Math.abs(diffX) > Math.abs(diffY)) {
                         // 上方向に指が動いた、または横方向の動きが大きい場合
                         // ＝内部のスクロールや別操作を意図しているため、ドラッグをキャンセル
