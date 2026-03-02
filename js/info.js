@@ -3,13 +3,13 @@
  */
 
 const APP_VERSION = "1.1.1";
-const REPORT_URL = ""; // TODO: ここにGoogleフォームなどのURLを設定してください
+const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
     {
         version: "1.1.1",
         date: "2026-03-02",
-        content: "不具合報告・要望を送る機能を追加しましたが、まだ実装されていません。"
+        content: "仮不具合報告・要望を送る機能を追加しました。"
     },
     {
         version: "1.1.0",
@@ -176,7 +176,7 @@ function renderUpdateHistory(customNotifications = []) {
 async function fetchGlobalNotifications() {
     // お知らせ取得専用のGAS URL (※ユーザー側で設定した本物のURLをここに記述してください)
     // もしURLが不明な場合は、管理者用のGAS設定画面から取得してください。
-    const INFO_GAS_URL = "https://script.google.com/macros/s/AKfycbzqfGv_e7E2-uI7_9vR5-vY7-n7n-n7n/exec";
+    const INFO_GAS_URL = "https://script.google.com/macros/s/AKfycbwWKilj5EdkG15FB0sjj52WAOX6WlHL9xT_Ugj1hkK5y3c0TqVD_i14LG8UhEJ5m1Z0/exec";
 
     // プレースホルダーの場合はスキップ（エラーではなく警告のみ）
     if (INFO_GAS_URL.includes("n7n-n7n")) {

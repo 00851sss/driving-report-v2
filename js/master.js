@@ -116,6 +116,15 @@ function renderTagList(type) {
             editBtn.innerHTML = '<span class="material-symbols-rounded">edit</span>';
             editBtn.onclick = () => editVehicleNickname(item);
             actions.appendChild(editBtn);
+
+            // Sheet URL Button (Vehicles only)
+            const sheetBtn = document.createElement('button');
+            sheetBtn.className = 'icon-btn sheet';
+            sheetBtn.title = 'シートURLを設定';
+            sheetBtn.innerHTML = '<span class="material-symbols-rounded">link</span>';
+            sheetBtn.style.color = item.sheetUrl ? 'var(--color-primary)' : '';
+            sheetBtn.onclick = () => editVehicleSheetUrl(item);
+            actions.appendChild(sheetBtn);
         }
 
         // QR Button (Vehicles only)

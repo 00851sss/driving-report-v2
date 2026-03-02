@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initQRScanner();
     initQRDisplay();
     initInfo(); // 通知・バージョン情報の初期化
+    initSs();   // スプレッドシート連携の初期化
     initSyncStatus(); // 同期ステータスの初期化
 
     // URLハッシュによる自動車両選択（QRスキャン結果等で遷移してきた場合）

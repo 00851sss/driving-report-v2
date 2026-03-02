@@ -241,13 +241,21 @@ async function syncMasterData() {
             throw new Error(result.message || 'マスタデータ取得に失敗しました');
         }
 
-        // リストを上書き（車両はニックネームを保持しつつマージ）
-        const newVehiclePlates = result.vehicles || [];
+        // リストを上書き（車両はニックネームとシートURLを保持しつつマージ）
+        const newVehicles = result.vehicles || [];
         const oldVehicles = appData.vehicles || [];
-        appData.vehicles = newVehiclePlates.map(plate => {
-            // 既存のリストから同じナンバーのものを探してニックネームを引き継ぐ
-            const old = oldVehicles.find(v => v.plate === plate);
-            return { plate: plate, nickname: old ? old.nickname : '' };
+        appData.vehicles = newVehicles.map(v => {
+            // GASから { plate, sheetUrl } が来る場合と、文字列の場合の両方に対応
+            const plate = (typeof v === 'object') ? (v.plate || '') : String(v);
+            const gasSheetUrl = (typeof v === 'object') ? (v.sheetUrl || '') : '';
+
+            // 既存のリストから同じナンバーを探してニックネーム・URLを引き継ぐ
+            const old = oldVehicles.find(o => (typeof o === 'object' ? o.plate : o) === plate);
+            const oldNickname = old ? (old.nickname || '') : '';
+            // GASにURLがあれば優先、なければローカルの設定を維持
+            const sheetUrl = gasSheetUrl || (old ? (old.sheetUrl || '') : '');
+
+            return { plate, nickname: oldNickname, sheetUrl };
         });
 
         appData.drivers = (result.drivers || []);
