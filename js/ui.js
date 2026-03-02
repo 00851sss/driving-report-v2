@@ -9,9 +9,14 @@ function initHistoryManagement() {
     window.addEventListener('popstate', (event) => {
         const state = event.state;
 
-        // 全てのモーダルを一旦閉じる
+        // 全てのモーダルを一旦閉じる（アニメーション込み）
         document.querySelectorAll('.modal-overlay.open').forEach(m => {
-            m.classList.remove('open', 'closing');
+            if (m.id !== state?.modalId) {
+                m.classList.add('closing');
+                setTimeout(() => {
+                    m.classList.remove('open', 'closing');
+                }, 300);
+            }
         });
 
         if (state) {
@@ -424,9 +429,27 @@ window.showCustomPrompt = function (title, message, defaultValue = '') {
     });
 };
 
+/**
+ * モーダル背景切り替え部分をクリックして閉じる
+ */
+function setupModalOverlayClickClose() {
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            // overlay自体（背景の暗い部分）がクリックされた場合のみ閉じる
+            if (e.target === overlay) {
+                window.closeModal(overlay);
+            }
+        });
+    });
+}
+
 // --- モーダルを下へスワイプして閉じる処理 ---
 function setupModalDragToClose() {
-    const modals = [document.getElementById('settings-modal'), document.getElementById('destination-modal')];
+    const modals = [
+        document.getElementById('settings-modal'),
+        document.getElementById('destination-modal'),
+        document.getElementById('info-modal')
+    ];
 
     modals.forEach(modal => {
         if (!modal) return;

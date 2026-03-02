@@ -106,6 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // モーダルのスワイプで閉じる機能
     setupModalDragToClose();
+    // モーダル背景クリックで閉じる機能
+    setupModalOverlayClickClose();
 
     // 履歴管理の初期化（ブラウザの戻るボタン対応）
     initHistoryManagement();
