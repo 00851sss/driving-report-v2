@@ -174,12 +174,22 @@ function renderUpdateHistory(customNotifications = []) {
  * お知らせ専用GASからデータを取得
  */
 async function fetchGlobalNotifications() {
+    // お知らせ取得専用のGAS URL (※ユーザー側で設定した本物のURLをここに記述してください)
+    // もしURLが不明な場合は、管理者用のGAS設定画面から取得してください。
     const INFO_GAS_URL = "https://script.google.com/macros/s/AKfycbzqfGv_e7E2-uI7_9vR5-vY7-n7n-n7n/exec";
+
+    // プレースホルダーの場合はスキップ（エラーではなく警告のみ）
+    if (INFO_GAS_URL.includes("n7n-n7n")) {
+        console.info("[info.js] Dedicated notification URL is a placeholder. Skipping fetch.");
+        return;
+    }
+
     try {
         const res = await fetch(INFO_GAS_URL);
         if (!res.ok) return;
         const result = await res.json();
-        if (result.status === "success" && result.notifications) {
+
+        if (result.status === 'success' && result.notifications) {
             renderUpdateHistory(result.notifications);
         }
     } catch (e) {
