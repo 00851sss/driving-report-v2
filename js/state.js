@@ -60,13 +60,18 @@ function loadSettings() {
         }
     }
 
-    if (gasUrlEl && !_listenersAdded.has('gas-url-input')) {
-        gasUrlEl.addEventListener('change', saveSettings);
-        _listenersAdded.add('gas-url-input');
-    }
-    if (passEl && !_listenersAdded.has('passcode-input')) {
-        passEl.addEventListener('change', saveSettings);
-        _listenersAdded.add('passcode-input');
+    // GAS URLとパスコードは自動保存せず、専用ボタンで手動保存する
+    const btnSaveGas = document.getElementById('btn-save-gas-settings');
+    if (btnSaveGas && !_listenersAdded.has('btn-save-gas-settings')) {
+        btnSaveGas.addEventListener('click', () => {
+            saveSettings();
+            if (window.showCustomAlert) {
+                window.showCustomAlert('「共通」の設定を保存しました。');
+            } else {
+                alert('「共通」の設定を保存しました。');
+            }
+        });
+        _listenersAdded.add('btn-save-gas-settings');
     }
 }
 
@@ -77,24 +82,24 @@ function saveSettings() {
     const vSel = document.getElementById('default-vehicle');
     const dSel = document.getElementById('default-driver');
 
-    // 要素が見つからない場合は保存を中止（画面読み込みが不完全な可能性）
-    if (!gasUrlEl || !passcodeEl) return;
-
-    const newGasUrl = gasUrlEl.value.trim();
-    const newPasscode = passcodeEl.value.trim();
-
-    // 重要な設定項目が「既存あり 且つ 新規が空」という異常な状態での上書きを防止
-    // (スクリプトの誤動作による消失を防ぐため)
-    if (appData.gasUrl && !newGasUrl && document.activeElement !== gasUrlEl) {
-        console.warn('Attempted to clear GAS URL automatically. Blocked.');
-    } else {
-        appData.gasUrl = newGasUrl;
+    // DOMから設定用の入力要素が取得できた場合のみ、値を読み取って appData を更新する
+    if (gasUrlEl) {
+        const newGasUrl = gasUrlEl.value.trim();
+        // 意図しない空保存の防止
+        if (appData.gasUrl && !newGasUrl && document.activeElement !== gasUrlEl) {
+            console.warn('Attempted to clear GAS URL automatically. Blocked.');
+        } else {
+            appData.gasUrl = newGasUrl;
+        }
     }
 
-    if (appData.passcode && !newPasscode && document.activeElement !== passcodeEl) {
-        console.warn('Attempted to clear Passcode automatically. Blocked.');
-    } else {
-        appData.passcode = newPasscode;
+    if (passcodeEl) {
+        const newPasscode = passcodeEl.value.trim();
+        if (appData.passcode && !newPasscode && document.activeElement !== passcodeEl) {
+            console.warn('Attempted to clear Passcode automatically. Blocked.');
+        } else {
+            appData.passcode = newPasscode;
+        }
     }
 
     if (vSel) appData.defaultVehicle = vSel.value;

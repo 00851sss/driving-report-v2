@@ -2,10 +2,20 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.2.4";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "1.2.4",
+        date: "2026-03-08",
+        content: "重大な不具合の修正と安全機能の追加\n日またぎ（夜間勤務）時のデータ消失防止の確認ダイアログ追加\nデフォルト車両以外を選択している場合の警告表示機能（車両間違い防止）\n過去・未来の日付を編集している場合の警告表示機能（上書き防止）\n「アプリ内で見る」の表示データ漏れ（給油量・400km超等）の修正\nその他運用安定性の向上"
+    },
+    {
+        version: "1.2.3",
+        date: "2026-03-08",
+        content: "不具合の修正\nデフォルトに設定した車両がホームの｢別タブで開く｣が同期されない\n同期データの時間表示のズレ\nデータ同期の処理方法の変更\n一部設定の変更\nGAS保存時のエラー修正\nその他軽微な修正"
+    },
     {
         version: "1.2.0",
         date: "2026-03-03",
@@ -59,10 +69,48 @@ function initInfo() {
     // 定期取得 (3分おき)
     setInterval(fetchGlobalNotifications, 3 * 60 * 1000);
 
+    let _lastActiveDay = new Date().getDate();
+
     // タブ復帰時にも更新
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
             fetchGlobalNotifications();
+
+            // 日付またぎチェック (アプリを開いたまま翌日になった場合)
+            const currentDay = new Date().getDate();
+            if (currentDay !== _lastActiveDay) {
+                _lastActiveDay = currentDay;
+                const dateInput = document.getElementById('report-date');
+                if (dateInput) {
+                    const ok = await window.showCustomConfirm('日付が更新されています。\n操作日を【本日】にリセットしますか？\n（現在入力中のデータは失われます。夜間運行を継続する場合は「キャンセル」を選んでください）');
+                    if (ok) {
+                        const today = new Date();
+                        const yyyy = today.getFullYear();
+                        const mm = String(today.getMonth() + 1).padStart(2, '0');
+                        const dd = String(today.getDate()).padStart(2, '0');
+                        dateInput.value = `${yyyy}-${mm}-${dd}`;
+                        if (window.showCustomAlert) {
+                            window.showCustomAlert('操作日を本日にリセットしました。');
+                        }
+
+                        // 日付が変わってOKされた時のみ、再同期をかける
+                        if (typeof window.loadFormData === 'function') {
+                            const currentVid = document.getElementById('vehicle-id')?.value;
+                            if (currentVid) {
+                                window.loadFormData();
+                            }
+                        }
+                    }
+                }
+            } else {
+                // 日付が同じ場合は、シンプルに現在選択中の車両データがあれば再取得して最新化する
+                if (typeof window.loadFormData === 'function') {
+                    const currentVid = document.getElementById('vehicle-id')?.value;
+                    if (currentVid) {
+                        window.loadFormData();
+                    }
+                }
+            }
         }
     });
 

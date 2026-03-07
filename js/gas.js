@@ -49,8 +49,25 @@ function applyDayData(values, lastEndMeter) {
 
     const fmtTime = val => {
         if (!val) return '';
-        const m = String(val).match(/T(\d{2}):(\d{2})/);
-        return m ? `${m[1]}:${m[2]}` : String(val);
+        // "1899-12-30T12:05:00.000Z" のようなISO形式、または "21:05" のような文字列の両方に対応する正規表現
+        const m = String(val).match(/(?:T|\b)(\d{1,2}):(\d{2})(?::\d{2})?(?:Z|\.\d+Z)?$/) || String(val).match(/(?:T|\s|^)(\d{1,2}):(\d{2})/);
+        if (m) {
+            let hh = parseInt(m[1], 10);
+            const mm = m[2];
+            // もしUTCのZがついていて、日本時間とずれている場合（1899-12-30T12:05:00.000Z はJSTで 21:05）
+            if (String(val).endsWith('Z') && val.includes('1899-12-30T')) {
+                hh = (hh + 9) % 24;
+            }
+            return `${String(hh).padStart(2, '0')}:${mm}`;
+        }
+
+        // スプレッドシートに直接「930」や「1700」と入力されたケースへの対応
+        const digitMatch = String(val).match(/^(\d{1,2})(\d{2})$/);
+        if (digitMatch) {
+            return `${String(digitMatch[1]).padStart(2, '0')}:${digitMatch[2]}`;
+        }
+
+        return String(val);
     };
 
     const setVal = (id, val) => {
@@ -212,86 +229,118 @@ async function submitSection(section) {
     }
 }
 
-// ---- マスタデータ同期 ----
-async function syncMasterData() {
-    // UIから直接最新の入力を取得（Blurイベント前でも動作するようにする）
-    const gasUrlEl = document.getElementById('gas-url-input');
-    const passcodeEl = document.getElementById('passcode-input');
-    const url = (gasUrlEl ? gasUrlEl.value.trim() : '') || appData.gasUrl;
-    const pass = (passcodeEl ? passcodeEl.value.trim() : '') || appData.passcode;
+/**
+ * スマホ等から選択した CSV File を読み込んでマスタデータに反映する
+ *
+ * フォーマット（1行目ヘッダー、2行目以降データ）:
+ *   車両,運転者,確認者,訪問先
+ *   品川 123 あ 4567,田中太郎,鈴木一郎,本社
+ *   横浜 456 い 8910,佐藤花子,,○○工場
+ *
+ * ※空欄はスキップ。ニックネームは設定画面から別途編集してください。
+ */
+function syncMasterData(file) {
     const msgEl = document.getElementById('status-sync');
+    if (!file) return;
 
-    if (!url || !pass || !url.startsWith('https://')) {
-        if (msgEl) {
-            msgEl.textContent = 'GAS URLとパスコードを正しく設定してください';
-            msgEl.className = 'status-msg visible error';
+    if (msgEl) { msgEl.textContent = '読み込み中...'; msgEl.className = 'status-msg visible sending'; }
+    if (window.showLoading) window.showLoading('CSVを読み込み中...');
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const text = e.target.result;
+            // BOM除去・行分割（1行目ヘッダーはスキップ）
+            const lines = text.split(/\r?\n/)
+                .map(l => l.replace(/^\uFEFF/, '').trim())
+                .filter(l => l);
+            // 1行目がヘッダーかどうか判定（1列目が "車両" や "vehicle" なら飛ばす）
+            const firstCol = (lines[0] || '').split(',')[0].trim().toLowerCase();
+            const startIdx = (firstCol === '車両' || firstCol === 'vehicle') ? 1 : 0;
+            const dataLines = lines.slice(startIdx);
+
+            // 現在のデータをベースにして、CSVからの新規分を追加する（既存のものは保持）
+            const newVehicles = [...(appData.vehicles || [])];
+            const newDrivers = [...(appData.drivers || [])];
+            const newCheckers = [...(appData.checkers || [])];
+            const newDestinations = [...(appData.destinations || [])];
+
+            let addedCount = 0;
+
+            for (const line of dataLines) {
+                const parts = line.split(',');
+                const vehicle = (parts[0] || '').trim();
+                const driver = (parts[1] || '').trim();
+                const checker = (parts[2] || '').trim();
+                const destination = (parts[3] || '').trim();
+
+                if (vehicle && !newVehicles.some(v => v.plate === vehicle)) {
+                    newVehicles.push({ plate: vehicle, nickname: '', sheetUrl: '' });
+                    addedCount++;
+                }
+                if (driver && !newDrivers.some(d => d.name === driver)) {
+                    newDrivers.push({ name: driver, favorite: false });
+                    addedCount++;
+                }
+                if (checker && !newCheckers.some(c => c.name === checker)) {
+                    newCheckers.push({ name: checker, favorite: false });
+                    addedCount++;
+                }
+                if (destination && !newDestinations.some(d => d.name === destination)) {
+                    newDestinations.push({ name: destination, favorite: false });
+                    addedCount++;
+                }
+            }
+
+            if (addedCount === 0 && dataLines.length > 0) {
+                // 追加分がゼロでも、エラーにはせず既存のデータをそのまま生かす
+            }
+
+            appData.vehicles = newVehicles;
+            appData.drivers = newDrivers;
+            appData.checkers = newCheckers;
+            appData.destinations = newDestinations;
+
+            saveSettings();
+            ['vehicle', 'driver', 'checker', 'destination'].forEach(type => {
+                renderTagList(type);
+                updateSelectOptions(type);
+            });
+            if (typeof updateSsLinkArea === 'function') updateSsLinkArea();
+
+            if (msgEl) { msgEl.textContent = `読み込み完了！ (${total} 件)`; msgEl.className = 'status-msg visible success'; }
+            setTimeout(() => { if (msgEl) msgEl.className = 'status-msg'; }, 3000);
+
+        } catch (err) {
+            console.error('[gas.js] syncMasterData (CSV):', err);
+            if (msgEl) { msgEl.textContent = `エラー: ${err.message}`; msgEl.className = 'status-msg visible error'; }
+        } finally {
+            if (window.hideLoading) window.hideLoading();
         }
-        return;
-    }
-
-    if (msgEl) { msgEl.textContent = '同期中...'; msgEl.className = 'status-msg visible sending'; }
-    if (window.showLoading) window.showLoading('マスタデータ同期中...');
-
-    try {
-        if (typeof updateSyncStatus === 'function') updateSyncStatus('syncing');
-        const res = await fetch(url, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'getMaster', passcode: pass }),
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const result = await res.json();
-
-        if (result.status !== 'success') {
-            throw new Error(result.message || 'マスタデータ取得に失敗しました');
-        }
-
-        // リストを上書き（車両はニックネームとシートURLを保持しつつマージ）
-        const newVehicles = result.vehicles || [];
-        const oldVehicles = appData.vehicles || [];
-        appData.vehicles = newVehicles.map(v => {
-            const plate = (v && typeof v === 'object') ? (v.plate || '') : String(v);
-            const gasSheetUrl = (v && typeof v === 'object') ? (v.sheetUrl || '') : '';
-            const old = oldVehicles.find(o => (o && typeof o === 'object' ? o.plate : o) === plate);
-            const oldNickname = (old && typeof old === 'object') ? (old.nickname || '') : '';
-            const sheetUrl = gasSheetUrl || ((old && typeof old === 'object') ? (old.sheetUrl || '') : '');
-            return { plate, nickname: oldNickname, sheetUrl };
-        }).filter(v => v.plate);
-
-        // 文字列の配列だった場合を考慮し、常に {name, favorite} 形式のオブジェクト配列に変換して保存
-        const toObjList = (list) => (list || []).map(item =>
-            (typeof item === 'object' && item !== null) ? item : { name: String(item), favorite: false }
-        ).filter(i => i.name);
-
-        appData.drivers = toObjList(result.drivers);
-        appData.checkers = toObjList(result.checkers);
-        appData.destinations = toObjList(result.destinations);
-
-        // お知らせの更新を追加
-        if (typeof renderUpdateHistory === 'function') {
-            renderUpdateHistory(result.notifications || []);
-        }
-
-        // フロントエンドのUIに反映して保存
-        saveSettings();
-        ['vehicle', 'driver', 'checker', 'destination'].forEach(type => {
-            renderTagList(type);
-            updateSelectOptions(type);
-        });
-
-        if (msgEl) { msgEl.textContent = '同期完了！'; msgEl.className = 'status-msg visible success'; }
-        setTimeout(() => { if (msgEl) msgEl.className = 'status-msg'; }, 3000);
-
-        // スプレッドシートURLボタンの状態を更新
-        if (typeof updateSsLinkArea === 'function') updateSsLinkArea();
-
-
-    } catch (e) {
-        console.error('[gas.js] syncMasterData:', e);
-        if (msgEl) { msgEl.textContent = `エラー: ${e.message}`; msgEl.className = 'status-msg visible error'; }
-    } finally {
-        if (typeof updateSyncStatus === 'function') updateSyncStatus();
+    };
+    reader.onerror = () => {
+        if (msgEl) { msgEl.textContent = 'ファイルの読み込みに失敗しました'; msgEl.className = 'status-msg visible error'; }
         if (window.hideLoading) window.hideLoading();
-    }
+    };
+    reader.readAsText(file, 'UTF-8');
+}
+
+/**
+ * 見本 CSV をダウンロードさせる
+ */
+function downloadSampleCsv() {
+    const content = [
+        '車両,運転者,確認者,訪問先',
+        '品川 123 あ 4567,田中太郎,鈴木一郎,本社',
+        '横浜 456 い 8910,佐藤花子,,○○工場',
+        ',,山田確認者,△△工場',
+    ].join('\r\n');
+
+    const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'master.csv';
+    a.click();
+    URL.revokeObjectURL(url);
 }

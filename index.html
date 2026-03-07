@@ -111,11 +111,18 @@
 
                     <div class="tab-content" id="tab-general">
                         <div class="setting-block">
-                            <div class="setting-block-title">マスタデータ同期</div>
+                            <div class="setting-block-title">マスタデータ読み込み</div>
                             <p style="font-size: 0.8rem; color: var(--color-text-sub); margin-bottom: 8px;">
-                                GAS（スプレッドシート）から、車両・運転者・確認者のリストを取得します。</p>
+                                CSVファイル（車両・運転者・確認者・訪問先のリスト）をスマホから選んで読み込みます。
+                            </p>
+                            <!-- 実際のファイル入力（非表示） -->
+                            <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display:none;">
+                            <!-- ボタンを押すとファイル選択ダイアログが開く -->
                             <button class="btn-secondary" id="btn-sync-master" style="width: 100%; margin-top: 0;"><span
-                                    class="material-symbols-rounded">sync</span> GASからリストを取得</button>
+                                    class="material-symbols-rounded">upload_file</span> CSVファイルを選択</button>
+                            <button class="btn-secondary" id="btn-download-sample-csv"
+                                style="width: 100%; margin-top: 8px;"><span
+                                    class="material-symbols-rounded">download</span> 見本CSVをダウンロード</button>
                             <div class="status-msg" id="status-sync"></div>
                         </div>
                         <div class="setting-block">
@@ -126,6 +133,8 @@
                             <div class="setting-block-title">パスコード</div>
                             <input type="password" id="passcode-input" placeholder="送信用パスコード">
                         </div>
+                        <button class="btn-submit" id="btn-save-gas-settings"
+                            style="width: 100%; margin-top: 16px;">設定を保存する</button>
                     </div>
                 </div>
 
@@ -146,8 +155,9 @@
                         style="font-size: 0.8rem; color: var(--color-text-sub); text-align: center; margin-bottom: 8px;">
                         v1.0.0</div>
                 </div>
-                <div class="modal-body" style="padding: 0;">
-                    <div id="update-history-list" class="update-history-container">
+                <div class="modal-body" style="padding: 0; display: flex; flex-direction: column; overflow: hidden;">
+                    <div id="update-history-list" class="update-history-container"
+                        style="flex: 1; overflow-y: auto; padding: 16px;">
                         <!-- JSで履歴が生成されます -->
                     </div>
                 </div>
@@ -214,6 +224,18 @@
                             class="material-symbols-rounded">settings</span></button>
                 </div>
             </header>
+
+            <div id="vehicle-warning"
+                style="display: none; background: #ea580c; color: white; padding: 10px 16px; margin: 16px 16px 0 16px; border-radius: 8px; font-weight: bold; text-align: center; font-size: 0.9rem; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <span class="material-symbols-rounded">directions_car</span>
+                <span>デフォルト以外の車両を選択しています。間違いありませんか？</span>
+            </div>
+
+            <div id="date-warning"
+                style="display: none; background: #eab308; color: #713f12; padding: 10px 16px; margin: 16px 16px 0 16px; border-radius: 8px; font-weight: bold; text-align: center; font-size: 0.9rem; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <span class="material-symbols-rounded">event_note</span>
+                <span>過去または未来の日付を表示・編集しています</span>
+            </div>
 
             <div class="section-card" style="margin: 16px 16px 24px 16px;">
                 <div class="section-body" style="padding: 16px;">
@@ -744,7 +766,7 @@
     </div>
     <!-- スプレッドシート閲覧用モーダル -->
     <div class="modal-overlay" id="ss-viewer-modal" role="dialog">
-        <div class="modal-sheet" style="height: 95%; max-height: 95%;">
+        <div class="modal-sheet">
             <div class="modal-handle"></div>
             <!-- ヘッダー：月ナビ＋UIバー統合 -->
             <div class="sv-header-bar">

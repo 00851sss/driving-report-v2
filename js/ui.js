@@ -1,66 +1,26 @@
 // --- UI共通制御 ---
+// （スマホ戻るボタンによる履歴管理は無効）
 function initHistoryManagement() {
-    // 初回の状態（ホーム）を履歴にセット
-    if (!window.history.state) {
-        window.history.replaceState({ viewId: 'view-home' }, '', '');
-    }
-
-    // ブラウザの戻る/進むボタン操作を検知
-    window.addEventListener('popstate', (event) => {
-        const state = event.state;
-
-        // 全てのモーダルを一旦閉じる（アニメーション込み）
-        document.querySelectorAll('.modal-overlay.open').forEach(m => {
-            if (m.id !== state?.modalId) {
-                m.classList.add('closing');
-                setTimeout(() => {
-                    m.classList.remove('open', 'closing');
-                }, 300);
-            }
-        });
-
-        if (state) {
-            if (state.modalId) {
-                // モーダルを開く状態
-                const modal = document.getElementById(state.modalId);
-                if (modal) modal.classList.add('open');
-            } else if (state.viewId) {
-                // 通常のView切り替え
-                internalSwitchView(state.viewId);
-            }
-        } else {
-            internalSwitchView('view-home');
-        }
-    });
+    // 何もしない（history管理を廃止）
 }
 
 /**
- * 履歴を積みつつモーダルを開く
+ * モーダルを開く
  */
 function openModalWithHistory(modalId) {
     const modal = document.getElementById(modalId);
-    if (!modal) return;
-
-    modal.classList.add('open');
-    window.history.pushState({ modalId: modalId }, '', '');
+    if (modal) modal.classList.add('open');
 }
 
 /**
- * モーダルを閉じる（履歴を一つ戻すことで popstate に任せる）
+ * モーダルを閉じる
  */
 window.closeModal = function (modalEl) {
     if (!modalEl || modalEl.classList.contains('closing')) return;
-
-    // 現在の履歴がこのモーダルのものなら、戻るボタンをシミュレートする
-    if (window.history.state && window.history.state.modalId === modalEl.id) {
-        window.history.back();
-    } else {
-        // 直接閉じる（popstate を介さない）
-        modalEl.classList.add('closing');
-        setTimeout(() => {
-            modalEl.classList.remove('open', 'closing');
-        }, 300);
-    }
+    modalEl.classList.add('closing');
+    setTimeout(() => {
+        modalEl.classList.remove('open', 'closing');
+    }, 300);
 }
 
 function handleUrlHash() {
@@ -220,15 +180,11 @@ function internalSwitchView(viewId) {
     window.scrollTo(0, 0);
 }
 
-// --- View切り替え（通常用：履歴に追加する） ---
+// --- View切り替え（通常用） ---
 function switchView(viewId) {
     const currentView = document.querySelector('.view.active');
     if (currentView && currentView.id === viewId) return;
-
     internalSwitchView(viewId);
-
-    // 履歴に状態を追加
-    window.history.pushState({ viewId: viewId }, '', '');
 }
 
 // --- 安全な画面遷移（未送信チェック付き） ---

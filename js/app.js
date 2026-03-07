@@ -88,8 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-add-checker')?.addEventListener('click', () => addItemToList('checker'));
     document.getElementById('btn-add-destination')?.addEventListener('click', () => addItemToList('destination'));
 
+    // CSVファイル選択ボタン → hidden input をトリガー
+    const csvFileInput = document.getElementById('csv-file-input');
     document.getElementById('btn-sync-master')?.addEventListener('click', () => {
-        if (typeof syncMasterData === 'function') syncMasterData();
+        if (csvFileInput) csvFileInput.click();
+    });
+    // ファイルが選択されたら読み込む
+    csvFileInput?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file && typeof syncMasterData === 'function') {
+            syncMasterData(file);
+        }
+        e.target.value = ''; // 同じファイルを再選択できるようにリセット
+    });
+    // 見本CSVダウンロード
+    document.getElementById('btn-download-sample-csv')?.addEventListener('click', () => {
+        if (typeof downloadSampleCsv === 'function') downloadSampleCsv();
     });
 
     // 訪問先モーダル関連の初期化

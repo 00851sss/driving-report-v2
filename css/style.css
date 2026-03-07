@@ -848,8 +848,7 @@ button:disabled {
     background: rgba(0, 0, 0, 0.5);
     display: none;
     justify-content: center;
-    align-items: flex-end;
-    /* 荳九°繧峨せ繝ｩ繧､繝峨い繝・・縺吶ｋ縺溘ａ */
+    align-items: center;
     z-index: 1000;
     backdrop-filter: blur(4px);
 }
@@ -883,23 +882,28 @@ button:disabled {
     }
 }
 
-@keyframes modalSheetUp {
+
+@keyframes modalSheetFadeIn {
     from {
-        transform: translateY(100%);
+        opacity: 0;
+        transform: scale(0.98);
     }
 
     to {
-        transform: translateY(0);
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
-@keyframes modalSheetDown {
+@keyframes modalSheetFadeOut {
     from {
-        transform: translateY(0);
+        opacity: 1;
+        transform: scale(1);
     }
 
     to {
-        transform: translateY(100%);
+        opacity: 0;
+        transform: scale(0.98);
     }
 }
 
@@ -907,24 +911,23 @@ button:disabled {
     background: var(--color-surface);
     width: 100%;
     max-width: 540px;
-    height: 80vh;
-    border-radius: 20px 20px 0 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
     overflow: hidden;
     /* Sheet閾ｪ菴薙・繧ｹ繧ｯ繝ｭ繝ｼ繝ｫ縺輔○縺咤ody縺ｧ蛻ｶ蠕｡ */
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
-    /* translateY(0) 繧呈・遉ｺ縺吶ｋ縺薙→縺ｧ蠎ｧ讓咏ｳｻ繧貞ｮ牙ｮ壹＆縺帙ｋ */
-    transform: translateY(0);
+    box-shadow: var(--shadow-lg);
 }
 
 .modal-overlay.open .modal-sheet {
-    animation: modalSheetUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: modalSheetFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .modal-overlay.closing .modal-sheet {
-    animation: modalSheetDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: modalSheetFadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .modal-header {

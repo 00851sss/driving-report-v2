@@ -73,8 +73,47 @@ window.resetForm = function () {
             if (d) d.value = appData.defaultDriver;
         });
     }
+
+    if (window.updateDateWarning) window.updateDateWarning();
+    if (window.updateVehicleWarning) window.updateVehicleWarning();
 };
 
+window.updateVehicleWarning = function () {
+    const vId = document.getElementById('vehicle-id');
+    const warningEl = document.getElementById('vehicle-warning');
+    if (!vId || !warningEl) return;
+
+    const currentVid = vId.value;
+    const defaultVid = appData.defaultVehicle;
+
+    // 車両が選択されており、かつデフォルト車両と異なる場合に警告を表示
+    if (currentVid && defaultVid && currentVid !== defaultVid) {
+        warningEl.style.display = 'flex';
+    } else {
+        warningEl.style.display = 'none';
+    }
+};
+
+window.updateDateWarning = function () {
+    const dateInput = document.getElementById('report-date');
+    const warningEl = document.getElementById('date-warning');
+    if (!dateInput || !warningEl) return;
+
+    const selectedDate = dateInput.value;
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    if (selectedDate && selectedDate !== todayStr) {
+        warningEl.style.display = 'flex';
+    } else {
+        warningEl.style.display = 'none';
+    }
+};
+
+// DOM初期化
 document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('report-date');
     if (dateInput && !dateInput.value) {
@@ -87,7 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (appData.defaultVehicle) {
         const vId = document.getElementById('vehicle-id');
-        if (vId) vId.value = appData.defaultVehicle;
+        if (vId) {
+            vId.value = appData.defaultVehicle;
+            vId.dispatchEvent(new Event('change', { bubbles: true })); // UI連動のためイベント発火
+        }
     }
     if (appData.defaultDriver) {
         ['driver-name-1', 'driver-name-2', 'driver-name-3'].forEach(id => {
@@ -97,13 +139,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('report-date')?.addEventListener('change', () => {
+        if (window.updateDateWarning) window.updateDateWarning();
         if (window.resetForm) window.resetForm();
         if (typeof loadDayData === 'function') loadDayData();
     });
     document.getElementById('vehicle-id')?.addEventListener('change', () => {
+        if (window.updateVehicleWarning) window.updateVehicleWarning();
         if (window.resetForm) window.resetForm();
         if (typeof loadDayData === 'function') loadDayData();
     });
+
+    if (window.updateDateWarning) window.updateDateWarning();
+    if (window.updateVehicleWarning) window.updateVehicleWarning();
 
     setTimeout(() => { if (typeof loadDayData === 'function') loadDayData(); }, 100);
 
@@ -384,6 +431,11 @@ function setupRecordPhases(recordNum) {
 window.collectData = function () {
     const g = id => document.getElementById(id)?.value ?? '';
     const r = name => document.querySelector(`input[name="${name}"]:checked`)?.value ?? '';
+    const t = id => {
+        const val = g(id);
+        if (!val) return '';
+        return val;
+    };
 
     let passcode = '';
     try { const settings = JSON.parse(localStorage.getItem('app-settings') || '{}'); passcode = settings.passcode || ''; } catch (e) { }
@@ -400,11 +452,11 @@ window.collectData = function () {
 
     return {
         date: g('report-date'), vehicleId: g('vehicle-id'), passcode: passcode,
-        preCheckTime: g('pre-check-time'), preCheckMethod: r('pre-check-method'), preChecker: g('pre-checker'), preAlcohol: r('pre-alcohol'), preAlcoholVal: g('pre-alcohol-val'),
-        driver1: g('driver-name-1'), destination1: g('destination-1'), startTime1: g('start-time-1'), endTime1: g('end-time-1'), startMeter1: g('start-meter-1'), endMeter1: g('end-meter-1'), distance1: d1, preInspection1: r('pre-inspection-1'), vehicleReturn1: g('vehicle-return-1'),
-        driver2: g('driver-name-2'), destination2: g('destination-2'), startTime2: g('start-time-2'), endTime2: g('end-time-2'), startMeter2: g('start-meter-2'), endMeter2: g('end-meter-2'), distance2: d2, preInspection2: r('pre-inspection-2'), vehicleReturn2: g('vehicle-return-2'),
-        driver3: g('driver-name-3'), destination3: g('destination-3'), startTime3: g('start-time-3'), endTime3: g('end-time-3'), startMeter3: g('start-meter-3'), endMeter3: g('end-meter-3'), distance3: d3, preInspection3: r('pre-inspection-3'), vehicleReturn3: g('vehicle-return-3'),
-        postCheckTime: g('post-check-time'), postCheckMethod: r('post-check-method'), postChecker: g('post-checker'), postAlcohol: r('post-alcohol'), postAlcoholVal: g('post-alcohol-val'),
+        preCheckTime: t('pre-check-time'), preCheckMethod: r('pre-check-method'), preChecker: g('pre-checker'), preAlcohol: r('pre-alcohol'), preAlcoholVal: g('pre-alcohol-val'),
+        driver1: g('driver-name-1'), destination1: g('destination-1'), startTime1: t('start-time-1'), endTime1: t('end-time-1'), startMeter1: g('start-meter-1'), endMeter1: g('end-meter-1'), distance1: d1, preInspection1: r('pre-inspection-1'), vehicleReturn1: g('vehicle-return-1'),
+        driver2: g('driver-name-2'), destination2: g('destination-2'), startTime2: t('start-time-2'), endTime2: t('end-time-2'), startMeter2: g('start-meter-2'), endMeter2: g('end-meter-2'), distance2: d2, preInspection2: r('pre-inspection-2'), vehicleReturn2: g('vehicle-return-2'),
+        driver3: g('driver-name-3'), destination3: g('destination-3'), startTime3: t('start-time-3'), endTime3: t('end-time-3'), startMeter3: g('start-meter-3'), endMeter3: g('end-meter-3'), distance3: d3, preInspection3: r('pre-inspection-3'), vehicleReturn3: g('vehicle-return-3'),
+        postCheckTime: t('post-check-time'), postCheckMethod: r('post-check-method'), postChecker: g('post-checker'), postAlcohol: r('post-alcohol'), postAlcoholVal: g('post-alcohol-val'),
         refuelAmount: g('refuel-amount'), refuelMeter: g('refuel-meter'), notes: g('notes'),
         totalDistance: String(total.toFixed(1)), isOver400km: total >= 400,
     };

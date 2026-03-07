@@ -76,10 +76,28 @@ const svState = {
 // ======================================
 function svFmtTime(val) {
     if (!val) return '';
+    // Dateオブジェクトによる直接処理
     if (typeof val === 'object' && typeof val.getHours === 'function')
         return String(val.getHours()).padStart(2, '0') + ':' + String(val.getMinutes()).padStart(2, '0');
-    const m = String(val).match(/(\d{1,2}):(\d{2})/);
-    return m ? m[0] : '';
+
+    // 文字列処理
+    const m = String(val).match(/(?:T|\b)(\d{1,2}):(\d{2})(?::\d{2})?(?:Z|\.\d+Z)?$/) || String(val).match(/(\d{1,2}):(\d{2})/);
+    if (m) {
+        let hh = parseInt(m[1], 10);
+        const mm = m[2];
+        if (String(val).endsWith('Z') && val.includes('1899-12-30T')) {
+            hh = (hh + 9) % 24;
+        }
+        return `${String(hh).padStart(2, '0')}:${mm}`;
+    }
+
+    // スプレッドシートに直接「930」や「1700」と入力されたケースへの対応
+    const digitMatch = String(val).match(/^(\d{1,2})(\d{2})$/);
+    if (digitMatch) {
+        return `${String(digitMatch[1]).padStart(2, '0')}:${digitMatch[2]}`;
+    }
+
+    return '';
 }
 function svFmtNum(val) {
     if (val === '' || val == null) return '';
@@ -95,8 +113,10 @@ function svParseDayData(rows, di, year, month) {
     const r1 = rows[di * 3 + 1] || [];
     const r2 = rows[di * 3 + 2] || [];
     const n = v => Number(v) || 0;
-    const fmtMethod = row => row[7] === true ? '対面' : (row[9] === true ? '電話' : '');
-    const fmtAlcohol = row => row[12] === true ? '有' : (row[14] === true ? '無' : '');
+    const isChk = v => String(v).match(/^(true|TRUE|1|✓|○|yes|Yes|YES)$/) ? '✓' : '';
+    const fmtMethod = row => row[7] === true || String(row[7]).toUpperCase() === 'TRUE' ? '対面' : (row[9] === true || String(row[9]).toUpperCase() === 'TRUE' ? '電話' : '');
+    const fmtAlcohol = row => row[12] === true || String(row[12]).toUpperCase() === 'TRUE' ? '有' : (row[14] === true || String(row[14]).toUpperCase() === 'TRUE' ? '無' : '');
+
     return {
         dayNum: di + 1,
         dow: new Date(year, month - 1, di + 1).getDay(),
@@ -116,21 +136,21 @@ function svParseDayData(rows, di, year, month) {
         driver1: r0[2] || '', dest1: r0[3] || '',
         start1: svFmtTime(r0[16]), end1: svFmtTime(r0[17]),
         depKm1: svFmtNum(r0[18]), arrKm1: svFmtNum(r0[19]), dist1: svFmtNum(r0[20]),
-        isOver1: r0[21] === true ? '✓' : '', preInsp1: r0[23] === true ? '✓' : '',
+        isOver1: isChk(r0[21]), preInsp1: isChk(r0[23]),
         vReturn1: r0[25] || '', refuelAmt: svFmtNum(r0[22]), notes: r0[24] || '',
         _dep1: n(r0[18]), _arr1: n(r0[19]),
         // 記録2
         driver2: r1[2] || '', dest2: r1[3] || '',
         start2: svFmtTime(r1[16]), end2: svFmtTime(r1[17]),
         depKm2: svFmtNum(r1[18]), arrKm2: svFmtNum(r1[19]), dist2: svFmtNum(r1[20]),
-        isOver2: r1[21] === true ? '✓' : '', preInsp2: r1[23] === true ? '✓' : '',
+        isOver2: isChk(r1[21]), preInsp2: isChk(r1[23]),
         vReturn2: r1[25] || '', refuelMeter: svFmtNum(r1[22]),
         _dep2: n(r1[18]), _arr2: n(r1[19]),
         // 記録3
         driver3: r2[2] || '', dest3: r2[3] || '',
         start3: svFmtTime(r2[16]), end3: svFmtTime(r2[17]),
         depKm3: svFmtNum(r2[18]), arrKm3: svFmtNum(r2[19]), dist3: svFmtNum(r2[20]),
-        isOver3: r2[21] === true ? '✓' : '', preInsp3: r2[23] === true ? '✓' : '',
+        isOver3: isChk(r2[21]), preInsp3: isChk(r2[23]),
         vReturn3: r2[25] || '',
         _dep3: n(r2[18]), _arr3: n(r2[19]),
     };
