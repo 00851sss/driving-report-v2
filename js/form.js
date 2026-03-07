@@ -205,6 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById(btnId);
         btn?.addEventListener('click', async () => {
             const msgEl = document.getElementById(`status-${badgeId}`);
+            const vid = document.getElementById('vehicle-id')?.value;
+            // 車両マスタに存在するかチェック
+            const vehicleExists = appData.vehicles && appData.vehicles.some(v => (v.plate || v) === vid);
+            if (!vehicleExists) {
+                window.showCustomAlert(`車両「${vid || '未選択'}」はマスタに登録されていません。送信できません。`);
+                return;
+            }
+
             let ok = true;
             fields.forEach(({ id, name }) => {
                 if (id) {
@@ -356,6 +364,14 @@ function setupRecordPhases(recordNum) {
             const sTimeEl = document.getElementById(`start-time-${recordNum}`);
             const sMeterEl = document.getElementById(`start-meter-${recordNum}`);
             const msgEl = document.getElementById(`status-record-${recordNum}`);
+            const vid = document.getElementById('vehicle-id')?.value;
+
+            // 車両マスタに存在するかチェック
+            const vehicleExists = appData.vehicles && appData.vehicles.some(v => (v.plate || v) === vid);
+            if (!vehicleExists) {
+                window.showCustomAlert(`車両「${vid || '未選択'}」はマスタに登録されていません。送信できません。`);
+                return;
+            }
 
             // すでに運転中の場合は解除確認
             if (btnStart.getAttribute('data-active') === "true") {
