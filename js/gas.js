@@ -2,13 +2,36 @@
  * gas.js - GAS通信（起動時データ読込・セクション別送信）
  */
 
-// ---- 起動時: 当日データをGASから読み込む ----
-async function loadDayData() {
+/**
+ * 起動時または手動同期ボタンクリック時: 当日データをGASから読み込む
+ * @param {boolean} isManual 手動ボタンからの呼び出し時にバリデーションを表示するかどうか
+ */
+async function loadDayData(isManual = false) {
     const url = appData.gasUrl;
     const pass = appData.passcode;
     const date = document.getElementById('report-date')?.value;
     const vid = document.getElementById('vehicle-id')?.value;
 
+    // 手動実行時のバリデーション
+    if (isManual) {
+        if (!url || !pass) {
+            window.showCustomAlert('設定画面でGAS URLとパスワードを入力してください。');
+            return;
+        }
+        if (!vid) {
+            window.showCustomAlert('車両を選択してください。');
+            return;
+        }
+
+        // 車両マスタに存在するかチェック
+        const exists = appData.vehicles && appData.vehicles.some(v => (v.plate || v) === vid);
+        if (!exists) {
+            const ok = await window.showCustomConfirm(`車両「${vid}」はマスタに登録されていません。\nこのままデータを読み込みますか？`);
+            if (!ok) return;
+        }
+    }
+
+    // 自動実行時 (isManual=false) の最低限のチェック
     if (!url || !pass || !date || !vid) return;
 
     if (window.showLoading) window.showLoading('データ読込中...');
@@ -29,7 +52,9 @@ async function loadDayData() {
         applyDayData(result.values, result.lastEndMeter);
     } catch (e) {
         console.warn('[gas.js] loadDayData failed:', e.message);
-        // エラーは通知しない（任意読込なので失敗してもOK）
+        if (isManual) {
+            window.showCustomAlert(`データの読み込みに失敗しました:\n${e.message}`);
+        }
     } finally {
         if (typeof updateSyncStatus === 'function') updateSyncStatus();
         if (window.hideLoading) window.hideLoading();
@@ -301,7 +326,7 @@ function syncMasterData(file) {
             appData.checkers = newCheckers;
             appData.destinations = newDestinations;
 
-            saveSettings();
+            persistSettings();
             ['vehicle', 'driver', 'checker', 'destination'].forEach(type => {
                 renderTagList(type);
                 updateSelectOptions(type);

@@ -206,10 +206,17 @@ document.addEventListener('DOMContentLoaded', () => {
         btn?.addEventListener('click', async () => {
             const msgEl = document.getElementById(`status-${badgeId}`);
             let ok = true;
-            fields.forEach(({ id }) => {
-                const el = document.getElementById(id);
-                if (el && !el.value) { el.classList.add('error'); ok = false; }
-                else if (el) { el.classList.remove('error'); }
+            fields.forEach(({ id, name }) => {
+                if (id) {
+                    const el = document.getElementById(id);
+                    if (el && !el.value) { el.classList.add('error'); ok = false; }
+                    else if (el) { el.classList.remove('error'); }
+                } else if (name) {
+                    const group = document.querySelector(`input[name="${name}"]`)?.closest('.radio-group');
+                    const checked = document.querySelector(`input[name="${name}"]:checked`);
+                    if (!checked) { group?.classList.add('error'); ok = false; }
+                    else { group?.classList.remove('error'); }
+                }
             });
 
             // メーター整合性チェック (到着 >= 出発)
@@ -271,11 +278,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    setupSubmit('btn-submit-pre-check', 'preCheck', 'pre-check', [{ id: 'pre-check-time' }, { id: 'pre-checker' }]);
-    setupSubmit('btn-submit-record-1', 'record1', 'record-1', [{ id: 'destination-1' }, { id: 'end-time-1' }, { id: 'end-meter-1' }]);
-    setupSubmit('btn-submit-record-2', 'record2', 'record-2', [{ id: 'destination-2' }, { id: 'end-time-2' }, { id: 'end-meter-2' }]);
-    setupSubmit('btn-submit-record-3', 'record3', 'record-3', [{ id: 'destination-3' }, { id: 'end-time-3' }, { id: 'end-meter-3' }]);
-    setupSubmit('btn-submit-post-check', 'postCheck', 'post-check', [{ id: 'post-check-time' }, { id: 'post-checker' }]);
+    setupSubmit('btn-submit-pre-check', 'preCheck', 'pre-check', [
+        { id: 'pre-check-time' },
+        { id: 'pre-checker' },
+        { name: 'pre-check-method' },
+        { name: 'pre-alcohol' }
+    ]);
+    setupSubmit('btn-submit-record-1', 'record1', 'record-1', [
+        { id: 'destination-1' },
+        { id: 'end-time-1' },
+        { id: 'end-meter-1' },
+        { id: 'vehicle-return-1' }
+    ]);
+    setupSubmit('btn-submit-record-2', 'record2', 'record-2', [
+        { id: 'destination-2' },
+        { id: 'end-time-2' },
+        { id: 'end-meter-2' },
+        { id: 'vehicle-return-2' }
+    ]);
+    setupSubmit('btn-submit-record-3', 'record3', 'record-3', [
+        { id: 'destination-3' },
+        { id: 'end-time-3' },
+        { id: 'end-meter-3' },
+        { id: 'vehicle-return-3' }
+    ]);
+    setupSubmit('btn-submit-post-check', 'postCheck', 'post-check', [
+        { id: 'post-check-time' },
+        { id: 'post-checker' },
+        { name: 'post-check-method' },
+        { name: 'post-alcohol' }
+    ]);
     setupSubmit('btn-submit-refuel', 'refuel', 'refuel', []);
 });
 
@@ -355,10 +387,21 @@ function setupRecordPhases(recordNum) {
 
             // 未入力チェックと赤枠表示
             let ok = true;
+            // 入力フィールドのチェック
             [driverEl, sTimeEl, sMeterEl].forEach(el => {
                 if (el && !el.value) { el.classList.add('error'); ok = false; }
                 else if (el) { el.classList.remove('error'); }
             });
+            // ラジオボタン（点検実施）のチェック
+            const inspectionName = `pre-inspection-${recordNum}`;
+            const inspectionGroup = document.querySelector(`input[name="${inspectionName}"]`)?.closest('.radio-group');
+            const inspectionChecked = document.querySelector(`input[name="${inspectionName}"]:checked`);
+            if (!inspectionChecked) {
+                inspectionGroup?.classList.add('error');
+                ok = false;
+            } else {
+                inspectionGroup?.classList.remove('error');
+            }
 
             if (!ok) {
                 if (msgEl) { msgEl.textContent = '必須項目を入力してください'; msgEl.className = 'status-msg visible error'; }

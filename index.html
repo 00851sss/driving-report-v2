@@ -212,7 +212,7 @@
                 </div>
                 <div class="header-actions">
                     <button class="btn-icon" id="btn-reload-data"
-                        onclick="if(window.resetForm) window.resetForm(); if(typeof loadDayData === 'function') loadDayData();"
+                        onclick="if(window.resetForm) window.resetForm(); if(typeof loadDayData === 'function') loadDayData(true);"
                         aria-label="データ更新"><span class="material-symbols-rounded">sync</span></button>
                     <button class="btn-icon" id="btn-theme-toggle" aria-label="テーマ切替"><span
                             class="material-symbols-rounded">dark_mode</span></button>
@@ -335,8 +335,7 @@
                     <div class="field-group" style="flex:1">
                         <div class="field-label">確認方法</div>
                         <div class="radio-group" role="group">
-                            <label><input type="radio" name="pre-check-method" value="対面"
-                                    checked><span>対面</span></label>
+                            <label><input type="radio" name="pre-check-method" value="対面"><span>対面</span></label>
                             <label><input type="radio" name="pre-check-method" value="電話"><span>電話</span></label>
                         </div>
                     </div>
@@ -350,7 +349,7 @@
                 <div class="field-group">
                     <div class="field-label">酒気帯び</div>
                     <div class="radio-group" role="group">
-                        <label><input type="radio" name="pre-alcohol" value="無" checked><span>無</span></label>
+                        <label><input type="radio" name="pre-alcohol" value="無"><span>無</span></label>
                         <label><input type="radio" name="pre-alcohol" value="有"><span>有</span></label>
                     </div>
                 </div>
@@ -384,8 +383,7 @@
                     <div class="field-group" style="flex:1">
                         <div class="field-label">確認方法</div>
                         <div class="radio-group" role="group">
-                            <label><input type="radio" name="post-check-method" value="対面"
-                                    checked><span>対面</span></label>
+                            <label><input type="radio" name="post-check-method" value="対面"><span>対面</span></label>
                             <label><input type="radio" name="post-check-method" value="電話"><span>電話</span></label>
                         </div>
                     </div>
@@ -399,7 +397,7 @@
                 <div class="field-group">
                     <div class="field-label">酒気帯び</div>
                     <div class="radio-group" role="group">
-                        <label><input type="radio" name="post-alcohol" value="無" checked><span>無</span></label>
+                        <label><input type="radio" name="post-alcohol" value="無"><span>無</span></label>
                         <label><input type="radio" name="post-alcohol" value="有"><span>有</span></label>
                     </div>
                 </div>
@@ -425,7 +423,7 @@
                     <div class="field-group">
                         <div class="field-label">点検実施</div>
                         <div class="radio-group" role="group">
-                            <label><input type="radio" name="pre-inspection-1" value="実施" checked><span>済</span></label>
+                            <label><input type="radio" name="pre-inspection-1" value="実施"><span>済</span></label>
                             <label><input type="radio" name="pre-inspection-1" value="未実施"><span>未</span></label>
                         </div>
                     </div>
@@ -514,7 +512,7 @@
                     <div class="field-group">
                         <div class="field-label">点検実施</div>
                         <div class="radio-group" role="group">
-                            <label><input type="radio" name="pre-inspection-2" value="実施" checked><span>済</span></label>
+                            <label><input type="radio" name="pre-inspection-2" value="実施"><span>済</span></label>
                             <label><input type="radio" name="pre-inspection-2" value="未実施"><span>未</span></label>
                         </div>
                     </div>
@@ -602,7 +600,7 @@
                     <div class="field-group">
                         <div class="field-label">点検実施</div>
                         <div class="radio-group" role="group">
-                            <label><input type="radio" name="pre-inspection-3" value="実施" checked><span>済</span></label>
+                            <label><input type="radio" name="pre-inspection-3" value="実施"><span>済</span></label>
                             <label><input type="radio" name="pre-inspection-3" value="未実施"><span>未</span></label>
                         </div>
                     </div>

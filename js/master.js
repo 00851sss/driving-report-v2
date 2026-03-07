@@ -13,7 +13,7 @@ function addItemToList(type) {
             appData.vehicles.push({ plate: plate, nickname: nickname });
             if (nickInput) nickInput.value = '';
             input.value = '';
-            saveSettings();
+            persistSettings();
             renderTagList(type);
             updateSelectOptions(type);
         }
@@ -32,7 +32,7 @@ function addItemToList(type) {
     }
 
     input.value = '';
-    saveSettings();
+    persistSettings();
     renderTagList(type);
     updateSelectOptions(type);
 }
@@ -64,7 +64,7 @@ async function removeItemFromList(type, name) {
     } else if (type === 'destination') {
         appData.destinations = appData.destinations.filter(d => (typeof d === 'string' ? d : d.name) !== (typeof name === 'string' ? name : name.name));
     }
-    saveSettings();
+    persistSettings();
     renderTagList(type);
     updateSelectOptions(type);
 }
@@ -219,7 +219,7 @@ function updateSelectOptions(type) {
 function toggleFavorite(type, item) {
     if (typeof item !== 'object') return;
     item.favorite = !item.favorite;
-    saveSettings();
+    persistSettings();
     renderTagList(type);
     updateSelectOptions(type);
 }
@@ -229,7 +229,7 @@ async function editVehicleNickname(vehicleObj) {
     const newName = await window.showCustomPrompt('車両編集', '新しいニックネームを入力してください', vehicleObj.nickname || '');
     if (newName !== null) {
         vehicleObj.nickname = newName;
-        saveSettings();
+        persistSettings();
         renderTagList('vehicle');
         updateSelectOptions('vehicle');
         window.showCustomAlert('ニックネームを更新しました');

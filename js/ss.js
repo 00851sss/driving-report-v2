@@ -36,7 +36,7 @@ async function fetchAndCacheVehicleUrl(vid) {
         const result = await res.json();
         if (result.status === 'success' && result.url) {
             const v = appData.vehicles.find(v => v.plate === vid);
-            if (v) { v.sheetUrl = result.url; saveSettings(); }
+            if (v) { v.sheetUrl = result.url; persistSettings(); }
             updateSsLinkArea(); // URL取得後に再描画
         }
     } catch (e) { console.warn('[ss.js] fetchAndCacheVehicleUrl:', e.message); }

@@ -75,19 +75,34 @@ function loadSettings() {
     }
 }
 
+/**
+ * 内部状態 (appData) を localStorage に書き出す。
+ * UIの状態に関わらず、現在の appData をそのまま保存する安全な方法。
+ */
+function persistSettings() {
+    localStorage.setItem('app-settings', JSON.stringify(appData));
+}
+
 const _listenersAdded = new Set();
+/**
+ * UI（ドロップダウン等）から値を読み取って appData を更新し、保存する。
+ * 主に「設定」タブでのユーザー操作時に使用する。
+ */
 function saveSettings() {
     const gasUrlEl = document.getElementById('gas-url-input');
     const passcodeEl = document.getElementById('passcode-input');
     const vSel = document.getElementById('default-vehicle');
     const dSel = document.getElementById('default-driver');
 
+    const activeEl = document.activeElement;
+
     // DOMから設定用の入力要素が取得できた場合のみ、値を読み取って appData を更新する
     if (gasUrlEl) {
         const newGasUrl = gasUrlEl.value.trim();
-        // 意図しない空保存の防止
-        if (appData.gasUrl && !newGasUrl && document.activeElement !== gasUrlEl) {
-            console.warn('Attempted to clear GAS URL automatically. Blocked.');
+        // 意図しない空保存の防止: 
+        // 既存の値があるのに新しく読み取った値が空で、かつユーザーがその入力欄を操作していない場合は保存をスキップ
+        if (appData.gasUrl && !newGasUrl && activeEl !== gasUrlEl) {
+            console.warn('[state.js] Attempted to clear GAS URL automatically. Blocked.');
         } else {
             appData.gasUrl = newGasUrl;
         }
@@ -95,15 +110,30 @@ function saveSettings() {
 
     if (passcodeEl) {
         const newPasscode = passcodeEl.value.trim();
-        if (appData.passcode && !newPasscode && document.activeElement !== passcodeEl) {
-            console.warn('Attempted to clear Passcode automatically. Blocked.');
+        if (appData.passcode && !newPasscode && activeEl !== passcodeEl) {
+            console.warn('[state.js] Attempted to clear Passcode automatically. Blocked.');
         } else {
             appData.passcode = newPasscode;
         }
     }
 
-    if (vSel) appData.defaultVehicle = vSel.value;
-    if (dSel) appData.defaultDriver = dSel.value;
+    // デフォルト設定も同様にガード
+    if (vSel) {
+        const newV = vSel.value;
+        if (appData.defaultVehicle && !newV && activeEl !== vSel) {
+            console.warn('[state.js] Attempted to clear Default Vehicle automatically. Blocked.');
+        } else {
+            appData.defaultVehicle = newV;
+        }
+    }
+    if (dSel) {
+        const newD = dSel.value;
+        if (appData.defaultDriver && !newD && activeEl !== dSel) {
+            console.warn('[state.js] Attempted to clear Default Driver automatically. Blocked.');
+        } else {
+            appData.defaultDriver = newD;
+        }
+    }
 
-    localStorage.setItem('app-settings', JSON.stringify(appData));
+    persistSettings();
 }
