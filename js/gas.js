@@ -112,6 +112,30 @@ function applyDayData(values, lastEndMeter) {
         }
     };
 
+    // ラジオボタンを復元するヘルパー関数
+    const setRadio = (name, val) => {
+        if (!val) return;
+        const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
+        if (radio) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    };
+
+    // GASデータのチェック値をラジオボタンの値文字列に変換
+    // GAS側: TRUE/FALSE (bool型 or 文字列)、アプリ側: 「実施」/「未実施」
+    const toInspection = val => {
+        if (!val || val === 'false' || val === 'FALSE') return '';
+        const s = String(val).toUpperCase();
+        return (s === 'TRUE' || s === '1' || s === '実施') ? '実施' : '未実施';
+    };
+    // アルコール: 有/無
+    const toAlcohol = val => {
+        if (!val) return '';
+        const s = String(val);
+        return (s === '有' || s === 'true' || s === 'TRUE' || s === '1') ? '有' : '無';
+    };
+
     // Row0 (記録1 + 乗車前チェック)
     setVal('pre-check-time', fmtTime(v(0, 6)));
     setVal('pre-checker', v(0, 11));
@@ -198,6 +222,28 @@ function applyDayData(values, lastEndMeter) {
     } else if (v(2, 16) && window.markAsDriving) {
         window.markAsDriving('3');
     }
+
+    // ラジオボタンの復元（運行前点検チェック）
+    // ① 運行前点検: GAS側は X列 = index23 (TRUE/FALSE または 実施/未実施)
+    setRadio('pre-inspection-1', toInspection(v(0, 23)));
+    setRadio('pre-inspection-2', toInspection(v(1, 23)));
+    setRadio('pre-inspection-3', toInspection(v(2, 23)));
+
+    // ② アルコール (乗務前/後): GAS側は一方がTRUEなら有、もう一方がTRUEなら無
+    // Row0 index12=M列(有:乗前), index14=O列(無:乗前)
+    const preAlcRaw = (v(0, 12) === 'true' || v(0, 12).toUpperCase() === 'TRUE') ? '有'
+        : ((v(0, 14) === 'true' || v(0, 14).toUpperCase() === 'TRUE') ? '無' : '');
+    if (preAlcRaw) setRadio('pre-alcohol', preAlcRaw);
+
+    // Row1 index12=M列(有:乗後), index14=O列(無:乗後)
+    const postAlcRaw = (v(1, 12) === 'true' || v(1, 12).toUpperCase() === 'TRUE') ? '有'
+        : ((v(1, 14) === 'true' || v(1, 14).toUpperCase() === 'TRUE') ? '無' : '');
+    if (postAlcRaw) setRadio('post-alcohol', postAlcRaw);
+
+    // ③ 車両持帰: GAS側は Z列 = index25
+    setVal('vehicle-return-1', v(0, 25));
+    setVal('vehicle-return-2', v(1, 25));
+    setVal('vehicle-return-3', v(2, 25));
 
     // 給油・特記の反映 (GASからの取得はA列〜Z列なので、W列はインデックス22、Y列は24)
     setVal('refuel-amount', v(0, 22)); // 記録1のW列

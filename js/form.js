@@ -36,18 +36,27 @@ window.markAsUnsent = function (taskId, defaultText = '未送信') {
 };
 
 window.resetForm = function () {
-    // 1. 各種入力のクリア (ラジオボタン、日付、車両IDを除く)
-    const inputs = document.querySelectorAll('input:not([type="radio"]), select, textarea');
-    inputs.forEach(el => {
-        if (el.id !== 'report-date' && el.id !== 'vehicle-id') {
-            el.value = '';
-        }
+    // 1. 各種入力のクリア（設定モーダルを除くメインビュー内のみ）
+    // ※ document全体を対象にするとgas-url-input, passcode-input等の設定フィールドも
+    //   クリアされてしまうため、.view クラスを持つ要素内に限定する
+    const viewScope = document.querySelectorAll('.view');
+    viewScope.forEach(view => {
+        view.querySelectorAll('input:not([type="radio"]), select, textarea').forEach(el => {
+            if (el.id !== 'report-date' && el.id !== 'vehicle-id') {
+                el.value = '';
+            }
+        });
     });
     document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
-    document.querySelectorAll('.status-msg').forEach(el => el.className = 'status-msg');
+    // status-msgもメインビュー内のみリセット（設定モーダルのメッセージは残す）
+    viewScope.forEach(view => {
+        view.querySelectorAll('.status-msg').forEach(el => el.className = 'status-msg');
+    });
 
-    // 2. ラジオボタンのリセット（未選択へ）
-    document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+    // 2. ラジオボタンのリセット（メインビュー内のみ）
+    viewScope.forEach(view => {
+        view.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+    });
     const alcohol1Group = document.getElementById('pre-alcohol-val-group');
     if (alcohol1Group) alcohol1Group.style.display = 'none';
     const alcohol2Group = document.getElementById('post-alcohol-val-group');
@@ -270,6 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (err) {
                 if (msgEl) { msgEl.textContent = err; msgEl.className = 'status-msg visible error'; }
+                // status-msgだけだと非表示のビューにある場合に見えないため、アラートでも表示
+                if (window.showCustomAlert) window.showCustomAlert(`送信に失敗しました:\n${err}`);
                 return;
             }
 
@@ -295,20 +306,20 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSubmit('btn-submit-record-1', 'record1', 'record-1', [
         { id: 'destination-1' },
         { id: 'end-time-1' },
-        { id: 'end-meter-1' },
-        { id: 'vehicle-return-1' }
+        { id: 'end-meter-1' }
+        // vehicle-return-1 は任意入力（バリデーション不要）
     ]);
     setupSubmit('btn-submit-record-2', 'record2', 'record-2', [
         { id: 'destination-2' },
         { id: 'end-time-2' },
-        { id: 'end-meter-2' },
-        { id: 'vehicle-return-2' }
+        { id: 'end-meter-2' }
+        // vehicle-return-2 は任意入力（バリデーション不要）
     ]);
     setupSubmit('btn-submit-record-3', 'record3', 'record-3', [
         { id: 'destination-3' },
         { id: 'end-time-3' },
-        { id: 'end-meter-3' },
-        { id: 'vehicle-return-3' }
+        { id: 'end-meter-3' }
+        // vehicle-return-3 は任意入力（バリデーション不要）
     ]);
     setupSubmit('btn-submit-post-check', 'postCheck', 'post-check', [
         { id: 'post-check-time' },
@@ -393,6 +404,7 @@ function setupRecordPhases(recordNum) {
 
                     if (err) {
                         if (msgEl) { msgEl.textContent = '同期エラー: ' + err; msgEl.className = 'status-msg visible error'; }
+                        if (window.showCustomAlert) window.showCustomAlert(`取消の同期に失敗しました:\n${err}`);
                     } else {
                         removeDrivingState(recordNum);
                         if (msgEl) msgEl.className = 'status-msg'; // エラー消去
@@ -440,6 +452,8 @@ function setupRecordPhases(recordNum) {
 
             if (err) {
                 if (msgEl) { msgEl.textContent = '同期に失敗しました: ' + err; msgEl.className = 'status-msg visible error'; }
+                // status-msgが#record-N-arrival内のため出発前フェーズでは不可視。アラートでも通知する
+                if (window.showCustomAlert) window.showCustomAlert(`出発の同期に失敗しました:\n${err}`);
                 return;
             }
 
@@ -477,6 +491,7 @@ function setupRecordPhases(recordNum) {
 
                 if (err) {
                     if (msgEl) { msgEl.textContent = '同期エラー: ' + err; msgEl.className = 'status-msg visible error'; }
+                    if (window.showCustomAlert) window.showCustomAlert(`取消の同期に失敗しました:\n${err}`);
                 } else {
                     if (msgEl) msgEl.className = 'status-msg';
                     removeDrivingState(recordNum);
