@@ -16,7 +16,7 @@
     <link rel="icon" href="icons/icon-192.png" type="image/png">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="css/style.css?v=26">
+    <link rel="stylesheet" href="css/style.css?v=27">
 </head>
 
 <body>
@@ -155,9 +155,8 @@
                         style="font-size: 0.8rem; color: var(--color-text-sub); text-align: center; margin-bottom: 8px;">
                         v1.0.0</div>
                 </div>
-                <div class="modal-body" style="padding: 0; display: flex; flex-direction: column; overflow: hidden;">
-                    <div id="update-history-list" class="update-history-container"
-                        style="flex: 1; overflow-y: auto; padding: 16px;">
+                <div class="modal-body">
+                    <div id="update-history-list" class="update-history-container">
                         <!-- JSで履歴が生成されます -->
                     </div>
                 </div>
@@ -205,7 +204,23 @@
 
         <div id="view-home" class="view active">
             <header class="app-header">
-                <h2>運行日報</h2>
+                <div class="header-title-container" onclick="toggleHeaderMenu(event)" style="position: relative; display: flex; align-items: center; cursor: pointer; padding: 4px; margin-left: -4px; border-radius: 8px; transition: background 0.2s;">
+                    <h2 style="pointer-events: none;">運行日報</h2>
+                    <span class="material-symbols-rounded" style="font-size: 1.4rem; color: var(--color-text-sub); pointer-events: none;">expand_more</span>
+                    
+                    <!-- ドロップダウンメニュー -->
+                    <div id="header-dropdown" class="header-dropdown-menu" style="display: none;">
+                        <div class="dropdown-header">ツール一覧</div>
+                        <a href="#" class="dropdown-item" onclick="alert('準備中です'); return false;">
+                            <span class="material-symbols-rounded">construction</span>
+                            <span>ツール 1 (準備中)</span>
+                        </a>
+                        <a href="#" class="dropdown-item" onclick="alert('準備中です'); return false;">
+                            <span class="material-symbols-rounded">science</span>
+                            <span>ツール 2 (準備中)</span>
+                        </a>
+                    </div>
+                </div>
                 <div id="sync-status" class="sync-status offline">
                     <span class="status-dot"></span>
                     <span class="status-text">オフライン</span>
@@ -240,8 +255,21 @@
             <div class="section-card" style="margin: 16px 16px 24px 16px;">
                 <div class="section-body" style="padding: 16px;">
                     <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <div>
-                            <input type="date" id="report-date" class="control-input">
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="date" id="report-date" class="control-input" style="flex: 1;">
+                            <button id="btn-today" class="btn-today-date" title="今日の日付にする" onclick="(async () => {
+                                const currentDate = document.getElementById('report-date').value;
+                                const today = new Date();
+                                const yyyy = today.getFullYear();
+                                const mm = String(today.getMonth()+1).padStart(2,'0');
+                                const dd = String(today.getDate()).padStart(2,'0');
+                                const todayStr = yyyy+'-'+mm+'-'+dd;
+                                if (currentDate === todayStr) return;
+                                const ok = await window.showCustomConfirm('操作日を【本日 ' + yyyy+'/'+mm+'/'+dd + '】に変更しますか？\n夜間運行を継続する場合は「キャンセル」を選んでください。');
+                                if (!ok) return;
+                                document.getElementById('report-date').value = todayStr;
+                                document.getElementById('report-date').dispatchEvent(new Event('change', {bubbles: true}));
+                            })()">今日</button>
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <select id="vehicle-id" class="control-input" style="flex: 1;">

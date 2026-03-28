@@ -2,10 +2,15 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.2.7";
+const APP_VERSION = "1.2.8";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "1.2.8",
+        date: "2026-03-28",
+        content: "新機能とUI改善\n・日付入力欄の横に「今日」ボタンを追加（ボタン押下時に確認ダイアログも表示）\n・アプリを開いたまま日付が変わった際に自動で再読み込み確認を出す機能を追加\n・ヘッダーの「運行日報」タイトルに他ツールへのリンク用メニューを追加（現在準備中）\n・給油・特記事項の未入力チェックの変更"
+    },
     {
         version: "1.2.7",
         date: "2026-03-28",
@@ -80,45 +85,50 @@ function initInfo() {
     setInterval(fetchGlobalNotifications, 3 * 60 * 1000);
 
     let _lastActiveDay = new Date().getDate();
+    let _dateChangeDialogShown = false; // ダイアログ重複表示防止フラグ
 
-    // タブ復帰時にも更新
+    // 日付またぎチェックの共通処理
+    const checkDateChange = async () => {
+        const currentDay = new Date().getDate();
+        if (currentDay !== _lastActiveDay && !_dateChangeDialogShown) {
+            _lastActiveDay = currentDay;
+            _dateChangeDialogShown = true;
+            const dateInput = document.getElementById('report-date');
+            if (dateInput) {
+                const ok = await window.showCustomConfirm('日付が更新されています。\n操作日を【本日】にリセットしますか？\n（現在入力中のデータは失われます。夜間運行を継続する場合は「キャンセル」を選んでください）');
+                if (ok) {
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    dateInput.value = `${yyyy}-${mm}-${dd}`;
+                    if (window.showCustomAlert) {
+                        window.showCustomAlert('操作日を本日にリセットしました。');
+                    }
+                    if (typeof window.loadFormData === 'function') {
+                        const currentVid = document.getElementById('vehicle-id')?.value;
+                        if (currentVid) window.loadFormData();
+                    }
+                }
+            }
+            _dateChangeDialogShown = false;
+        }
+    };
+
+    // ① 毎分定期チェック（アプリを開いたまま24時を越えた時に対応）
+    setInterval(checkDateChange, 60 * 1000);
+
+    // ② タブ復帰時の日付またぎチェック
     document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
             fetchGlobalNotifications();
+            await checkDateChange();
 
-            // 日付またぎチェック (アプリを開いたまま翌日になった場合)
-            const currentDay = new Date().getDate();
-            if (currentDay !== _lastActiveDay) {
-                _lastActiveDay = currentDay;
-                const dateInput = document.getElementById('report-date');
-                if (dateInput) {
-                    const ok = await window.showCustomConfirm('日付が更新されています。\n操作日を【本日】にリセットしますか？\n（現在入力中のデータは失われます。夜間運行を継続する場合は「キャンセル」を選んでください）');
-                    if (ok) {
-                        const today = new Date();
-                        const yyyy = today.getFullYear();
-                        const mm = String(today.getMonth() + 1).padStart(2, '0');
-                        const dd = String(today.getDate()).padStart(2, '0');
-                        dateInput.value = `${yyyy}-${mm}-${dd}`;
-                        if (window.showCustomAlert) {
-                            window.showCustomAlert('操作日を本日にリセットしました。');
-                        }
-
-                        // 日付が変わってOKされた時のみ、再同期をかける
-                        if (typeof window.loadFormData === 'function') {
-                            const currentVid = document.getElementById('vehicle-id')?.value;
-                            if (currentVid) {
-                                window.loadFormData();
-                            }
-                        }
-                    }
-                }
-            } else {
-                // 日付が同じ場合は、シンプルに現在選択中の車両データがあれば再取得して最新化する
+            // 日付が変わっていない場合は最新データを再取得
+            if (new Date().getDate() === _lastActiveDay) {
                 if (typeof window.loadFormData === 'function') {
                     const currentVid = document.getElementById('vehicle-id')?.value;
-                    if (currentVid) {
-                        window.loadFormData();
-                    }
+                    if (currentVid) window.loadFormData();
                 }
             }
         }

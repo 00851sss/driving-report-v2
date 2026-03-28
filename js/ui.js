@@ -228,6 +228,30 @@ window.safeSwitchView = async function (targetViewId) {
     switchView(targetViewId);
 };
 
+// --- ヘッダーのドロップダウンメニュー制御 ---
+window.toggleHeaderMenu = function(event) {
+    event.stopPropagation(); // 親へのクリック伝播を防ぐ
+    const menu = document.getElementById('header-dropdown');
+    if (menu) {
+        if (menu.style.display === 'none') {
+            menu.style.display = 'flex';
+        } else {
+            menu.style.display = 'none';
+        }
+    }
+};
+
+// メニューの外側をクリックしたら閉じる
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('header-dropdown');
+    if (menu && menu.style.display !== 'none') {
+        const container = event.target.closest('.header-title-container');
+        if (!container) {
+            menu.style.display = 'none';
+        }
+    }
+});
+
 // --- セクションを開く際の確認 ---
 window.openSectionView = async function (viewId, badgeId) {
     const badge = document.getElementById(badgeId);

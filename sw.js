@@ -1,16 +1,16 @@
-const CACHE_NAME = 'driving-report-v26';
+const CACHE_NAME = 'driving-report-v27';
 const ASSETS = [
     'index.html',
-    'css/style.css?v=26',
-    'js/state.js?v=26',
-    'js/ui.js?v=26',
-    'js/info.js?v=26',
-    'js/master.js?v=26',
-    'js/qr.js?v=26',
-    'js/ss.js?v=26',
-    'js/app.js?v=26',
-    'js/form.js?v=26',
-    'js/gas.js?v=26',
+    'css/style.css?v=27',
+    'js/state.js?v=27',
+    'js/ui.js?v=27',
+    'js/info.js?v=27',
+    'js/master.js?v=27',
+    'js/qr.js?v=27',
+    'js/ss.js?v=27',
+    'js/app.js?v=27',
+    'js/form.js?v=27',
+    'js/gas.js?v=27',
     'manifest.json',
     'icons/icon-192.png',
     'icons/icon-512.png'
