@@ -2,10 +2,20 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.2.4";
+const APP_VERSION = "1.2.7";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "1.2.7",
+        date: "2026-03-28",
+        content: "不具合修正\n・更新・日付変更ボタンを押すとGAS URLやパスコードなど共通設定が消えてしまう不具合を修正\n・ページ更新後に運行前点検チェックの選択が外れた状態で送信されてしまう不具合を修正（読込時に正しく復元されるよう対応）\n・出発・取消・送信ボタン押下時にエラーが表示されないケースがある問題を修正（アラートでも通知するよう強化）\n・車両持帰の選択を任意に変更（未選択のまま送信できるよう修正）"
+    },
+    {
+        version: "1.2.6",
+        date: "2026-03-08",
+        content: "安全機能の追加\n未登録車両での送信・出発を防止するバリデーションを追加\nマスタに登録されていない車両では送信・出発操作ができないよう制限"
+    },
     {
         version: "1.2.4",
         date: "2026-03-08",
