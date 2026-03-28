@@ -2,10 +2,15 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.2.8";
+const APP_VERSION = "1.2.9";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "1.2.9",
+        date: "2026-03-28",
+        content: "不具合修正\n・「別タブで開く」操作時、日付を変更しても以前の月（現在の日付など）のタブが開かれてしまう不具合を修正（日付変更時に対応する月のURLを再取得するよう改善）"
+    },
     {
         version: "1.2.8",
         date: "2026-03-28",

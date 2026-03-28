@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupRecordPhases(1); setupRecordPhases(2); setupRecordPhases(3);
 
     // 送信ボタンの処理
-    const setupSubmit = (btnId, sectionId, badgeId, fields) => {
+    const setupSubmit = (btnId, sectionId, badgeId, fields, anyOf = []) => {
         const btn = document.getElementById(btnId);
         btn?.addEventListener('click', async () => {
             const msgEl = document.getElementById(`status-${badgeId}`);
@@ -252,6 +252,27 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         return;
                     }
+                }
+            }
+
+            // anyOf: 指定フィールドのうち少なくとも1つ入力必須チェック
+            if (anyOf.length > 0) {
+                const anyFilled = anyOf.some(id => {
+                    const el = document.getElementById(id);
+                    return el && el.value.trim() !== '';
+                });
+                if (!anyFilled) {
+                    anyOf.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.add('error');
+                    });
+                    if (msgEl) { msgEl.textContent = '給油量・給油メーター・備考のいずれかを入力してください'; msgEl.className = 'status-msg visible error'; }
+                    return;
+                } else {
+                    anyOf.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('error');
+                    });
                 }
             }
 
@@ -327,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'post-check-method' },
         { name: 'post-alcohol' }
     ]);
-    setupSubmit('btn-submit-refuel', 'refuel', 'refuel', []);
+    setupSubmit('btn-submit-refuel', 'refuel', 'refuel', [], ['refuel-amount', 'refuel-meter', 'notes']);
 });
 
 function setupAlcoholToggle(radioName, groupId, inputId) {

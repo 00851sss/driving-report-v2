@@ -453,11 +453,20 @@ function initSs() {
     });
     document.getElementById('vehicle-id')?.addEventListener('change', () => {
         updateSsLinkArea();
-        // 車両選択時にURLが未キャッシュならGASから自動取得（syncと競合しないよう少し遅延）
+        // 車両選択時、常に最新のURLをGASから取得（当月タブへの自動リンク適用のため）
         const vid = document.getElementById('vehicle-id')?.value;
-        if (vid && !getCurrentVehicleSheetUrl() && appData.gasUrl && appData.passcode) {
+        if (vid && appData.gasUrl && appData.passcode) {
             setTimeout(() => fetchAndCacheVehicleUrl(vid), 1500);
         }
     });
+
+    document.getElementById('report-date')?.addEventListener('change', () => {
+        // 日付変更時にも新しいURL（新しい月のタブなど）を取得し直す
+        const vid = document.getElementById('vehicle-id')?.value;
+        if (vid && appData.gasUrl && appData.passcode) {
+            setTimeout(() => fetchAndCacheVehicleUrl(vid), 1500);
+        }
+    });
+
     updateSsLinkArea();
 }
