@@ -2,10 +2,15 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.2.14";
+const APP_VERSION = "1.2.15";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "1.2.15",
+        date: "2026-05-03",
+        content: "不具合修正\n・出発取り消し後、走行距離と運行前点検がリセットされない不具合を修正"
+    },
     {
         version: "1.2.14",
         date: "2026-05-03",

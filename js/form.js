@@ -415,6 +415,12 @@ function setupRecordPhases(recordNum) {
                     driverEl.value = '';
                     sTimeEl.value = '';
                     sMeterEl.value = '';
+                    document.getElementById(`destination-${recordNum}`).value = '';
+                    document.getElementById(`end-time-${recordNum}`).value = '';
+                    document.getElementById(`end-meter-${recordNum}`).value = '';
+                    document.getElementById(`vehicle-return-${recordNum}`).value = '';
+                    document.querySelectorAll(`input[name="pre-inspection-${recordNum}"]`).forEach(r => r.checked = false);
+                    sMeterEl.dispatchEvent(new Event('input'));
                     if (msgEl) { msgEl.textContent = '取消を同期中...'; msgEl.className = 'status-msg visible sending'; }
 
                     btnStart.disabled = true;
@@ -431,6 +437,7 @@ function setupRecordPhases(recordNum) {
                     } else {
                         removeDrivingState(recordNum);
                         if (msgEl) msgEl.className = 'status-msg'; // エラー消去
+                        switchView('view-home');
                     }
                 }
                 return;
@@ -501,6 +508,7 @@ function setupRecordPhases(recordNum) {
                 document.getElementById(`end-time-${recordNum}`).value = '';
                 document.getElementById(`end-meter-${recordNum}`).value = '';
                 document.getElementById(`vehicle-return-${recordNum}`).value = '';
+                document.querySelectorAll(`input[name="pre-inspection-${recordNum}"]`).forEach(r => r.checked = false);
                 document.getElementById(`start-meter-${recordNum}`).dispatchEvent(new Event('input'));
 
                 btnCancel.disabled = true;
@@ -519,6 +527,7 @@ function setupRecordPhases(recordNum) {
                     if (msgEl) msgEl.className = 'status-msg';
                     removeDrivingState(recordNum);
                     markAsUnsent(`record-${recordNum}`);
+                    switchView('view-home');
                 }
             }
         });
