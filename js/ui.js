@@ -39,108 +39,163 @@ function handleUrlHash() {
 
 let currentDestinationTargetId = null;
 
-function initDestinationModal() {
-    const modal = document.getElementById('destination-modal');
-    const inputArea = document.getElementById('destination-modal-input');
-    const btnOk = document.getElementById('btn-dest-modal-ok');
-    const btnCancel = document.getElementById('btn-dest-modal-cancel');
+/** 固定アイテム（常にリスト最上部に表示） */
+const FIXED_DESTINATIONS = ['自宅', '会社'];
 
-    if (!modal || !inputArea || !btnOk || !btnCancel) return;
+/** 現在のルート配列（例: ['自宅', '会社', '前橋']） */
+let destRouteItems = [];
 
-    // 記録1〜3の入力欄クリックでモーダルを開く
-    ['destination-1', 'destination-2', 'destination-3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('click', () => {
-                currentDestinationTargetId = id;
-                inputArea.value = el.value || ''; // 現在の値をテキストエリアにセット
-                renderDestinationModalChips();
-                openModalWithHistory('destination-1' === id ? 'destination-modal' : 'destination-modal'); // IDに関わらずモーダル自体を開く
-            });
-        }
-    });
+/**
+ * ルート入力欄（dest-route-display）を destRouteItems の内容で更新する
+ */
+function updateDestRouteDisplay() {
+    const display = document.getElementById('dest-route-display');
+    const btnUndo = document.getElementById('btn-dest-undo');
 
-    // ※修正：行番号がズレるため destination-modal も History 対応させる
+    if (!display) return;
 
-    // 決定ボタン
-    btnOk.addEventListener('click', () => {
-        if (currentDestinationTargetId) {
-            const el = document.getElementById(currentDestinationTargetId);
-            if (el) {
-                el.value = inputArea.value.trim();
-                el.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-        }
-        window.closeModal(modal);
-        currentDestinationTargetId = null;
-    });
+    // input 要素なので .value で操作
+    display.value = destRouteItems.join('→');
 
-    // キャンセルボタン
-    btnCancel.addEventListener('click', () => {
-        window.closeModal(modal);
-        currentDestinationTargetId = null;
+    // 「一つ戻る」ボタンの有効/無効
+    if (btnUndo) {
+        btnUndo.disabled = destRouteItems.length === 0;
+    }
+}
+
+/**
+ * 固定チップ（自宅・会社）をレンダリング
+ */
+function renderFixedChips() {
+    const container = document.getElementById('destination-fixed-chip-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    FIXED_DESTINATIONS.forEach(name => {
+        const chip = document.createElement('button');
+        chip.className = 'dest-chip fixed';
+        chip.type = 'button';
+        chip.textContent = name;
+        chip.addEventListener('click', () => {
+            destRouteItems.push(name);
+            updateDestRouteDisplay();
+        });
+        container.appendChild(chip);
     });
 }
 
+/**
+ * 登録リストチップをレンダリング（お気に入り優先）
+ */
 function renderDestinationModalChips() {
     const container = document.getElementById('destination-modal-chip-list');
-    const inputArea = document.getElementById('destination-modal-input');
-    if (!container || !inputArea) return;
-
+    if (!container) return;
     container.innerHTML = '';
+
     const list = appData.destinations || [];
 
-    // お気に入りを優先してソート
+    // お気に入り優先ソート
     const sortedList = [...list].sort((a, b) => {
         const aFav = (typeof a === 'object' && a.favorite) ? 1 : 0;
         const bFav = (typeof b === 'object' && b.favorite) ? 1 : 0;
         return bFav - aFav;
     });
 
-    // 現在の入力値を配列化（チェック状態の判定用、全角・半角スペース両方対応）
-    const currentValues = inputArea.value.split(/[\s　]+/).filter(v => v.length > 0);
-
-    sortedList.forEach((item) => {
+    sortedList.forEach(item => {
         const name = typeof item === 'object' ? item.name : item;
         const isFav = typeof item === 'object' && item.favorite;
-        const isChecked = currentValues.includes(name);
 
-        const wrapper = document.createElement('label');
-        wrapper.className = 'checkbox-item' + (isChecked ? ' checked' : '') + (isFav ? ' priority' : '');
-
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = isChecked;
-
-        const labelText = document.createElement('span');
-        labelText.className = 'item-label';
-        labelText.textContent = name;
-
-        wrapper.appendChild(checkbox);
-        wrapper.appendChild(labelText);
-
-        checkbox.addEventListener('change', () => {
-            // デザイン用のクラス切り替え
-            if (checkbox.checked) {
-                wrapper.classList.add('checked');
-            } else {
-                wrapper.classList.remove('checked');
-            }
-
-            let vals = inputArea.value.split(/[\s　]+/).filter(v => v.length > 0);
-            if (checkbox.checked) {
-                if (!vals.includes(name)) {
-                    vals.push(name);
-                }
-            } else {
-                vals = vals.filter(v => v !== name);
-            }
-            inputArea.value = vals.join(' ');
+        const chip = document.createElement('button');
+        chip.className = 'dest-chip' + (isFav ? ' fav' : '');
+        chip.type = 'button';
+        chip.textContent = name;
+        chip.addEventListener('click', () => {
+            destRouteItems.push(name);
+            updateDestRouteDisplay();
         });
-
-        container.appendChild(wrapper);
+        container.appendChild(chip);
     });
 }
+
+/**
+ * 既存の値（スペース区切り or →区切り）を destRouteItems に復元
+ */
+function parseDestinationValue(val) {
+    if (!val || !val.trim()) return [];
+    if (val.includes('→')) {
+        return val.split('→').map(s => s.trim()).filter(s => s.length > 0);
+    }
+    return val.split(/[\s　]+/).filter(s => s.length > 0);
+}
+
+function initDestinationModal() {
+    const modal = document.getElementById('destination-modal');
+    const btnOk = document.getElementById('btn-dest-modal-ok');
+    const btnCancel = document.getElementById('btn-dest-modal-cancel');
+    const btnUndo = document.getElementById('btn-dest-undo');
+    const btnClear = document.getElementById('btn-dest-clear');
+
+    if (!modal || !btnOk || !btnCancel) return;
+
+    // 記録 1〜3 の入力欄クリックでモーダルを開く
+    ['destination-1', 'destination-2', 'destination-3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => {
+                currentDestinationTargetId = id;
+                destRouteItems = parseDestinationValue(el.value);
+                updateDestRouteDisplay();
+                renderFixedChips();
+                renderDestinationModalChips();
+                openModalWithHistory('destination-modal');
+            });
+        }
+    });
+
+    // ルート入力欄を直接編集したときに destRouteItems を同期
+    document.getElementById('dest-route-display')?.addEventListener('input', (e) => {
+        destRouteItems = parseDestinationValue(e.target.value);
+        const btnUndoEl = document.getElementById('btn-dest-undo');
+        if (btnUndoEl) btnUndoEl.disabled = destRouteItems.length === 0;
+    });
+
+    // 一つ戻るボタン
+    btnUndo?.addEventListener('click', () => {
+        if (destRouteItems.length > 0) {
+            destRouteItems.pop();
+            updateDestRouteDisplay();
+        }
+    });
+
+    // 全クリアボタン
+    btnClear?.addEventListener('click', () => {
+        destRouteItems = [];
+        updateDestRouteDisplay();
+    });
+
+    // 決定ボタン
+    btnOk.addEventListener('click', () => {
+        if (currentDestinationTargetId) {
+            const el = document.getElementById(currentDestinationTargetId);
+            const display = document.getElementById('dest-route-display');
+            if (el && display) {
+                el.value = display.value.trim();
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+        window.closeModal(modal);
+        currentDestinationTargetId = null;
+        destRouteItems = [];
+    });
+
+    // キャンセルボタン
+    btnCancel.addEventListener('click', () => {
+        window.closeModal(modal);
+        currentDestinationTargetId = null;
+        destRouteItems = [];
+    });
+}
+
 
 // --- テーマ切り替えロジック ---
 function initTheme() {

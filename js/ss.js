@@ -85,7 +85,9 @@ function svFmtTime(val) {
     if (m) {
         let hh = parseInt(m[1], 10);
         const mm = m[2];
-        if (String(val).endsWith('Z') && val.includes('1899-12-30T')) {
+        // GASはスプレッドシートのJST時刻をUTCのDateとしてJSON送信する。
+        // 「1899-12-30T」(09:00〜23:59 JST) と「1899-12-29T」(00:00〜08:59 JST) の両方に +9時間補正が必要
+        if (String(val).endsWith('Z') && (val.includes('1899-12-30T') || val.includes('1899-12-29T'))) {
             hh = (hh + 9) % 24;
         }
         return `${String(hh).padStart(2, '0')}:${mm}`;

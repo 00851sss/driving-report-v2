@@ -16,7 +16,7 @@
     <link rel="icon" href="icons/icon-192.png" type="image/png">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="css/style.css?v=28">
+    <link rel="stylesheet" href="css/style.css?v=29">
 </head>
 
 <body>
@@ -179,13 +179,33 @@
                 </div>
                 <div class="modal-body">
                     <div class="section-body">
-                        <label class="field-label" for="destination-modal-input">直接入力・編集</label>
-                        <textarea id="destination-modal-input" class="control-input" rows="3"
-                            placeholder="修正が必要な場合はこちらで編集..." style="width: 100%; resize: none;"></textarea>
-
-                        <div class="field-label">登録リストから選択</div>
-                        <div class="tag-list grid-3" id="destination-modal-chip-list">
-                            <!-- JSでチップが生成されます -->
+                        <!-- ① 現在のルート（直接編集可能なinput） -->
+                        <div>
+                            <div class="field-label" style="margin-bottom: 6px;">現在のルート <span style="font-weight:400; opacity:0.6;">（直接編集可）</span></div>
+                            <input type="text" id="dest-route-display"
+                                placeholder="← リストをタップするか直接入力（例: 会社→前橋→会社）"
+                                style="width:100%; font-size:0.9rem;">
+                        </div>
+                        <!-- ② 操作ボタン -->
+                        <div class="dest-route-actions">
+                            <button id="btn-dest-undo" class="btn-secondary dest-action-btn" disabled>
+                                <span class="material-symbols-rounded">undo</span> 一つ戻る
+                            </button>
+                            <button id="btn-dest-clear" class="btn-secondary dest-action-btn">
+                                <span class="material-symbols-rounded">clear_all</span> 全クリア
+                            </button>
+                        </div>
+                        <!-- ③ 固定チップ（自宅・会社） -->
+                        <div>
+                            <div class="field-label" style="margin-bottom: 6px;">固定</div>
+                            <div class="tag-list grid-2" id="destination-fixed-chip-list"></div>
+                        </div>
+                        <!-- ④ 登録リスト -->
+                        <div>
+                            <div class="field-label" style="margin-bottom: 6px;">登録リストから追加</div>
+                            <div class="tag-list grid-3" id="destination-modal-chip-list">
+                                <!-- JSでチップが生成されます -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -836,15 +856,15 @@
 
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="js/state.js?v=25"></script>
-    <script src="js/ui.js?v=25"></script>
-    <script src="js/info.js?v=25"></script>
-    <script src="js/master.js?v=25"></script>
-    <script src="js/qr.js?v=25"></script>
-    <script src="js/ss.js?v=25"></script>
-    <script src="js/app.js?v=25"></script>
-    <script src="js/form.js?v=25"></script>
-    <script src="js/gas.js?v=25"></script>
+    <script src="js/state.js?v=29"></script>
+    <script src="js/ui.js?v=29"></script>
+    <script src="js/info.js?v=29"></script>
+    <script src="js/master.js?v=29"></script>
+    <script src="js/qr.js?v=29"></script>
+    <script src="js/ss.js?v=29"></script>
+    <script src="js/app.js?v=29"></script>
+    <script src="js/form.js?v=29"></script>
+    <script src="js/gas.js?v=29"></script>
 
     <script>
         // サービスワーカーの登録

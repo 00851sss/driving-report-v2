@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 送信ボタンの処理
     const setupSubmit = (btnId, sectionId, badgeId, fields, anyOf = []) => {
         const btn = document.getElementById(btnId);
+        const originalBtnHtml = btn ? btn.innerHTML : '';
         btn?.addEventListener('click', async () => {
             const msgEl = document.getElementById(`status-${badgeId}`);
             const vid = document.getElementById('vehicle-id')?.value;
@@ -284,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ▼ 送信中のUIロック（二重送信防止）
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = ' 送信中...';
+                btn.innerHTML = '<span class="material-symbols-rounded">sync</span> 送信中...';
                 btn.style.opacity = '0.7';
             }
             if (msgEl) { msgEl.textContent = '送信中...'; msgEl.className = 'status-msg visible sending'; }
@@ -294,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ▼ 送信完了後のUIロック解除
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-rounded">check_circle</span> 到着・送信'; // 元のテキスト（CSS等で上書きされるため仮）
+                btn.innerHTML = originalBtnHtml;
                 btn.style.opacity = '1';
             }
 
@@ -391,6 +392,7 @@ function setupRecordPhases(recordNum) {
     const btnCancel = document.getElementById(`btn-cancel-record-${recordNum}`);
 
     if (btnStart) {
+        const originalStartHtml = btnStart.innerHTML;
         btnStart.addEventListener('click', async () => {
             const driverEl = document.getElementById(`driver-name-${recordNum}`);
             const sTimeEl = document.getElementById(`start-time-${recordNum}`);
@@ -462,13 +464,13 @@ function setupRecordPhases(recordNum) {
 
             // 二重送信・操作防止
             btnStart.disabled = true;
-            btnStart.innerHTML = ' 同期中...';
+            btnStart.innerHTML = '<span class="material-symbols-rounded">sync</span> 同期中...';
             btnStart.style.opacity = '0.7';
 
             const err = await submitSection(`record${recordNum}`);
 
             btnStart.disabled = false;
-            btnStart.innerHTML = '出発';
+            btnStart.innerHTML = originalStartHtml;
             btnStart.style.opacity = '1';
 
             if (err) {

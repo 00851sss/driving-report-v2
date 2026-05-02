@@ -777,6 +777,14 @@ button:disabled {
     width: 100%;
 }
 
+.grid-2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100%;
+}
+
+
 .checkbox-item {
     display: flex;
     flex-direction: column;
@@ -834,7 +842,6 @@ button:disabled {
 
 .grid-3 .tag {
     margin: 0 !important;
-    /* 繧ｰ繝ｪ繝・ラ譎ゅ・繝槭・繧ｸ繝ｳ荳崎ｦ・*/
     padding: 10px 4px;
     height: auto;
     min-height: 44px;
@@ -842,9 +849,196 @@ button:disabled {
     text-align: center;
     font-size: 0.85rem;
     white-space: normal;
-    /* 謚倥ｊ霑斐＠繧定ｨｱ蜿ｯ */
     word-break: break-all;
 }
+
+/* ---- 訪問先ルートビルダー ---- */
+
+/* ---- 訪問先ルートビルダー ---- */
+
+/* モーダル内のsection-bodyのgapを狭める */
+#destination-modal .section-body {
+    gap: 10px;
+}
+
+/* ルート表示エリア */
+.dest-route-display {
+    min-height: 44px;
+    background: var(--color-input-bg);
+    border: 1.5px solid var(--color-border);
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 2px;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+}
+
+.dest-route-display.has-items {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.04);
+}
+
+.dest-route-item {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(var(--color-primary-rgb), 0.18);
+    color: var(--color-text);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dest-route-arrow {
+    color: var(--color-text-sub);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0 1px;
+    user-select: none;
+}
+
+.dest-route-placeholder {
+    color: var(--color-text-sub);
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+/* 自由入力行（テキスト + 追加ボタン） */
+.dest-custom-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.dest-custom-input-row input {
+    flex: 1;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+}
+
+/* 追加ボタン（+アイコンのみ） */
+.dest-add-btn {
+    width: 40px !important;
+    height: 40px;
+    padding: 0 !important;
+    flex-shrink: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--color-primary-rgb), 0.1) !important;
+    border-color: rgba(var(--color-primary-rgb), 0.3) !important;
+    color: var(--color-primary) !important;
+    margin-top: 0 !important;
+}
+
+.dest-add-btn:hover {
+    background: rgba(var(--color-primary-rgb), 0.2) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.dest-add-btn .material-symbols-rounded {
+    font-size: 1.2rem;
+}
+
+/* 操作ボタン行 ― 横並び */
+.dest-route-actions {
+    display: flex;
+    flex-direction: row;   /* 確実に横並び */
+    gap: 8px;
+}
+
+/* ★ KEY FIX: btn-secondary の width:100% を上書き */
+.dest-action-btn {
+    flex: 1;
+    width: auto !important;
+    min-width: 0;
+    padding: 8px 8px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+    margin-top: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.dest-action-btn .material-symbols-rounded {
+    font-size: 1rem;
+}
+
+/* タップで追加するチップ */
+.dest-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 8px 4px;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: 10px;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    text-align: center;
+    min-height: 44px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    word-break: break-all;
+    line-height: 1.2;
+    touch-action: manipulation;
+}
+
+.dest-chip:hover {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.06);
+}
+
+.dest-chip:active {
+    transform: scale(0.92);
+    background: rgba(var(--color-primary-rgb), 0.18);
+    border-color: var(--color-primary);
+}
+
+/* 固定アイテム（自宅・会社） */
+.dest-chip.fixed {
+    background: rgba(var(--color-primary-rgb), 0.08);
+    border-color: rgba(var(--color-primary-rgb), 0.35);
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.dest-chip.fixed:active {
+    background: rgba(var(--color-primary-rgb), 0.22);
+}
+
+[data-theme="dark"] .dest-chip.fixed {
+    background: rgba(var(--color-primary-rgb), 0.14);
+}
+
+/* お気に入りマーク */
+.dest-chip.fav::before {
+    content: '★';
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    font-size: 0.5rem;
+    color: var(--color-warning);
+    line-height: 1;
+}
+
+/* グリッド内のdest-chipは横いっぱいに */
+.grid-3 .dest-chip {
+    width: 100%;
+}
+
 
 /* ---- Dialog Box (Center Alert/Confirm) ---- */
 .dialog-overlay {

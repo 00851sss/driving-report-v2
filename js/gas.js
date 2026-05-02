@@ -79,8 +79,10 @@ function applyDayData(values, lastEndMeter) {
         if (m) {
             let hh = parseInt(m[1], 10);
             const mm = m[2];
-            // もしUTCのZがついていて、日本時間とずれている場合（1899-12-30T12:05:00.000Z はJSTで 21:05）
-            if (String(val).endsWith('Z') && val.includes('1899-12-30T')) {
+            // GASはスプレッドシートのJST時刻をUTCのDateとしてJSON送信する。
+            // そのため「1899-12-30T」(09:00〜23:59 JST) と
+            // 「1899-12-29T」(00:00〜08:59 JST) の両方に +9時間補正が必要
+            if (String(val).endsWith('Z') && (val.includes('1899-12-30T') || val.includes('1899-12-29T'))) {
                 hh = (hh + 9) % 24;
             }
             return `${String(hh).padStart(2, '0')}:${mm}`;
@@ -379,7 +381,7 @@ function syncMasterData(file) {
             });
             if (typeof updateSsLinkArea === 'function') updateSsLinkArea();
 
-            if (msgEl) { msgEl.textContent = `読み込み完了！ (${total} 件)`; msgEl.className = 'status-msg visible success'; }
+            if (msgEl) { msgEl.textContent = `読み込み完了！ (${addedCount} 件)`; msgEl.className = 'status-msg visible success'; }
             setTimeout(() => { if (msgEl) msgEl.className = 'status-msg'; }, 3000);
 
         } catch (err) {
