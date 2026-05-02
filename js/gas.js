@@ -403,7 +403,7 @@ function syncMasterData(file) {
  */
 function downloadSampleCsv() {
     const content = [
-        '車両,運転者,確認者,訪問先',
+        '車両,運転者名,確認者名,訪問先',
         '品川 123 あ 4567,田中太郎,鈴木一郎,本社',
         '横浜 456 い 8910,佐藤花子,,○○工場',
         ',,山田確認者,△△工場',

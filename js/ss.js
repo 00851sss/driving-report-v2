@@ -133,7 +133,7 @@ function svParseDayData(rows, di, year, month) {
         postMethod: fmtMethod(r1),
         postChecker: r1[11] || '',
         postAlcohol: fmtAlcohol(r1),
-        postAlcoholVal: r2[13] || '',
+        postAlcoholVal: r2[14] || '',
         // 記録1
         driver1: r0[2] || '', dest1: r0[3] || '',
         start1: svFmtTime(r0[16]), end1: svFmtTime(r0[17]),

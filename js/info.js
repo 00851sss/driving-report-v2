@@ -2,10 +2,15 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.2.15";
+const APP_VERSION = "2.0.0";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "2.0.0",
+        date: "2026-05-03",
+        content: "v2.0.0 リリース\n\n【不具合修正】\n・QRコード生成に失敗した際、確認ダイアログが表示されていた不具合を修正（エラー通知のみ表示するよう変更）\n・月次スプレッドシートビューアで乗務後アルコール数値が誤った列から読み込まれていた不具合を修正\n\n【改善】\n・見本CSVのヘッダー名を「運転者名」「確認者名」に統一（実際のデータと表記を合わせた）"
+    },
     {
         version: "1.2.15",
         date: "2026-05-03",

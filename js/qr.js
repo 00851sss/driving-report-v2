@@ -136,7 +136,7 @@ window.showVehicleQR = function (vehicle) {
         modal.classList.add('open');
     } catch (e) {
         console.error("QR生成エラー", e);
-        window.showCustomConfirm("QRコードの生成に失敗しました。");
+        window.showCustomAlert("QRコードの生成に失敗しました。");
     }
 };
 
