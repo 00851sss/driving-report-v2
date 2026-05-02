@@ -45,6 +45,9 @@ const FIXED_DESTINATIONS = ['自宅', '会社'];
 /** 現在のルート配列（例: ['自宅', '会社', '前橋']） */
 let destRouteItems = [];
 
+/** アンドゥ用履歴スタック */
+let destRouteHistory = [];
+
 /**
  * ルート入力欄（dest-route-display）を destRouteItems の内容で更新する
  */
@@ -57,9 +60,9 @@ function updateDestRouteDisplay() {
     // input 要素なので .value で操作
     display.value = destRouteItems.join('→');
 
-    // 「一つ戻る」ボタンの有効/無効
+    // 「一つ戻る」ボタンの有効/無効（履歴があれば有効）
     if (btnUndo) {
-        btnUndo.disabled = destRouteItems.length === 0;
+        btnUndo.disabled = destRouteHistory.length === 0;
     }
 }
 
@@ -77,6 +80,7 @@ function renderFixedChips() {
         chip.type = 'button';
         chip.textContent = name;
         chip.addEventListener('click', () => {
+            destRouteHistory.push([...destRouteItems]);
             destRouteItems.push(name);
             updateDestRouteDisplay();
         });
@@ -110,6 +114,7 @@ function renderDestinationModalChips() {
         chip.type = 'button';
         chip.textContent = name;
         chip.addEventListener('click', () => {
+            destRouteHistory.push([...destRouteItems]);
             destRouteItems.push(name);
             updateDestRouteDisplay();
         });
@@ -144,6 +149,7 @@ function initDestinationModal() {
             el.addEventListener('click', () => {
                 currentDestinationTargetId = id;
                 destRouteItems = parseDestinationValue(el.value);
+                destRouteHistory = [];
                 updateDestRouteDisplay();
                 renderFixedChips();
                 renderDestinationModalChips();
@@ -156,19 +162,20 @@ function initDestinationModal() {
     document.getElementById('dest-route-display')?.addEventListener('input', (e) => {
         destRouteItems = parseDestinationValue(e.target.value);
         const btnUndoEl = document.getElementById('btn-dest-undo');
-        if (btnUndoEl) btnUndoEl.disabled = destRouteItems.length === 0;
+        if (btnUndoEl) btnUndoEl.disabled = destRouteHistory.length === 0;
     });
 
     // 一つ戻るボタン
     btnUndo?.addEventListener('click', () => {
-        if (destRouteItems.length > 0) {
-            destRouteItems.pop();
+        if (destRouteHistory.length > 0) {
+            destRouteItems = destRouteHistory.pop();
             updateDestRouteDisplay();
         }
     });
 
     // 全クリアボタン
     btnClear?.addEventListener('click', () => {
+        destRouteHistory.push([...destRouteItems]);
         destRouteItems = [];
         updateDestRouteDisplay();
     });

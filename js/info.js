@@ -2,10 +2,20 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "1.2.12";
+const APP_VERSION = "1.2.14";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "1.2.14",
+        date: "2026-05-03",
+        content: "不具合修正\n・バックグラウンドからアプリに戻ったときにデータが再読み込みされない不具合を修正\n・日付またぎ後にリセットしたときもデータが再読み込みされるよう修正\n（内部的に存在しない関数を呼び出していたため、どちらの処理も動作していなかった）"
+    },
+    {
+        version: "1.2.13",
+        date: "2026-05-03",
+        content: "不具合修正\n・訪問先・現場名の選択で「全クリア」を押した後、「一つ戻る」ボタンが使えない不具合を修正\n（全クリア後も「一つ戻る」で全クリア前の状態に戻せるようになりました）"
+    },
     {
         version: "1.2.12",
         date: "2026-05-03",
@@ -125,10 +135,8 @@ function initInfo() {
                     if (window.showCustomAlert) {
                         window.showCustomAlert('操作日を本日にリセットしました。');
                     }
-                    if (typeof window.loadFormData === 'function') {
-                        const currentVid = document.getElementById('vehicle-id')?.value;
-                        if (currentVid) window.loadFormData();
-                    }
+                    const currentVid = document.getElementById('vehicle-id')?.value;
+                    if (currentVid && typeof loadDayData === 'function') loadDayData();
                 }
             }
             _dateChangeDialogShown = false;
@@ -146,10 +154,8 @@ function initInfo() {
 
             // 日付が変わっていない場合は最新データを再取得
             if (new Date().getDate() === _lastActiveDay) {
-                if (typeof window.loadFormData === 'function') {
-                    const currentVid = document.getElementById('vehicle-id')?.value;
-                    if (currentVid) window.loadFormData();
-                }
+                const currentVid = document.getElementById('vehicle-id')?.value;
+                if (currentVid && typeof loadDayData === 'function') loadDayData();
             }
         }
     });

@@ -1,16 +1,16 @@
-const CACHE_NAME = 'driving-report-v29';
+const CACHE_NAME = 'driving-report-v31';
 const ASSETS = [
     'index.html',
-    'css/style.css?v=29',
-    'js/state.js?v=29',
-    'js/ui.js?v=29',
-    'js/info.js?v=29',
-    'js/master.js?v=29',
-    'js/qr.js?v=29',
-    'js/ss.js?v=29',
-    'js/app.js?v=29',
-    'js/form.js?v=29',
-    'js/gas.js?v=29',
+    'css/style.css?v=31',
+    'js/state.js?v=31',
+    'js/ui.js?v=31',
+    'js/info.js?v=31',
+    'js/master.js?v=31',
+    'js/qr.js?v=31',
+    'js/ss.js?v=31',
+    'js/app.js?v=31',
+    'js/form.js?v=31',
+    'js/gas.js?v=31',
     'manifest.json',
     'icons/icon-192.png',
     'icons/icon-512.png'
@@ -28,15 +28,21 @@ self.addEventListener('install', (event) => {
 // キャッシュを更新
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        Promise.all([
-            caches.keys().then((keys) => {
-                return Promise.all(
-                    keys.filter((key) => key !== CACHE_NAME)
-                        .map((key) => caches.delete(key))
-                );
-            }),
-            self.clients.claim() // 全てのクライアントを新しいSWの制御下に置く
-        ])
+        caches.keys().then((keys) => {
+            const oldKeys = keys.filter((key) => key !== CACHE_NAME);
+            const isUpdate = oldKeys.length > 0;
+            return Promise.all([
+                ...oldKeys.map((key) => caches.delete(key)),
+                self.clients.claim()
+            ]).then(() => {
+                // アップデート時のみ全クライアントにリロードを通知
+                if (isUpdate) {
+                    return self.clients.matchAll({ type: 'window' }).then((clients) => {
+                        clients.forEach((client) => client.postMessage({ type: 'SW_UPDATED' }));
+                    });
+                }
+            });
+        })
     );
 });
 
