@@ -16,7 +16,7 @@
     <link rel="icon" href="icons/icon-192.png" type="image/png">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="css/style.css?v=34">
+    <link rel="stylesheet" href="css/style.css?v=35">
 </head>
 
 <body>
@@ -135,6 +135,15 @@
                         </div>
                         <button class="btn-submit" id="btn-save-gas-settings"
                             style="width: 100%; margin-top: 16px;">設定を保存する</button>
+                        <div class="setting-block" id="pwa-install-block" style="display:none; margin-top: 16px;">
+                            <div class="setting-block-title">アプリをインストール</div>
+                            <p style="font-size: 0.8rem; color: var(--color-text-sub); margin-bottom: 8px;">
+                                ホーム画面に追加してアプリとして使えます。
+                            </p>
+                            <button class="btn-secondary" id="btn-install-pwa" style="width: 100%; margin-top: 0;">
+                                <span class="material-symbols-rounded">install_mobile</span> ホーム画面に追加
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -856,17 +865,41 @@
 
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="js/state.js?v=34"></script>
-    <script src="js/ui.js?v=34"></script>
-    <script src="js/info.js?v=34"></script>
-    <script src="js/master.js?v=34"></script>
-    <script src="js/qr.js?v=34"></script>
-    <script src="js/ss.js?v=34"></script>
-    <script src="js/app.js?v=34"></script>
-    <script src="js/form.js?v=34"></script>
-    <script src="js/gas.js?v=34"></script>
+    <script src="js/state.js?v=35"></script>
+    <script src="js/ui.js?v=35"></script>
+    <script src="js/info.js?v=35"></script>
+    <script src="js/master.js?v=35"></script>
+    <script src="js/qr.js?v=35"></script>
+    <script src="js/ss.js?v=35"></script>
+    <script src="js/app.js?v=35"></script>
+    <script src="js/form.js?v=35"></script>
+    <script src="js/gas.js?v=35"></script>
 
     <script>
+        // PWAインストールプロンプト
+        let _deferredInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            _deferredInstallPrompt = e;
+            const block = document.getElementById('pwa-install-block');
+            if (block) block.style.display = 'block';
+        });
+        window.addEventListener('appinstalled', () => {
+            _deferredInstallPrompt = null;
+            const block = document.getElementById('pwa-install-block');
+            if (block) block.style.display = 'none';
+        });
+        document.getElementById('btn-install-pwa')?.addEventListener('click', async () => {
+            if (!_deferredInstallPrompt) return;
+            _deferredInstallPrompt.prompt();
+            const { outcome } = await _deferredInstallPrompt.userChoice;
+            _deferredInstallPrompt = null;
+            if (outcome === 'accepted') {
+                const block = document.getElementById('pwa-install-block');
+                if (block) block.style.display = 'none';
+            }
+        });
+
         // サービスワーカーの登録
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

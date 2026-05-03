@@ -2,10 +2,15 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.0.1";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "2.0.1",
+        date: "2026-05-03",
+        content: "改善\n・設定 → 共通タブに「ホーム画面に追加」ボタンを追加\n　（インストール可能なタイミングでのみ表示されます）"
+    },
     {
         version: "2.0.0",
         date: "2026-05-03",
