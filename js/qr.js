@@ -149,11 +149,13 @@ function printVehicleQR(vehicle) {
     const qrDataUrl = qrCanvas.toDataURL("image/png");
     const printWindow = window.open('', '_blank');
 
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>車両QRプリント - ${plate}</title>
+            <title>車両QRプリント - ${esc(plate)}</title>
             <style>
                 body { font-family: sans-serif; text-align: center; padding: 40px; }
                 .card { border: 2px solid #ccc; padding: 40px; display: inline-block; border-radius: 16px; }
@@ -165,8 +167,8 @@ function printVehicleQR(vehicle) {
         </head>
         <body>
             <div class="card">
-                <div class="nickname">${nickname || '車両'}</div>
-                <div class="plate">${plate}</div>
+                <div class="nickname">${esc(nickname) || '車両'}</div>
+                <div class="plate">${esc(plate)}</div>
                 <img src="${qrDataUrl}">
                 <div class="hint">このQRをスキャンすると車両が自動選択されます</div>
             </div>
