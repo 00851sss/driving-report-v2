@@ -2,10 +2,15 @@
  * info.js - アプリのバージョン管理と更新履歴
  */
 
-const APP_VERSION = "2.0.2";
+const APP_VERSION = "2.0.3";
 const REPORT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdA8xbIC7D6Z2ocp42pcwG8L_ZAFqlItyqTfAxpWZxvb3Z1Ng/viewform?usp=dialog"; // TODO: ここにGoogleフォームなどのURLを設定してください
 
 const UPDATE_HISTORY = [
+    {
+        version: "2.0.3",
+        date: "2026-05-31",
+        content: "改善\n・ヘッダーのツールメニューに「勤怠詳細」ツールへのリンクを追加"
+    },
     {
         version: "2.0.2",
         date: "2026-05-03",
